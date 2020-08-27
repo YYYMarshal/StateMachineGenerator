@@ -7,7 +7,8 @@ public class ItemStateOnDrag : MonoBehaviour, IDragHandler
 {
     public void OnDrag(PointerEventData eventData)
     {
-        SetDraggedPosition(eventData);
+        if(Input.GetMouseButton(0))
+            SetDraggedPosition(eventData);
     }
 
     //https://www.cnblogs.com/ylwshzh/p/4460915.html

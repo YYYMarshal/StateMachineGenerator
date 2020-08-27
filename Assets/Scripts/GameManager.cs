@@ -13,9 +13,10 @@ public class GameManager : MonoBehaviour
         btnCreateState = GameObject.Find("BtnCreateState");
         BGGameManager.GetComponent<Button>().onClick.AddListener(BGGameManagerOnClick);
         btnCreateState.GetComponent<Button>().onClick.AddListener(BtnCreateStateOnClick);
-        //Button btn = null;
-        
         btnCreateState.SetActive(false);
+        //Button btn = null;
+        string str = $"$:{BGGameManager.name}";
+        Debug.Log(str);
     }
 
     void Start()
@@ -29,6 +30,8 @@ public class GameManager : MonoBehaviour
             btnCreateState.SetActive(true);
             btnCreateState.transform.localPosition = GetMousePosition2D(true);
         }
+        //if (Input.GetMouseButtonDown(0) && btnCreateState.activeSelf)
+        //    btnCreateState.SetActive(false);
     }
 
     private Vector2 GetMousePosition2D(bool isReduce)
@@ -49,8 +52,8 @@ public class GameManager : MonoBehaviour
     }
     private void BGGameManagerOnClick()
     {
-        if (btnCreateState.activeSelf)
-            btnCreateState.SetActive(false);
+        //if (btnCreateState.activeSelf)
+        //    btnCreateState.SetActive(false);
     }
     private void BtnCreateStateOnClick()
     {
