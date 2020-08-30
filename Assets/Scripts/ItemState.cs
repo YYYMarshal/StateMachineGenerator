@@ -108,8 +108,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         GlobalVariable.CurtRelated.curtStateIndex = GetCurtStateIndex();
 
-        LineClass lineClass = new LineClass(GlobalVariable.CurtRelated.currentLine, startPos);
-        lineClass.pre = gameObject;
+        LineClass lineClass = new LineClass(GlobalVariable.CurtRelated.currentLine, startPos)
+        {
+            pre = gameObject
+        };
         GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].
             lstLine.Add(lineClass);
 
