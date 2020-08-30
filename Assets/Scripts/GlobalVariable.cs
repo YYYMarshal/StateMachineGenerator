@@ -20,6 +20,8 @@ public class LineClass
     public LineRenderer line = null;
     public Vector3 startPos;
     public Vector3 endPos;
+    public GameObject pre;
+    public GameObject next;
     public LineClass(LineRenderer line, Vector3 startPos, Vector3 endPos = default)
     {
         this.line = line;
