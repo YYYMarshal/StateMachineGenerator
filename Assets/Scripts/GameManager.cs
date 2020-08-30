@@ -14,11 +14,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEditorInternal;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IPointerClickHandler
 {
     private GameObject goBGGameManager;
     private Button btnCreateState;
+
     private void Awake()
     {
         goBGGameManager = GameObject.Find("BGGameManager");
@@ -30,27 +33,26 @@ public class GameManager : MonoBehaviour
     void Start()
     {
     }
-    public float minFov = 15f;
-    public float maxFov = 90f;
-    public float sensitivity = 10f;
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        //Using up is to close the button after the click event of 
+        //creating the status button is executed.
+
+        //V2.0 : Don't use Input.GetMouseButtonDown(1) method anymore, 
+        //so don't need the comments above.
+        if (Input.GetMouseButtonUp(0))
+            btnCreateState.gameObject.SetActive(false);
+
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
             btnCreateState.gameObject.SetActive(true);
             btnCreateState.transform.localPosition = GetMousePosition2D(true);
         }
-        //Using up is to close the button after the click event of 
-        //creating the status button is executed
-        if (Input.GetMouseButtonUp(0))
-            btnCreateState.gameObject.SetActive(false);
-
-        float fov = Camera.main.fieldOfView;
-        fov += Input.GetAxis("Mouse ScrollWheel") * sensitivity;
-        fov = Mathf.Clamp(fov, minFov, maxFov);
-        Camera.main.fieldOfView = fov;
     }
-
     private Vector2 GetMousePosition2D(bool isBtn)
     {
         Vector2 transformParentPivot =
@@ -71,12 +73,14 @@ public class GameManager : MonoBehaviour
     }
     private void BtnCreateStateOnClick()
     {
-        //UnityEditor.AssetDatabase.LoadAssetAtPath
         btnCreateState.gameObject.SetActive(false);
-        GameObject itemState = Instantiate(Resources.Load<GameObject>("Prefabs/ItemState"),
-            GetMousePosition2D(false), Quaternion.identity);
-        itemState.transform.SetParent(goBGGameManager.transform);
-        itemState.AddComponent<ItemState>();
+        GameObject goItemState = Instantiate(Resources.Load<GameObject>("Prefabs/ItemState"),
+           new Vector3(GetMousePosition2D(false).x, GetMousePosition2D(false).y, 0), Quaternion.identity);
+        //Set Canvas as its parent
+        goItemState.transform.SetParent(goBGGameManager.transform.parent);
+        goItemState.AddComponent<ItemState>();
+
+        GlobalVariable.lstItemState.Add(new ItemStateClass(goItemState));
     }
 
 }

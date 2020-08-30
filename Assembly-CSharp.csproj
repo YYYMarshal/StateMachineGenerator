@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\GlobalVariable.cs" />
     <Compile Include="Assets\Scripts\ItemState.cs" />
     <Compile Include="Assets\Scripts\SettingPanel.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
