@@ -10,6 +10,7 @@
 	
 	purpose:	Created before the above time
 *********************************************************************/
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -48,9 +49,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private int GetCurtStateIndex()
     {
-        for (int i = 0; i < GlobalVariable.lstItemState.Count; i++)
+        for (int i = 0; i < GlobalVariable.lstState.Count; i++)
         {
-            if (gameObject.Equals(GlobalVariable.lstItemState[i].goItemState))
+            if (gameObject.Equals(GlobalVariable.lstState[i].goItemState))
             {
                 return i;
             }
@@ -59,10 +60,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private int GetCurtLineIndex()
     {
-        for (int i = 0; i < GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].lstLine.Count; i++)
+        for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
         {
-            if (GlobalVariable.CurtRelated.currentLine.Equals(
-                GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].lstLine[i].line))
+            if (GlobalVariable.curt.line == GlobalVariable.lstLine[i].line)
             {
                 return i;
             }
@@ -81,41 +81,39 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             InstantiateLine();
 
         if (eventData.button == PointerEventData.InputButton.Left &&
-            GlobalVariable.CurtRelated.isStartPaint)
+            GlobalVariable.curt.isStartPaint)
         {
-            Debug.Log("YYY");
-            GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].receivePos = transform.GetChild(3).position;
-            Vector3 endPos = GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].receivePos;
-            GlobalVariable.CurtRelated.currentLine.SetPosition(1, GetRayPoint(endPos));
-            GlobalVariable.CurtRelated.isStartPaint = false;
+            Vector3 endPos = transform.GetChild(3).position;
+            GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].line.SetPosition(1, GetRayPoint(endPos));
+            GlobalVariable.curt.isStartPaint = false;
 
-            GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].
-                lstLine[GlobalVariable.CurtRelated.curtLineIndex].endPos = endPos;
+            GlobalVariable.curt.lineIndex = GetCurtLineIndex();
+            GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next = gameObject;
         }
 
     }
     private void InstantiateLine()
     {
-        GlobalVariable.CurtRelated.isStartPaint = true;
-
-        GlobalVariable.CurtRelated.currentLine = Instantiate(
+        LineRenderer lineTemp = Instantiate(
             Resources.Load<GameObject>("Prefabs/Line"), Vector3.zero, Quaternion.identity).GetComponent<LineRenderer>();
-        GlobalVariable.CurtRelated.currentLine.transform.SetParent(planeLineGroup.transform);
+        lineTemp.transform.SetParent(planeLineGroup.transform);
 
-        GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].launchPos = transform.GetChild(2).position;
-        Vector3 startPos = GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].launchPos;
-        GlobalVariable.CurtRelated.currentLine.SetPosition(0, GetRayPoint(startPos));
+        GlobalVariable.curt.stateIndex = GetCurtStateIndex();
 
-        GlobalVariable.CurtRelated.curtStateIndex = GetCurtStateIndex();
-
-        LineClass lineClass = new LineClass(GlobalVariable.CurtRelated.currentLine, startPos)
+        LineClass lineItem = new LineClass()
         {
-            pre = gameObject
+            line = lineTemp,
+            pre = GlobalVariable.lstState[GlobalVariable.curt.stateIndex].goItemState
         };
-        GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex].
-            lstLine.Add(lineClass);
 
-        GlobalVariable.CurtRelated.curtLineIndex = GetCurtLineIndex();
+        Vector3 startPos = transform.GetChild(2).position;
+        lineItem.line.SetPosition(0, GetRayPoint(startPos));
+
+        GlobalVariable.lstLine.Add(lineItem);
+
+        GlobalVariable.curt.line = lineTemp;
+        GlobalVariable.curt.isStartPaint = true;
+        GlobalVariable.curt.lineIndex = GetCurtLineIndex();
     }
     //https://www.cnblogs.com/ylwshzh/p/4460915.html
     public void OnDrag(PointerEventData eventData)
@@ -148,35 +146,32 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private void OnStateImageDrag_Line()
     {
-        GlobalVariable.CurtRelated.curtStateIndex = GetCurtStateIndex();
-        ItemStateClass itemStateClass = GlobalVariable.lstItemState[GlobalVariable.CurtRelated.curtStateIndex];
-        foreach (LineClass item in itemStateClass.lstLine)
+        GameObject state = gameObject;
+        //foreach (LineClass item in GlobalVariable.lstLine)
+        //{
+        //    item.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
+        //}
+        foreach (LineClass item in GlobalVariable.lstLine)
         {
-            item.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
+            if (state == item.pre)
+                item.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
+            if (state == item.next)
+                item.line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
         }
-        for (int i = 0; i < GlobalVariable.lstItemState.Count; i++)
-        {
-            for (int j = 0; j < GlobalVariable.lstItemState[i].lstLine.Count; j++)
-            {
-                itemStateClass.receivePos = transform.GetChild(3).position;
-                if (itemStateClass.receivePos == GlobalVariable.lstItemState[i].lstLine[j].endPos)
-                {
-                    GlobalVariable.lstItemState[i].lstLine[j].endPos = itemStateClass.receivePos;
-                    GlobalVariable.lstItemState[i].lstLine[j].line.SetPosition(1, GetRayPoint(itemStateClass.receivePos));
-                }
-            }
-        }
+        //for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
+        //{
+        //    if (state == GlobalVariable.lstLine[i].pre)
+        //        GlobalVariable.lstLine[i].line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
+        //    if (state == GlobalVariable.lstLine[i].next)
+        //        GlobalVariable.lstLine[i].line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
+        //}
     }
     private void Update()
     {
-        if (GlobalVariable.CurtRelated.isStartPaint)
+        if (GlobalVariable.curt.isStartPaint)
         {
-            GlobalVariable.CurtRelated.currentLine.SetPosition(1, GetRayPoint(Input.mousePosition));
-            //if (Input.GetMouseButtonDown(1))
-            //    GlobalVariable.isStartPaint = false;
+            GlobalVariable.curt.line.SetPosition(1, GetRayPoint(Input.mousePosition));
         }
-        //if (Input.GetMouseButtonDown(0))
-        //    GlobalVariable.isStartPaint = false;
     }
 
     private Vector3 GetRayPoint(Vector3 vector3)

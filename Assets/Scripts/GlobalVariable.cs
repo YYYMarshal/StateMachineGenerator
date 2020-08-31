@@ -18,44 +18,25 @@ using UnityEngine.UI;
 public class LineClass
 {
     public LineRenderer line = null;
-    public Vector3 startPos;
-    public Vector3 endPos;
     public GameObject pre;
     public GameObject next;
-    public LineClass(LineRenderer line, Vector3 startPos, Vector3 endPos = default)
-    {
-        this.line = line;
-        this.startPos = startPos;
-        this.endPos = endPos;
-    }
 }
-public class ItemStateClass
+public class StateClass
 {
     public GameObject goItemState = null;
-    public InputField iptNamme;
-    public Vector3 launchPos;
-    public Vector3 receivePos;
-
-    public List<LineClass> lstLine = new List<LineClass>();
-    public ItemStateClass(GameObject goItemState)
-    {
-        this.goItemState = goItemState;
-        iptNamme = goItemState.transform.GetChild(1).GetComponent<InputField>();
-        launchPos = goItemState.transform.GetChild(2).position;
-        receivePos = goItemState.transform.GetChild(3).position;
-        lstLine.Clear();
-    }
+    public InputField iptName;
+}
+public class CurtRelatedClass
+{
+    public LineRenderer line = null;
+    public bool isStartPaint = false;
+    public int stateIndex = 0;
+    public int lineIndex = 0;
 }
 
 public class GlobalVariable : MonoBehaviour
 {
-    //Struct don't require the static modifier
-    public struct CurtRelated
-    {
-        public static LineRenderer currentLine = null;
-        public static bool isStartPaint = false;
-        public static int curtStateIndex = 0;
-        public static int curtLineIndex = 0;
-    }
-    public static List<ItemStateClass> lstItemState = new List<ItemStateClass>();
+    public static CurtRelatedClass curt = new CurtRelatedClass();
+    public static List<StateClass> lstState = new List<StateClass>();
+    public static List<LineClass> lstLine = new List<LineClass>();
 }

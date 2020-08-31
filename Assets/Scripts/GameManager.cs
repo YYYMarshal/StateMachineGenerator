@@ -80,7 +80,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         goItemState.transform.SetParent(goBGGameManager.transform.parent);
         goItemState.AddComponent<ItemState>();
 
-        GlobalVariable.lstItemState.Add(new ItemStateClass(goItemState));
+        StateClass state = new StateClass
+        {
+            goItemState = goItemState,
+            iptName = goItemState.transform.GetChild(1).GetComponent<InputField>()
+        };
+        GlobalVariable.lstState.Add(state);
     }
 
 }
