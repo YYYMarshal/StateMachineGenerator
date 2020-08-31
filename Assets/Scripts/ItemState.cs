@@ -72,23 +72,44 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         //Double click with the left mouse button, then open the setting panel.
-        if (eventData.button == PointerEventData.InputButton.Left &&
-            eventData.clickCount == 2)
+        if (eventData.button == PointerEventData.InputButton.Left && eventData.clickCount == 2)
             goSettingPanel.SetActive(true);
 
         //If right-click to the state image gameobject, start drawing ray.
         if (eventData.button == PointerEventData.InputButton.Right)
             InstantiateLine();
 
-        if (eventData.button == PointerEventData.InputButton.Left &&
-            GlobalVariable.curt.isStartPaint)
+        if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.curt.isStartPaint)
         {
-            Vector3 endPos = transform.GetChild(3).position;
-            GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].line.SetPosition(1, GetRayPoint(endPos));
+            GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
             GlobalVariable.curt.isStartPaint = false;
 
-            GlobalVariable.curt.lineIndex = GetCurtLineIndex();
             GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next = gameObject;
+
+            Debug.Log(GlobalVariable.lstLine.Count);
+            bool isRepeated = false;
+            //If the line is repeated, it will be deleted.
+            for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
+            {
+                if (GlobalVariable.curt.lineIndex == i)
+                    continue;
+                if (GlobalVariable.lstLine[i].pre == GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].pre &&
+                    GlobalVariable.lstLine[i].next == GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next)
+                {
+                    isRepeated = true;
+                    GlobalVariable.lstLine.Remove(GlobalVariable.lstLine[GlobalVariable.curt.lineIndex]);
+                    Destroy(planeLineGroup.transform.GetChild(GlobalVariable.curt.lineIndex).gameObject);
+                }
+            }
+            Debug.Log(GlobalVariable.lstLine.Count);
+            Debug.Log("A " + GlobalVariable.curt.lineIndex);
+            //If the line is not repeated, it is judged whether it is self jump. If so, delete.
+            if (!isRepeated && GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].pre == GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next)
+            {
+                GlobalVariable.lstLine.Remove(GlobalVariable.lstLine[GlobalVariable.curt.lineIndex]);
+                Destroy(planeLineGroup.transform.GetChild(GlobalVariable.curt.lineIndex).gameObject);
+            }
+            Debug.Log(GlobalVariable.lstLine.Count);
         }
 
     }
@@ -98,21 +119,19 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             Resources.Load<GameObject>("Prefabs/Line"), Vector3.zero, Quaternion.identity).GetComponent<LineRenderer>();
         lineTemp.transform.SetParent(planeLineGroup.transform);
 
-        GlobalVariable.curt.stateIndex = GetCurtStateIndex();
-
         LineClass lineItem = new LineClass()
         {
             line = lineTemp,
-            pre = GlobalVariable.lstState[GlobalVariable.curt.stateIndex].goItemState
+            pre = gameObject
         };
 
-        Vector3 startPos = transform.GetChild(2).position;
-        lineItem.line.SetPosition(0, GetRayPoint(startPos));
+        lineItem.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
 
         GlobalVariable.lstLine.Add(lineItem);
 
         GlobalVariable.curt.line = lineTemp;
         GlobalVariable.curt.isStartPaint = true;
+        GlobalVariable.curt.stateIndex = GetCurtStateIndex();
         GlobalVariable.curt.lineIndex = GetCurtLineIndex();
     }
     //https://www.cnblogs.com/ylwshzh/p/4460915.html
@@ -147,10 +166,6 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     private void OnStateImageDrag_Line()
     {
         GameObject state = gameObject;
-        //foreach (LineClass item in GlobalVariable.lstLine)
-        //{
-        //    item.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
-        //}
         foreach (LineClass item in GlobalVariable.lstLine)
         {
             if (state == item.pre)
@@ -158,13 +173,6 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             if (state == item.next)
                 item.line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
         }
-        //for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
-        //{
-        //    if (state == GlobalVariable.lstLine[i].pre)
-        //        GlobalVariable.lstLine[i].line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
-        //    if (state == GlobalVariable.lstLine[i].next)
-        //        GlobalVariable.lstLine[i].line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
-        //}
     }
     private void Update()
     {
