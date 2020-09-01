@@ -50,7 +50,9 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         if (eventData.button == PointerEventData.InputButton.Right)
         {
             btnCreateState.gameObject.SetActive(true);
-            btnCreateState.transform.localPosition = GetMousePosition2D(true);
+            btnCreateState.transform.localScale = GetMousePosition2D(true);
+            //2020-9-1 14:34:52
+            //btnCreateState.transform.position = GetMousePosition2D(false);
         }
     }
     private Vector2 GetMousePosition2D(bool isBtn)
@@ -58,9 +60,14 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         Vector2 transformParentPivot =
             btnCreateState.transform.parent.GetComponent<RectTransform>().pivot;
         Vector2 vec;
-        //If it's a "Create State" button, the position of the current button should be
+        //If it's a "BtnCreateState", the position of the current button should be
         //set according to the pivot of the parent object; if it's a state picture,
         //the position should be set to the current position of the mouse.
+
+        //2020-9-1 14:34:52
+        //Because the "BtnCreateState" use the localPosition, the code statement block in "if" must be used;
+        //if the "BtnCreateState", the code statement block in "else" can be used, that is,
+        //the parameter "false" in passed when calling
         if (isBtn)
         {
             vec = new Vector2(
