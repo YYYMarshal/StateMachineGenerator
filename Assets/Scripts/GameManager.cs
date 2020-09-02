@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         if (eventData.button == PointerEventData.InputButton.Right)
         {
             btnCreateState.gameObject.SetActive(true);
-            btnCreateState.transform.localScale = GetMousePosition2D(true);
+            btnCreateState.transform.localPosition = GetMousePosition2D(true);
             //2020-9-1 14:34:52
             //btnCreateState.transform.position = GetMousePosition2D(false);
         }

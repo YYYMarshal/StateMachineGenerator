@@ -86,7 +86,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
             GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next = gameObject;
 
-            Debug.Log(GlobalVariable.lstLine.Count);
+            //Debug.Log(GlobalVariable.lstLine.Count);
             bool isRepeated = false;
             //If the line is repeated, it will be deleted.
             for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
@@ -99,17 +99,24 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                     isRepeated = true;
                     GlobalVariable.lstLine.Remove(GlobalVariable.lstLine[GlobalVariable.curt.lineIndex]);
                     Destroy(planeLineGroup.transform.GetChild(GlobalVariable.curt.lineIndex).gameObject);
+
+                    //GlobalVariable.curt.line = null;
+                    //GlobalVariable.curt.lineIndex = -1;
+
+                    //2020-9-2 12:40:01
+                    //break is necessary!!!
+                    break;
                 }
             }
-            Debug.Log(GlobalVariable.lstLine.Count);
-            Debug.Log("A " + GlobalVariable.curt.lineIndex);
+            //Debug.Log(GlobalVariable.lstLine.Count);
+            //Debug.Log("A " + GlobalVariable.curt.lineIndex);
             //If the line is not repeated, it is judged whether it is self jump. If so, delete.
             if (!isRepeated && GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].pre == GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next)
             {
                 GlobalVariable.lstLine.Remove(GlobalVariable.lstLine[GlobalVariable.curt.lineIndex]);
                 Destroy(planeLineGroup.transform.GetChild(GlobalVariable.curt.lineIndex).gameObject);
             }
-            Debug.Log(GlobalVariable.lstLine.Count);
+            //Debug.Log(GlobalVariable.lstLine.Count);
         }
 
     }
