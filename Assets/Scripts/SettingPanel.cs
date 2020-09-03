@@ -17,9 +17,11 @@ using UnityEngine.UI;
 
 public class SettingPanel : MonoBehaviour
 {
+
     private void Awake()
     {
         transform.GetChild(0).GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
+        transform.GetChild(1).GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         gameObject.SetActive(false);
     }
     // Start is called before the first frame update
@@ -36,5 +38,9 @@ public class SettingPanel : MonoBehaviour
     private void BtnCloseSettingPanelOnClick()
     {
         gameObject.SetActive(false);
+    }
+    private void BtnHelpOnClick()
+    {
+        Debug.Log("Help");
     }
 }
