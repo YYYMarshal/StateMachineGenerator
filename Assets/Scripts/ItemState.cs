@@ -118,10 +118,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.curt.isStartPaint)
         {
             int curtLineIndex = GlobalVariable.curt.lineIndex;
-            GlobalVariable.lstLine[curtLineIndex].line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+            LineClass lineClass = GlobalVariable.lstLine[curtLineIndex];
+            lineClass.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
             GlobalVariable.curt.isStartPaint = false;
 
-            GlobalVariable.lstLine[curtLineIndex].next = gameObject;
+            SetEdgeColliderPoints(lineClass.line, lineClass.edge);
+            lineClass.next = gameObject;
 
             bool isRepeated = false;
             //If the line is repeated, it will be deleted.
@@ -129,11 +131,11 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             {
                 if (curtLineIndex == i)
                     continue;
-                if (GlobalVariable.lstLine[i].pre == GlobalVariable.lstLine[curtLineIndex].pre &&
-                    GlobalVariable.lstLine[i].next == GlobalVariable.lstLine[curtLineIndex].next)
+                if (GlobalVariable.lstLine[i].pre == lineClass.pre &&
+                    GlobalVariable.lstLine[i].next == lineClass.next)
                 {
                     isRepeated = true;
-                    GlobalVariable.lstLine.Remove(GlobalVariable.lstLine[curtLineIndex]);
+                    GlobalVariable.lstLine.Remove(lineClass);
                     Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
 
                     //GlobalVariable.curt.line = null;
@@ -145,9 +147,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 }
             }
             //If the line is not repeated, it is judged whether it is self jump. If so, delete.
-            if (!isRepeated && GlobalVariable.lstLine[curtLineIndex].pre == GlobalVariable.lstLine[curtLineIndex].next)
+            if (!isRepeated && lineClass.pre == lineClass.next)
             {
-                GlobalVariable.lstLine.Remove(GlobalVariable.lstLine[curtLineIndex]);
+                GlobalVariable.lstLine.Remove(lineClass);
                 Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
             }
         }
@@ -162,6 +164,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         LineClass lineItem = new LineClass()
         {
             line = lineTemp,
+            edge = lineTemp.GetComponent<EdgeCollider2D>(),
             pre = gameObject
         };
 
@@ -180,27 +183,23 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             Vector2 targetPos;
             RectTransform rectTrans = gameObject.GetComponent<RectTransform>();
-            //Transform the screen point to world point int rectangle
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
-                rectTrans, eventData.position, eventData.pressEventCamera, out Vector3 worldPoint))
-            {
-                targetPos = worldPoint;
-                DragLimit();
-                //Control state objects will not move out of the window
-                void DragLimit()
-                {
-                    if (worldPoint.x - pivotFromBorder.halfWidth < 0)
-                        targetPos.x = pivotFromBorder.halfWidth;
-                    if (worldPoint.x + pivotFromBorder.halfWidth > Screen.width)
-                        targetPos.x = Screen.width - pivotFromBorder.halfWidth;
+            targetPos = Input.mousePosition;
 
-                    if (worldPoint.y - pivotFromBorder.bottom < 0)
-                        targetPos.y = pivotFromBorder.bottom;
-                    if (worldPoint.y + pivotFromBorder.top > Screen.height)
-                        targetPos.y = Screen.height - pivotFromBorder.top;
-                }
-                rectTrans.position = targetPos;
+            DragLimit();
+            //Control state objects will not move out of the window
+            void DragLimit()
+            {
+                if (Input.mousePosition.x - pivotFromBorder.halfWidth < 0)
+                    targetPos.x = pivotFromBorder.halfWidth;
+                if (Input.mousePosition.x + pivotFromBorder.halfWidth > Screen.width)
+                    targetPos.x = Screen.width - pivotFromBorder.halfWidth;
+
+                if (Input.mousePosition.y - pivotFromBorder.bottom < 0)
+                    targetPos.y = pivotFromBorder.bottom;
+                if (Input.mousePosition.y + pivotFromBorder.top > Screen.height)
+                    targetPos.y = Screen.height - pivotFromBorder.top;
             }
+            rectTrans.position = targetPos;
 
             OnStateImageDrag_LineControl();
             void OnStateImageDrag_LineControl()
@@ -233,4 +232,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         return Vector3.zero;
     }
 
+    private void SetEdgeColliderPoints(LineRenderer line, EdgeCollider2D edge)
+    {
+        for (int i = 0; i < line.positionCount; i++)
+            edge.points[i] = line.GetPosition(i);
+    }
 }

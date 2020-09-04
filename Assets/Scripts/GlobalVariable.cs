@@ -18,6 +18,7 @@ using UnityEngine.UI;
 public class LineClass
 {
     public LineRenderer line = null;
+    public EdgeCollider2D edge = null;
     public GameObject pre;
     public GameObject next;
 }

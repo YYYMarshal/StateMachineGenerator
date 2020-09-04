@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         //Because the "BtnCreateState" use the localPosition, the code statement block in "if" must be used;
         //if the "BtnCreateState", the code statement block in "else" can be used, that is,
         //the parameter "false" in passed when calling
+        //Code Statement Block:代码语句块
         if (isBtn)
         {
             vec = new Vector2(
