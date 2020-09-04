@@ -30,7 +30,6 @@ public class CurtRelatedClass
 {
     public LineRenderer line = null;
     public bool isStartPaint = false;
-    public int stateIndex = 0;
     public int lineIndex = 0;
 }
 

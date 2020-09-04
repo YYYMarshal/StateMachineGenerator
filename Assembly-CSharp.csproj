@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\ItemState.cs" />
     <Compile Include="Assets\Scripts\SettingPanel.cs" />
     <Compile Include="Assets\Scripts\Test.cs" />
+    <Compile Include="Assets\Scripts\TestLine.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/2019.4.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
