@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -41,11 +42,36 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         pivotFromBorder.top = rt.height * (1 - GetComponent<RectTransform>().pivot.y);
         pivotFromBorder.bottom = rt.height * GetComponent<RectTransform>().pivot.y;
 
+        //Because GameObject.Find() can't find banned gameObject, so use Transform.Find(string n)
         goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
 
-        iptName = transform.GetChild(1).GetComponent<InputField>();
+        iptName = transform.Find("IptName").GetComponent<InputField>();
+        transform.Find("BtnDelete").GetComponent<Button>().onClick.AddListener(BtnDeleteOnClick);
+
 
         planeLineGroup = GameObject.Find("PlaneLineGroup");
+    }
+    private void BtnDeleteOnClick()
+    {
+        GlobalVariable.lstState.Remove(GlobalVariable.lstState[GetCurtStateIndex()]);
+        Debug.Log(GlobalVariable.lstState.Count);
+
+        GameObject state = gameObject;
+        foreach (LineClass item in GlobalVariable.lstLine)
+        {
+            if (state == item.pre)
+            {
+                GlobalVariable.lstLine.Remove(item);
+                Destroy(planeLineGroup.transform.GetChild(GetCurtLineIndex(item.line)).gameObject);
+            }
+            if (state == item.next)
+            {
+                GlobalVariable.lstLine.Remove(item);
+                Destroy(planeLineGroup.transform.GetChild(GetCurtLineIndex(item.line)).gameObject);
+            }
+        }
+
+        Destroy(gameObject);
     }
     private int GetCurtStateIndex()
     {
@@ -58,11 +84,11 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
         return -1;
     }
-    private int GetCurtLineIndex()
+    private int GetCurtLineIndex(LineRenderer line)
     {
         for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
         {
-            if (GlobalVariable.curt.line == GlobalVariable.lstLine[i].line)
+            if (line == GlobalVariable.lstLine[i].line)
             {
                 return i;
             }
@@ -81,7 +107,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.curt.isStartPaint)
         {
-            GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
+            GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
             GlobalVariable.curt.isStartPaint = false;
 
             GlobalVariable.lstLine[GlobalVariable.curt.lineIndex].next = gameObject;
@@ -132,14 +158,14 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             pre = gameObject
         };
 
-        lineItem.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
+        lineItem.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
 
         GlobalVariable.lstLine.Add(lineItem);
 
         GlobalVariable.curt.line = lineTemp;
         GlobalVariable.curt.isStartPaint = true;
         GlobalVariable.curt.stateIndex = GetCurtStateIndex();
-        GlobalVariable.curt.lineIndex = GetCurtLineIndex();
+        GlobalVariable.curt.lineIndex = GetCurtLineIndex(lineTemp);
     }
     //https://www.cnblogs.com/ylwshzh/p/4460915.html
     public void OnDrag(PointerEventData eventData)
@@ -153,36 +179,40 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 rectTrans, eventData.position, eventData.pressEventCamera, out Vector3 worldPoint))
             {
                 targetPos = worldPoint;
-
+                DragLimit();
                 //Control state objects will not move out of the window
-                if (worldPoint.x - pivotFromBorder.halfWidth < 0)
-                    targetPos.x = pivotFromBorder.halfWidth;
-                if (worldPoint.x + pivotFromBorder.halfWidth > Screen.width)
-                    targetPos.x = Screen.width - pivotFromBorder.halfWidth;
+                void DragLimit()
+                {
+                    if (worldPoint.x - pivotFromBorder.halfWidth < 0)
+                        targetPos.x = pivotFromBorder.halfWidth;
+                    if (worldPoint.x + pivotFromBorder.halfWidth > Screen.width)
+                        targetPos.x = Screen.width - pivotFromBorder.halfWidth;
 
-                if (worldPoint.y - pivotFromBorder.bottom < 0)
-                    targetPos.y = pivotFromBorder.bottom;
-                if (worldPoint.y + pivotFromBorder.top > Screen.height)
-                    targetPos.y = Screen.height - pivotFromBorder.top;
+                    if (worldPoint.y - pivotFromBorder.bottom < 0)
+                        targetPos.y = pivotFromBorder.bottom;
+                    if (worldPoint.y + pivotFromBorder.top > Screen.height)
+                        targetPos.y = Screen.height - pivotFromBorder.top;
+                }
                 rectTrans.position = targetPos;
             }
 
-            OnStateImageDrag_Line();
-        }
-    }
-    private void OnStateImageDrag_Line()
-    {
-        GameObject state = gameObject;
-        foreach (LineClass item in GlobalVariable.lstLine)
-        {
-            if (state == item.pre)
-                item.line.SetPosition(0, GetRayPoint(transform.GetChild(2).position));
-            if (state == item.next)
-                item.line.SetPosition(1, GetRayPoint(transform.GetChild(3).position));
+            OnStateImageDrag_LineControl();
+            void OnStateImageDrag_LineControl()
+            {
+                GameObject state = gameObject;
+                foreach (LineClass item in GlobalVariable.lstLine)
+                {
+                    if (state == item.pre)
+                        item.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+                    if (state == item.next)
+                        item.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+                }
+            }
         }
     }
     private void Update()
     {
+        Debug.Log(GlobalVariable.lstState.Count);
         if (GlobalVariable.curt.isStartPaint)
         {
             GlobalVariable.curt.line.SetPosition(1, GetRayPoint(Input.mousePosition));

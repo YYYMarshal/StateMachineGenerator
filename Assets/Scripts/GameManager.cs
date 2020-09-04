@@ -42,7 +42,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         //so don't need the comments above.
         if (Input.GetMouseButtonUp(0))
             btnCreateState.gameObject.SetActive(false);
-
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -90,7 +89,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         StateClass state = new StateClass
         {
             goItemState = goItemState,
-            iptName = goItemState.transform.GetChild(1).GetComponent<InputField>()
+            iptName = goItemState.transform.Find("IptName").GetComponent<InputField>()
         };
         GlobalVariable.lstState.Add(state);
     }

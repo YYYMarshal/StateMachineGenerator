@@ -20,8 +20,8 @@ public class SettingPanel : MonoBehaviour
 
     private void Awake()
     {
-        transform.GetChild(0).GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
-        transform.GetChild(1).GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
+        transform.Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
+        transform.Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         gameObject.SetActive(false);
     }
     // Start is called before the first frame update
