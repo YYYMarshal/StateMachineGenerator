@@ -44,7 +44,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         pivotFromBorder.bottom = rt.height * GetComponent<RectTransform>().pivot.y;
 
         //Because GameObject.Find() can't find banned gameObject, so use Transform.Find(string n)
-        goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
+        goSettingPanel = transform.parent.parent.Find("SettingPanel").gameObject;
 
         iptName = transform.Find("IptName").GetComponent<InputField>();
         transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);

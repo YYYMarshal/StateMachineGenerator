@@ -19,12 +19,12 @@ using UnityEditorInternal;
 
 public class GameManager : MonoBehaviour, IPointerClickHandler
 {
-    private GameObject goBGGameManager;
+    private GameObject stateGroup;
     private Button btnCreateState;
 
     private void Awake()
     {
-        goBGGameManager = GameObject.Find("BGGameManager");
+        stateGroup = GameObject.Find("StateGroup");
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);
@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
             Quaternion.identity,
             //Set Canvas as its parent
-            goBGGameManager.transform.parent);
+            stateGroup.transform);
         goItemState.AddComponent<ItemState>();
 
         StateClass state = new StateClass
