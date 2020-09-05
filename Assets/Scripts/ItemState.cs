@@ -34,6 +34,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     private InputField iptName;
 
     private GameObject planeLineGroup;
+    private GameObject btnLineDelGroiup;
 
     private void Awake()
     {
@@ -46,12 +47,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
 
         iptName = transform.Find("IptName").GetComponent<InputField>();
-        transform.Find("BtnDelete").GetComponent<Button>().onClick.AddListener(BtnDeleteOnClick);
-
+        transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);
 
         planeLineGroup = GameObject.Find("PlaneLineGroup");
+        btnLineDelGroiup = GameObject.Find("BtnLineDelGroiup");
     }
-    private void BtnDeleteOnClick()
+    private void BtnStateDeleteOnClick()
     {
         GlobalVariable.lstState.Remove(GlobalVariable.lstState[GetCurtStateIndex()]);
 
@@ -68,12 +69,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             if (state == item.pre)
             {
                 lstLCTemp.Add(item);
-                Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
+                DestroyLineAndBtnDel(curtLineIndex);
             }
             else if (state == item.next)
             {
                 lstLCTemp.Add(item);
-                Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
+                DestroyLineAndBtnDel(curtLineIndex);
             }
         }
         for (int i = 0; i < lstLCTemp.Count; i++)
@@ -112,7 +113,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         //If right-click to the state image gameobject, start drawing ray.
         if (eventData.button == PointerEventData.InputButton.Right)
-            InstantiateLine();
+            CreateLine();
 
         //If left-click to the state image gameobject, end drawing ray.
         if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.curt.isStartPaint)
@@ -122,8 +123,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             lineClass.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
             GlobalVariable.curt.isStartPaint = false;
 
-            SetEdgeColliderPoints(lineClass.line, lineClass.edge);
             lineClass.next = gameObject;
+            ControlBtnLineDel(lineClass);
 
             bool isRepeated = false;
             //If the line is repeated, it will be deleted.
@@ -136,7 +137,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 {
                     isRepeated = true;
                     GlobalVariable.lstLine.Remove(lineClass);
-                    Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
+                    DestroyLineAndBtnDel(curtLineIndex);
 
                     //GlobalVariable.curt.line = null;
                     //GlobalVariable.curt.lineIndex = -1;
@@ -150,21 +151,22 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             if (!isRepeated && lineClass.pre == lineClass.next)
             {
                 GlobalVariable.lstLine.Remove(lineClass);
-                Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
+                DestroyLineAndBtnDel(curtLineIndex);
             }
         }
 
     }
-    private void InstantiateLine()
+    private void CreateLine()
     {
         LineRenderer lineTemp = Instantiate(
-            Resources.Load<GameObject>("Prefabs/Line"), Vector3.zero, Quaternion.identity).GetComponent<LineRenderer>();
-        lineTemp.transform.SetParent(planeLineGroup.transform);
+            Resources.Load<GameObject>("Prefabs/Line"),
+            Vector3.zero,
+            Quaternion.identity,
+            planeLineGroup.transform).GetComponent<LineRenderer>();
 
         LineClass lineItem = new LineClass()
         {
             line = lineTemp,
-            edge = lineTemp.GetComponent<EdgeCollider2D>(),
             pre = gameObject
         };
 
@@ -176,13 +178,33 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         GlobalVariable.curt.isStartPaint = true;
         GlobalVariable.curt.lineIndex = GetCurtLineIndex(lineTemp);
     }
-    //https://www.cnblogs.com/ylwshzh/p/4460915.html
+    private void ControlBtnLineDel(LineClass lineClass, bool isCreate = true)
+    {
+        float x = (lineClass.pre.transform.Find("EndPaintPos").position.x +
+            lineClass.next.transform.Find("StartPaintPos").position.x) / 2f;
+        float y = (lineClass.pre.transform.Find("EndPaintPos").position.y +
+            lineClass.next.transform.Find("StartPaintPos").position.y) / 2f;
+        if (isCreate)
+        {
+            GameObject goBtnLineDel = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLineDel"),
+               new Vector2(x, y), Quaternion.identity, GameObject.Find("BtnLineDelGroiup").transform);
+            goBtnLineDel.AddComponent<BtnLineDel>();
+            lineClass.btnLineDel = goBtnLineDel.GetComponent<Button>();
+        }
+        else
+            lineClass.btnLineDel.transform.position = new Vector2(x, y);
+    }
+    private void DestroyLineAndBtnDel(int curtLineIndex)
+    {
+        Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
+        Destroy(btnLineDelGroiup.transform.GetChild(curtLineIndex).gameObject);
+    }
     public void OnDrag(PointerEventData eventData)
     {
         if (Input.GetMouseButton(0))
         {
             Vector2 targetPos;
-            RectTransform rectTrans = gameObject.GetComponent<RectTransform>();
+            RectTransform stateRectTrans = gameObject.GetComponent<RectTransform>();
             targetPos = Input.mousePosition;
 
             DragLimit();
@@ -199,20 +221,26 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 if (Input.mousePosition.y + pivotFromBorder.top > Screen.height)
                     targetPos.y = Screen.height - pivotFromBorder.top;
             }
-            rectTrans.position = targetPos;
+            stateRectTrans.position = targetPos;
 
             OnStateImageDrag_LineControl();
             void OnStateImageDrag_LineControl()
             {
                 GameObject state = gameObject;
-                foreach (LineClass item in GlobalVariable.lstLine)
+                foreach (LineClass lineClass in GlobalVariable.lstLine)
                 {
-                    if (state == item.pre)
-                        item.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
-                    if (state == item.next)
-                        item.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+                    if (state == lineClass.pre)
+                    {
+                        lineClass.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+                    }
+                    if (state == lineClass.next)
+                    {
+                        lineClass.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+                    }
+                    ControlBtnLineDel(lineClass, false);
                 }
             }
+
         }
     }
     private void Update()
@@ -230,11 +258,5 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         if (isCollider)
             return hitInfo.point;
         return Vector3.zero;
-    }
-
-    private void SetEdgeColliderPoints(LineRenderer line, EdgeCollider2D edge)
-    {
-        for (int i = 0; i < line.positionCount; i++)
-            edge.points[i] = line.GetPosition(i);
     }
 }

@@ -20,14 +20,14 @@ public class SettingPanel : MonoBehaviour
 
     private void Awake()
     {
-        transform.Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
-        transform.Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
+        transform.GetChild(0).Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
+        transform.GetChild(0).Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         gameObject.SetActive(false);
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
