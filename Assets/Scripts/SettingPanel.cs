@@ -17,12 +17,32 @@ using UnityEngine.UI;
 
 public class SettingPanel : MonoBehaviour
 {
-
+    private GameObject goBgMaskDropDown;
+    private Dropdown ddlAction;
     private void Awake()
     {
-        transform.GetChild(0).Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
-        transform.GetChild(0).Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         gameObject.SetActive(false);
+        SetTopMenuUI();
+        SetStateUI();
+
+        InitDdlAction();
+
+        void SetTopMenuUI()
+        {
+            transform.Find("TopMenu").Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
+            transform.Find("TopMenu").Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
+        }
+        void SetStateUI()
+        {
+            transform.Find("State").Find("BtnGroup").Find("BtnActionAdd").GetComponent<Button>().onClick.AddListener(BtnActionAddOnClick);
+            //transform.Find("State/BtnGroup/BtnActionAdd").GetComponent<Button>().onClick.AddListener(BtnActionAddOnClick);
+            transform.Find("State").Find("BtnGroup").Find("BtnActionDel").GetComponent<Button>().onClick.AddListener(BtnActionDelOnClick);
+            goBgMaskDropDown = transform.Find("State").Find("BgMaskDropDown").gameObject;
+            goBgMaskDropDown.SetActive(false);
+            ddlAction = goBgMaskDropDown.transform.Find("DdlAction").GetComponent<Dropdown>();
+            ddlAction.options.Clear();
+            ddlAction.onValueChanged.AddListener(DdlActionOnValueChanged);
+        }
     }
     // Start is called before the first frame update
     void Start()
@@ -35,12 +55,38 @@ public class SettingPanel : MonoBehaviour
     {
 
     }
+    #region TopMenu
     private void BtnCloseSettingPanelOnClick()
     {
         gameObject.SetActive(false);
     }
     private void BtnHelpOnClick()
     {
-        Debug.Log("Help");
+        string url =
+            "http://note.youdao.com/noteshare?id=776559f906a009afc108ba7aa10ef1c1&sub=C833CC45DFD44CD7B5C39A92024A5CFB";
+        Application.OpenURL(url);
     }
+    #endregion
+
+    #region State
+    private void InitDdlAction()
+    {
+        ddlAction.options.Add(new Dropdown.OptionData("0DFAS"));
+        ddlAction.options.Add(new Dropdown.OptionData("1GFSGFS"));
+        ddlAction.options.Add(new Dropdown.OptionData("2ERWFD"));
+    }
+    private void DdlActionOnValueChanged(int index)
+    {
+        Debug.Log(index);
+        goBgMaskDropDown.SetActive(false);
+    }
+    private void BtnActionAddOnClick()
+    {
+        goBgMaskDropDown.SetActive(true);
+    }
+    private void BtnActionDelOnClick()
+    {
+
+    }
+    #endregion
 }

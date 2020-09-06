@@ -207,9 +207,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             RectTransform stateRectTrans = gameObject.GetComponent<RectTransform>();
             targetPos = Input.mousePosition;
 
-            DragLimit();
+            StateDragLimit();
             //Control state objects will not move out of the window
-            void DragLimit()
+            void StateDragLimit()
             {
                 if (Input.mousePosition.x - pivotFromBorder.halfWidth < 0)
                     targetPos.x = pivotFromBorder.halfWidth;
@@ -223,8 +223,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             }
             stateRectTrans.position = targetPos;
 
-            OnStateImageDrag_LineControl();
-            void OnStateImageDrag_LineControl()
+            OnStateDrag_LineControl();
+            void OnStateDrag_LineControl()
             {
                 GameObject state = gameObject;
                 foreach (LineClass lineClass in GlobalVariable.lstLine)
