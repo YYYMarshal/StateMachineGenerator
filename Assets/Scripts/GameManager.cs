@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             goItemState = goItemState,
             iptName = goItemState.transform.Find("IptName").GetComponent<InputField>()
         };
-        GlobalVariable.lstState.Add(state);
+        GlobalVariable.Instance.lstState.Add(state);
     }
 
 }

@@ -12,6 +12,7 @@
 *********************************************************************/
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -71,9 +72,30 @@ public class SettingPanel : MonoBehaviour
     #region State
     private void InitDdlAction()
     {
-        ddlAction.options.Add(new Dropdown.OptionData("0DFAS"));
-        ddlAction.options.Add(new Dropdown.OptionData("1GFSGFS"));
-        ddlAction.options.Add(new Dropdown.OptionData("2ERWFD"));
+        List<string> lst = LoadXml();
+        foreach (string item in lst)
+        {
+            ddlAction.options.Add(new Dropdown.OptionData(item));
+        }
+    }
+    private List<string> LoadXml()
+    {
+        List<string> lst = new List<string>();
+        XmlDocument xmlFile = new XmlDocument();
+        xmlFile.Load(GlobalVariable.Instance.PathXml);
+        XmlNodeList nodLst = xmlFile.SelectSingleNode("YYYXB").ChildNodes;
+        foreach (XmlElement elem in nodLst)
+        {
+            switch (elem.Name)
+            {
+                case "Action":
+                    lst.Add(elem.GetAttribute("type"));
+                    break;
+                case "Condition":
+                    break;
+            }
+        }
+        return lst;
     }
     private void DdlActionOnValueChanged(int index)
     {

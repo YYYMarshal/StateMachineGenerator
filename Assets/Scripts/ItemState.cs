@@ -54,17 +54,17 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private void BtnStateDeleteOnClick()
     {
-        GlobalVariable.lstState.Remove(GlobalVariable.lstState[GetCurtStateIndex()]);
+        GlobalVariable.Instance.lstState.Remove(GlobalVariable.Instance.lstState[GetCurtStateIndex()]);
 
         GameObject state = gameObject;
-        //若在for循环中动态删除 GlobalVariable.lstLine 的元素，则会导致循环次数与预期不符，
-        //因为 GlobalVariable.lstLine 的Count在减少
-        //If the element of "GlobalVariable.lstLine" deleted dynamically in the for loop, The number of
-        //cycles is not as expected, because "GlobalVariable.lstLine.Count" is decreasing.
+        //若在for循环中动态删除 GlobalVariable.Instance.lstLine 的元素，则会导致循环次数与预期不符，
+        //因为 GlobalVariable.Instance.lstLine 的Count在减少
+        //If the element of "GlobalVariable.Instance.lstLine" deleted dynamically in the for loop, The number of
+        //cycles is not as expected, because "GlobalVariable.Instance.lstLine.Count" is decreasing.
         List<LineClass> lstLCTemp = new List<LineClass>();
-        for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
+        for (int i = 0; i < GlobalVariable.Instance.lstLine.Count; i++)
         {
-            LineClass item = GlobalVariable.lstLine[i];
+            LineClass item = GlobalVariable.Instance.lstLine[i];
             int curtLineIndex = GetCurtLineIndex(item.line);
             if (state == item.pre)
             {
@@ -78,16 +78,16 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             }
         }
         for (int i = 0; i < lstLCTemp.Count; i++)
-            GlobalVariable.lstLine.Remove(lstLCTemp[i]);
+            GlobalVariable.Instance.lstLine.Remove(lstLCTemp[i]);
         lstLCTemp.Clear();
 
         Destroy(gameObject);
     }
     private int GetCurtStateIndex()
     {
-        for (int i = 0; i < GlobalVariable.lstState.Count; i++)
+        for (int i = 0; i < GlobalVariable.Instance.lstState.Count; i++)
         {
-            if (gameObject.Equals(GlobalVariable.lstState[i].goItemState))
+            if (gameObject.Equals(GlobalVariable.Instance.lstState[i].goItemState))
             {
                 return i;
             }
@@ -96,9 +96,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private int GetCurtLineIndex(LineRenderer line)
     {
-        for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
+        for (int i = 0; i < GlobalVariable.Instance.lstLine.Count; i++)
         {
-            if (line == GlobalVariable.lstLine[i].line)
+            if (line == GlobalVariable.Instance.lstLine[i].line)
             {
                 return i;
             }
@@ -116,31 +116,31 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             CreateLine();
 
         //If left-click to the state image gameobject, end drawing ray.
-        if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.curt.isStartPaint)
+        if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.Instance.curt.isStartPaint)
         {
-            int curtLineIndex = GlobalVariable.curt.lineIndex;
-            LineClass lineClass = GlobalVariable.lstLine[curtLineIndex];
+            int curtLineIndex = GlobalVariable.Instance.curt.lineIndex;
+            LineClass lineClass = GlobalVariable.Instance.lstLine[curtLineIndex];
             lineClass.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
-            GlobalVariable.curt.isStartPaint = false;
+            GlobalVariable.Instance.curt.isStartPaint = false;
 
             lineClass.next = gameObject;
             ControlBtnLineDel(lineClass);
 
             bool isRepeated = false;
             //If the line is repeated, it will be deleted.
-            for (int i = 0; i < GlobalVariable.lstLine.Count; i++)
+            for (int i = 0; i < GlobalVariable.Instance.lstLine.Count; i++)
             {
                 if (curtLineIndex == i)
                     continue;
-                if (GlobalVariable.lstLine[i].pre == lineClass.pre &&
-                    GlobalVariable.lstLine[i].next == lineClass.next)
+                if (GlobalVariable.Instance.lstLine[i].pre == lineClass.pre &&
+                    GlobalVariable.Instance.lstLine[i].next == lineClass.next)
                 {
                     isRepeated = true;
-                    GlobalVariable.lstLine.Remove(lineClass);
+                    GlobalVariable.Instance.lstLine.Remove(lineClass);
                     DestroyLineAndBtnDel(curtLineIndex);
 
-                    //GlobalVariable.curt.line = null;
-                    //GlobalVariable.curt.lineIndex = -1;
+                    //GlobalVariable.Instance.curt.line = null;
+                    //GlobalVariable.Instance.curt.lineIndex = -1;
 
                     //2020-9-2 12:40:01
                     //break is necessary!!!
@@ -150,7 +150,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             //If the line is not repeated, it is judged whether it is self jump. If so, delete.
             if (!isRepeated && lineClass.pre == lineClass.next)
             {
-                GlobalVariable.lstLine.Remove(lineClass);
+                GlobalVariable.Instance.lstLine.Remove(lineClass);
                 DestroyLineAndBtnDel(curtLineIndex);
             }
         }
@@ -172,11 +172,11 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         lineItem.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
 
-        GlobalVariable.lstLine.Add(lineItem);
+        GlobalVariable.Instance.lstLine.Add(lineItem);
 
-        GlobalVariable.curt.line = lineTemp;
-        GlobalVariable.curt.isStartPaint = true;
-        GlobalVariable.curt.lineIndex = GetCurtLineIndex(lineTemp);
+        GlobalVariable.Instance.curt.line = lineTemp;
+        GlobalVariable.Instance.curt.isStartPaint = true;
+        GlobalVariable.Instance.curt.lineIndex = GetCurtLineIndex(lineTemp);
     }
     private void ControlBtnLineDel(LineClass lineClass, bool isCreate = true)
     {
@@ -227,7 +227,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             void OnStateDrag_LineControl()
             {
                 GameObject state = gameObject;
-                foreach (LineClass lineClass in GlobalVariable.lstLine)
+                foreach (LineClass lineClass in GlobalVariable.Instance.lstLine)
                 {
                     if (state == lineClass.pre)
                     {
@@ -245,9 +245,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private void Update()
     {
-        if (GlobalVariable.curt.isStartPaint)
+        if (GlobalVariable.Instance.curt.isStartPaint)
         {
-            GlobalVariable.curt.line.SetPosition(1, GetRayPoint(Input.mousePosition));
+            GlobalVariable.Instance.curt.line.SetPosition(1, GetRayPoint(Input.mousePosition));
         }
     }
 

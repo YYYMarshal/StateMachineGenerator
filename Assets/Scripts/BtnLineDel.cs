@@ -44,6 +44,6 @@ public class BtnLineDel : MonoBehaviour
         int index = transform.GetSiblingIndex();
         Destroy(planeLineGroup.transform.GetChild(index).gameObject);
         Destroy(btnLineDelGroiup.transform.GetChild(index).gameObject);
-        GlobalVariable.lstLine.RemoveAt(index);
+        GlobalVariable.Instance.lstLine.RemoveAt(index);
     }
 }

@@ -10,6 +10,7 @@
 	
 	purpose:	
 *********************************************************************/
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,9 +36,21 @@ public class CurtRelatedClass
     public int lineIndex = 0;
 }
 
-public class GlobalVariable : MonoBehaviour
+public class GlobalVariable 
 {
-    public static CurtRelatedClass curt = new CurtRelatedClass();
-    public static List<StateClass> lstState = new List<StateClass>();
-    public static List<LineClass> lstLine = new List<LineClass>();
+    private static readonly Lazy<GlobalVariable> lazy =
+        new Lazy<GlobalVariable>(() => new GlobalVariable());
+    public static GlobalVariable Instance
+    {
+        get
+        {
+            return lazy.Value;
+        }
+    }
+    public CurtRelatedClass curt = new CurtRelatedClass();
+    public List<StateClass> lstState = new List<StateClass>();
+    public List<LineClass> lstLine = new List<LineClass>();
+
+    public string PathXml = $"{Application.dataPath}/Resources/XML/YYYXB_Labaction_AND_Condition.xml";
 }
+ 
