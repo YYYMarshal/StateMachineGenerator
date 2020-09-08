@@ -1,31 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Test : MonoBehaviour
+public class Test : MonoBehaviour, IPointerEnterHandler
 {
-    RectTransform rt = null;
-    // Start is called before the first frame update
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        eventData.hovered.ForEach(item => Debug.Log(item.name));
+        Debug.LogWarning(eventData.pointerEnter.transform.name);
+        Debug.LogError("DFDF");
+    }
+
     void Start()
     {
-        rt = GetComponent<RectTransform>();
-        GetOffSetMinMax();
     }
-
-    private void GetOffSetMinMax()
-    {
-        Debug.Log($"offsetMin : {rt.offsetMin}");
-        Debug.Log($"offsetMax : {rt.offsetMax}");
-    }
-    // Update is called once per frame
     void Update()
     {
-        //SetRectTransformSize();
-    }
-    private void SetRectTransformSize()
-    {
-        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50);
-        rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 50);
-        
     }
 }

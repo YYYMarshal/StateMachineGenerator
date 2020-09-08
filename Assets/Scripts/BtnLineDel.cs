@@ -20,11 +20,11 @@ public class BtnLineDel : MonoBehaviour
 
 {
     private GameObject planeLineGroup;
-    private GameObject btnLineDelGroiup;
+    private GameObject BtnLineGroup;
     private void Awake()
     {
         planeLineGroup = GameObject.Find("PlaneLineGroup");
-        btnLineDelGroiup = GameObject.Find("BtnLineDelGroiup");
+        BtnLineGroup = GameObject.Find("BtnLineGroup");
 
         gameObject.GetComponent<Button>().onClick.AddListener(BtnLineDelOnClick);
     }
@@ -43,7 +43,7 @@ public class BtnLineDel : MonoBehaviour
     {
         int index = transform.GetSiblingIndex();
         Destroy(planeLineGroup.transform.GetChild(index).gameObject);
-        Destroy(btnLineDelGroiup.transform.GetChild(index).gameObject);
+        Destroy(BtnLineGroup.transform.GetChild(index).gameObject);
         GlobalVariable.Instance.lstLine.RemoveAt(index);
     }
 }

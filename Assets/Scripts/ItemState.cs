@@ -33,8 +33,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
     private InputField iptName;
 
-    private GameObject planeLineGroup;
-    private GameObject btnLineDelGroiup;
+    private GameObject goPlaneLineGroup;
+    private GameObject goBtnLineGroup;
 
     private void Awake()
     {
@@ -49,8 +49,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         iptName = transform.Find("IptName").GetComponent<InputField>();
         transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);
 
-        planeLineGroup = GameObject.Find("PlaneLineGroup");
-        btnLineDelGroiup = GameObject.Find("BtnLineDelGroiup");
+        goPlaneLineGroup = GameObject.Find("PlaneLineGroup");
+        goBtnLineGroup = GameObject.Find("BtnLineGroup");
     }
     private void BtnStateDeleteOnClick()
     {
@@ -162,7 +162,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             Resources.Load<GameObject>("Prefabs/Line"),
             Vector3.zero,
             Quaternion.identity,
-            planeLineGroup.transform).GetComponent<LineRenderer>();
+            goPlaneLineGroup.transform).GetComponent<LineRenderer>();
 
         LineClass lineItem = new LineClass()
         {
@@ -180,15 +180,21 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private void ControlBtnLineDel(LineClass lineClass, bool isCreate = true)
     {
+        //Vector2 posPre = lineClass.pre.transform.Find("StartPaintPos").position;
+        //Vector2 posNext = lineClass.pre.transform.Find("EndPaintPos").position;
+        //float x = (posPre.x + posNext.x) / 2;
+        //float y = (posPre.y + posNext.y) / 2; 
         float x = (lineClass.pre.transform.Find("EndPaintPos").position.x +
             lineClass.next.transform.Find("StartPaintPos").position.x) / 2f;
         float y = (lineClass.pre.transform.Find("EndPaintPos").position.y +
             lineClass.next.transform.Find("StartPaintPos").position.y) / 2f;
+        //float x = lineClass.pre.transform.Find("EndPaintPos").position.x * 0.75F;
+        //float y = lineClass.pre.transform.Find("EndPaintPos").position.y * 0.75F;
         if (isCreate)
         {
-            GameObject goBtnLineDel = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLineDel"),
-               new Vector2(x, y), Quaternion.identity, GameObject.Find("BtnLineDelGroiup").transform);
-            goBtnLineDel.AddComponent<BtnLineDel>();
+            GameObject goBtnLineDel = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
+               new Vector2(x, y), Quaternion.identity, GameObject.Find("BtnLineGroup").transform);
+            goBtnLineDel.AddComponent<BtnLine>();
             lineClass.btnLineDel = goBtnLineDel.GetComponent<Button>();
         }
         else
@@ -196,8 +202,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private void DestroyLineAndBtnDel(int curtLineIndex)
     {
-        Destroy(planeLineGroup.transform.GetChild(curtLineIndex).gameObject);
-        Destroy(btnLineDelGroiup.transform.GetChild(curtLineIndex).gameObject);
+        Destroy(goPlaneLineGroup.transform.GetChild(curtLineIndex).gameObject);
+        Destroy(goBtnLineGroup.transform.GetChild(curtLineIndex).gameObject);
     }
     public void OnDrag(PointerEventData eventData)
     {
