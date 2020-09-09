@@ -21,9 +21,9 @@
 
   <Action type="audio" path="Main Camera" audio="实验准备就绪" op="play" loop="false" />
 
-  <Action type="video" video="视频.mp4" op="play" size="100,100"/>
-  <Action type="video" video="视频.mp4" op="stop"/>
-  <Action type="video" video="视频.mp4" op="play_autoclose" size="100,100"/>
+  <Action type="videoA" video="视频.mp4" op="play_autoclose" size="100,100"/>
+  <Action type="videoB" video="视频.mp4" op="play" size="100,100"/>
+  <Action type="videoC" video="视频.mp4" op="stop"/>
 
   <Action type="texture" texturename="头像1" size="100,100" bshow="true"/>
 
@@ -32,9 +32,9 @@
   <Action type="tag_3d" path="MZJC_zh/MZJC_JL_ylb/ylb_zz/tmthlba_zz" text="zhizhen1" offset="0,0,0" bshow="true"/>
   <Action type="tag2d" path="sysaq_dthc/dtzb_jyzl/jyzl/jyzl_tjt" text="铁架台" offset="0,0,0" fontsize="30"  bshow="true"/>
 
-  <Action type="tip" text="hello,welcome" buttonText="按键1,按键2" bshow="true" bgSize="800,600" useblock="true" uiinfo="DuoXuanKuang"/>
-  <Action type="tip" text="如未烘干无水碳酸钠，用此试剂标定盐酸浓度时结果会" buttonText="偏大,偏小" bshow="true" />
-  <Action type="tip" text="已烘干至恒重" bshow="true"/>
+  <Action type="tipA" text="已烘干至恒重" bshow="true"/>
+  <Action type="tipB" text="如未烘干无水碳酸钠，用此试剂标定盐酸浓度时结果会" buttonText="偏大,偏小" bshow="true" />
+  <Action type="tipC" text="hello,welcome" buttonText="按键1,按键2" bshow="true" bgSize="800,600" useblock="true" uiinfo="DuoXuanKuang"/>
 
   <Action type="flyingmode" enable="true" controlable="true" useraycast="false"/>
   <Action type="move" path="Main Camera" pos="7.688791,1.119859,9.105009" euler="0,0,0" moveSpeed="1" rotateSpeed="1"/>
@@ -46,14 +46,10 @@
   <Action type="setplayerequipt" itemID="1" isEquipted="true"/>
   <Action type="SetRightMenuState" devicePath="ZWGCnl_zwgc_cf/zwgc_yyys/zwgc_yyys_sm/zwgc_yyys_sm_b" menuKey="guananniu" menuState="0" />
   <Action type="moveplayer" playerid="1" pos="4.67,0.83,-58.87" euler="0,0,0" />
-  <Action type="collider" path="xxxxxxx" enable="true" collidertype="box" center="0,0,0" size="1,1,1" layerName="ObjLayer" />
-  <Action type="collider" path="CYJQ/CYJQ_sq/MXK_sq27" enable="true" collidertype="mesh" size="0,0,0" layerName="ObjLayer"/>
-  <Action type="reglock" key="key1" sceneid="" locked="false"/>
-  <Action type="reqlock" key="key1" sceneid="" getlock="true"/>
-  <Action type="group" seq="1">
-    <Action type="active" path="PATHPATH" targetactive="0" />
-    <Action type="active" path="GMP_rjnj_texiao/GMP_ruanjiaonang_keli/GMP_rjnkl_1" targetactive="0" />
-  </Action>
+  <Action type="colliderA" path="xxxxxxx" enable="true" collidertype="box" center="0,0,0" size="1,1,1" layerName="ObjLayer" />
+  <Action type="colliderB" path="CYJQ/CYJQ_sq/MXK_sq27" enable="true" collidertype="mesh" size="0,0,0" layerName="ObjLayer"/>
+  <Action type="reglockA" key="key1" sceneid="" locked="false"/>
+  <Action type="reqlockB" key="key1" sceneid="" getlock="true"/>
   <Action type="flash" path="穿戴规则讲解.swf" mode="0" />
   <Action type="processbar" time="5" tip="aaaa"/>
   <Action type="showdeviceknowlage" id="1" bshow="true"/>
@@ -61,7 +57,6 @@
   <Action type="color" path="ani/sysaq_tkhl_lt/lt_gt1" color="255,0,0,255"/>
 
   <Action type="startprocess" path="xx/a.exe" />
-  <Action type="startprocess" path="实验报告.docx" />
 
   <Action type="showAdjustVarInput" varname="HYYW_A" title="XXX输入框" isinnervar="false"/>
 

@@ -85,6 +85,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         lstLineClassTemp.Clear();
 
         Destroy(gameObject);
+        goSettingPanel.SetActive(false);
     }
     private int GetCurtStateIndex()
     {

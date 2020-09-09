@@ -53,7 +53,8 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
         Destroy(goPlaneLineGroup.transform.GetChild(index).gameObject);
         Destroy(goBtnLineGroup.transform.GetChild(index).gameObject);
         GlobalVariable.Instance.lstLine.RemoveAt(index);
-        btnLineDel.gameObject.SetActive(false);
+        //btnLineDel.gameObject.SetActive(false);
+        goSettingPanel.SetActive(false);
     }
 
     public void OnPointerClick(PointerEventData eventData)

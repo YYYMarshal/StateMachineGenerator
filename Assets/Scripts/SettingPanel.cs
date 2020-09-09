@@ -31,6 +31,9 @@ public class SettingPanel : MonoBehaviour
     private Dropdown ddlCondition;
     #endregion
 
+    List<List<KeyValuePair<string, string>>> lstXmlAction = new List<List<KeyValuePair<string, string>>>();
+    List<List<KeyValuePair<string, string>>> lstXmlCondition = new List<List<KeyValuePair<string, string>>>();
+
     private void Awake()
     {
         gameObject.SetActive(false);
@@ -42,7 +45,7 @@ public class SettingPanel : MonoBehaviour
 
         void SetTopMenuUI()
         {
-            transform.Find("TopMenu").Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(BtnCloseSettingPanelOnClick);
+            transform.Find("TopMenu").Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
             transform.Find("TopMenu").Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         }
         void SetStateUI()
@@ -65,7 +68,11 @@ public class SettingPanel : MonoBehaviour
 
             ddlCondition = goTransition.transform.Find("DdlCondition").GetComponent<Dropdown>();
             ddlCondition.options.Clear();
-            ddlCondition.onValueChanged.AddListener((index) => ddlCondition.gameObject.SetActive(false));
+            ddlCondition.onValueChanged.AddListener((index) =>
+            {
+                ddlCondition.gameObject.SetActive(false);
+                Debug.Log(lstXmlCondition[4][2].Value);
+            });
             ddlCondition.gameObject.SetActive(false);
 
             goTransition.transform.Find("BtnConditionGroup/BtnConditionAdd").GetComponent<Button>().onClick.AddListener(() => ddlCondition.gameObject.SetActive(true));
@@ -74,15 +81,13 @@ public class SettingPanel : MonoBehaviour
     }
     private void InitDdlActionDdlCondition()
     {
-        LoadXml(true).ForEach(item => ddlAction.options.Add(new Dropdown.OptionData(item)));
-        LoadXml(false).ForEach(item => ddlCondition.options.Add(new Dropdown.OptionData(item)));
-        
-        //Debug.Log($"{ddlAction.options.Count}\n{ddlCondition.options.Count}");
+        lstXmlAction = ReadXmlDoc(true);
+        lstXmlCondition = ReadXmlDoc(false);
+        lstXmlAction.ForEach(item => ddlAction.options.Add(new Dropdown.OptionData(item[0].Value)));
+        lstXmlCondition.ForEach(item => ddlCondition.options.Add(new Dropdown.OptionData(item[0].Value)));
 
-        List<string> LoadXml(bool isAction)
+        List<List<KeyValuePair<string, string>>> ReadXmlDoc(bool isAction)
         {
-            List<string> lstAction = new List<string>();
-            List<string> lstCondition = new List<string>();
             XmlDocument xmlFile = new XmlDocument();
             xmlFile.Load(GlobalVariable.Instance.PathXml);
             XmlNodeList nodLst = xmlFile.SelectSingleNode("YYYXB").ChildNodes;
@@ -91,14 +96,21 @@ public class SettingPanel : MonoBehaviour
                 switch (elem.Name)
                 {
                     case "Action":
-                        lstAction.Add(elem.GetAttribute("type"));
+                        List<KeyValuePair<string, string>> lstTempA = new List<KeyValuePair<string, string>>();
+                        //Because elem.Attributes is XmlAttributeCollection Type, so cannot use ForEach()
+                        foreach (XmlAttribute item in elem.Attributes)
+                            lstTempA.Add(new KeyValuePair<string, string>(item.Name, item.InnerXml));
+                        lstXmlAction.Add(lstTempA);
                         break;
                     case "Condition":
-                        lstCondition.Add(elem.GetAttribute("type"));
+                        List<KeyValuePair<string, string>> lstTempB = new List<KeyValuePair<string, string>>();
+                        foreach (XmlAttribute item in elem.Attributes)
+                            lstTempB.Add(new KeyValuePair<string, string>(item.Name, item.InnerXml));
+                        lstXmlCondition.Add(lstTempB);
                         break;
                 }
             }
-            return isAction ? lstAction : lstCondition;
+            return isAction ? lstXmlAction : lstXmlCondition;
         }
     }
     // Start is called before the first frame update
@@ -113,10 +125,6 @@ public class SettingPanel : MonoBehaviour
 
     }
     #region TopMenu
-    private void BtnCloseSettingPanelOnClick()
-    {
-        gameObject.SetActive(false);
-    }
     private void BtnHelpOnClick()
     {
         string url =
