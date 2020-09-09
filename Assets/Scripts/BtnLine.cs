@@ -22,18 +22,30 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
     private GameObject goPlaneLineGroup;
     private GameObject goBtnLineGroup;
 
+    private GameObject goSettingPanel;
+
     private Button btnLineDel;
     private void Awake()
     {
         goPlaneLineGroup = GameObject.Find("PlaneLineGroup");
         goBtnLineGroup = GameObject.Find("BtnLineGroup");
 
+        goSettingPanel = transform.parent.parent.Find("SettingPanel").gameObject;
+
+        transform.GetComponent<Button>().onClick.AddListener(BtnLineOnClick);
         btnLineDel = transform.Find("BtnLineDel").GetComponent<Button>();
         btnLineDel.onClick.AddListener(BtnLineDelOnClick);
         btnLineDel.gameObject.SetActive(false);
     }
     void Update()
     {
+    }
+    private void BtnLineOnClick()
+    {
+        if (!goSettingPanel.activeSelf)
+            goSettingPanel.SetActive(true);
+        int index = transform.GetSiblingIndex();
+        goSettingPanel.GetComponent<SettingPanel>().SetSettingPanel(GlobalVariable.Instance.lstLine[index]);
     }
     private void BtnLineDelOnClick()
     {

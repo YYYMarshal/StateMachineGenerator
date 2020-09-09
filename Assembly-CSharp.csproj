@@ -64,7 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BtnLine.cs" />
-    <Compile Include="Assets\Scripts\BtnLineDel.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\GlobalVariable.cs" />
     <Compile Include="Assets\Scripts\ItemState.cs" />

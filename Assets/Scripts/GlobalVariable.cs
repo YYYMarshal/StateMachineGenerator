@@ -16,6 +16,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class StateClass
+{
+    public GameObject goItemState = null;
+    public InputField iptName;
+}
 public class LineClass
 {
     public LineRenderer line = null;
@@ -24,19 +29,16 @@ public class LineClass
     public GameObject pre;
     public GameObject next;
 }
-public class StateClass
-{
-    public GameObject goItemState = null;
-    public InputField iptName;
-}
 public class CurtRelatedClass
 {
     public LineRenderer line = null;
     public bool isStartPaint = false;
+    //public int stateIndex = 0;
     public int lineIndex = 0;
+    //public bool isStateClicked = false;
 }
 
-public class GlobalVariable 
+public class GlobalVariable
 {
     private static readonly Lazy<GlobalVariable> lazy =
         new Lazy<GlobalVariable>(() => new GlobalVariable());
@@ -53,4 +55,3 @@ public class GlobalVariable
 
     public string PathXml = $"{Application.dataPath}/Resources/XML/YYYXB_Labaction_AND_Condition.xml";
 }
- 
