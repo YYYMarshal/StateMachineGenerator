@@ -29,10 +29,11 @@ public class SettingPanel : MonoBehaviour
     private GameObject goTransition;
     private Text txtTransitionTopic;
     private Dropdown ddlCondition;
+    private GameObject goContent;
     #endregion
 
-    List<List<KeyValuePair<string, string>>> lstXmlAction = new List<List<KeyValuePair<string, string>>>();
-    List<List<KeyValuePair<string, string>>> lstXmlCondition = new List<List<KeyValuePair<string, string>>>();
+    readonly List<List<KeyValuePair<string, string>>> lstXmlAction = new List<List<KeyValuePair<string, string>>>();
+    readonly List<List<KeyValuePair<string, string>>> lstXmlCondition = new List<List<KeyValuePair<string, string>>>();
 
     private void Awake()
     {
@@ -68,25 +69,22 @@ public class SettingPanel : MonoBehaviour
 
             ddlCondition = goTransition.transform.Find("DdlCondition").GetComponent<Dropdown>();
             ddlCondition.options.Clear();
-            ddlCondition.onValueChanged.AddListener((index) =>
-            {
-                ddlCondition.gameObject.SetActive(false);
-                Debug.Log(lstXmlCondition[4][2].Value);
-            });
+            ddlCondition.onValueChanged.AddListener(DdlConditionOnValueChanged);
             ddlCondition.gameObject.SetActive(false);
 
             goTransition.transform.Find("BtnConditionGroup/BtnConditionAdd").GetComponent<Button>().onClick.AddListener(() => ddlCondition.gameObject.SetActive(true));
             goTransition.transform.Find("BtnConditionGroup/BtnConditionDel").GetComponent<Button>().onClick.AddListener(BtnConditionDelOnClick);
+
+            goContent = transform.Find("Transition/SV_Condition/Viewport/Content").gameObject;
         }
     }
     private void InitDdlActionDdlCondition()
     {
-        lstXmlAction = ReadXmlDoc(true);
-        lstXmlCondition = ReadXmlDoc(false);
+        ReadXmlDoc();
         lstXmlAction.ForEach(item => ddlAction.options.Add(new Dropdown.OptionData(item[0].Value)));
         lstXmlCondition.ForEach(item => ddlCondition.options.Add(new Dropdown.OptionData(item[0].Value)));
 
-        List<List<KeyValuePair<string, string>>> ReadXmlDoc(bool isAction)
+        void ReadXmlDoc()
         {
             XmlDocument xmlFile = new XmlDocument();
             xmlFile.Load(GlobalVariable.Instance.PathXml);
@@ -110,7 +108,6 @@ public class SettingPanel : MonoBehaviour
                         break;
                 }
             }
-            return isAction ? lstXmlAction : lstXmlCondition;
         }
     }
     // Start is called before the first frame update
@@ -146,6 +143,12 @@ public class SettingPanel : MonoBehaviour
     #endregion
 
     #region Line Methods
+    private void DdlConditionOnValueChanged(int index)
+    {
+        ddlCondition.gameObject.SetActive(false);
+        GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
+        goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = $"type = {lstXmlCondition[index][0].Value}";
+    }
     private void BtnConditionDelOnClick()
     {
 

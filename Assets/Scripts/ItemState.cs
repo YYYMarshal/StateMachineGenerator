@@ -165,7 +165,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     private void CreateLine()
     {
         LineRenderer lineTemp = Instantiate(
-            Resources.Load<GameObject>("Prefabs/Line"),
+            Resources.Load<GameObject>("Prefabs/ItemLine"),
             Vector3.zero,
             Quaternion.identity,
             goPlaneLineGroup.transform).GetComponent<LineRenderer>();
