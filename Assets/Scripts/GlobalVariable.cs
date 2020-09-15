@@ -28,13 +28,16 @@ public class LineClass
     public Button btnLineDel = null;
     public GameObject pre;
     public GameObject next;
+    public bool isAnd;
+    public List<string> lstCondt = new List<string>();
 }
 public class CurtRelatedClass
 {
     public LineRenderer line = null;
     public bool isStartPaint = false;
     //public int stateIndex = 0;
-    public int lineIndex = 0;
+    public int itemStateLineIndex = 0;   //ItemState中用的：当前的Line索引
+    public int settingPanelLineIndex = 0;        //SettingPanel中用的：当前的Line/BtnLine索引
     //public bool isStateClicked = false;
 }
 

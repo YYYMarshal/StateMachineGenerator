@@ -30,6 +30,7 @@ public class SettingPanel : MonoBehaviour
     private Text txtTransitionTopic;
     private Dropdown ddlCondition;
     private GameObject goContent;
+    private Toggle toggleCondition;
     #endregion
 
     readonly List<List<KeyValuePair<string, string>>> lstXmlAction = new List<List<KeyValuePair<string, string>>>();
@@ -76,6 +77,13 @@ public class SettingPanel : MonoBehaviour
             goTransition.transform.Find("BtnConditionGroup/BtnConditionDel").GetComponent<Button>().onClick.AddListener(BtnConditionDelOnClick);
 
             goContent = transform.Find("Transition/SV_Condition/Viewport/Content").gameObject;
+
+            toggleCondition = transform.Find("Transition/ToggleCondition").GetComponent<Toggle>();
+            toggleCondition.onValueChanged.AddListener((isChecked) =>
+            {
+                int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
+                GlobalVariable.Instance.lstLine[spLI].isAnd = isChecked;
+            });
         }
     }
     private void InitDdlActionDdlCondition()
@@ -147,7 +155,11 @@ public class SettingPanel : MonoBehaviour
     {
         ddlCondition.gameObject.SetActive(false);
         GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
-        goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = $"type = {lstXmlCondition[index][0].Value}";
+        string str = $"type = {lstXmlCondition[index][0].Value}";
+        goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = str;
+
+        int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
+        GlobalVariable.Instance.lstLine[spLI].lstCondt.Add(str);
     }
     private void BtnConditionDelOnClick()
     {
@@ -156,17 +168,40 @@ public class SettingPanel : MonoBehaviour
     public void SetSettingPanel(LineClass line)
     {
         SetStateTransitionUIShow(false);
-        StateClass preStateClass = null;
-        StateClass nextStateClass = null;
-        foreach (StateClass stateClass in GlobalVariable.Instance.lstState)
+
+        int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
+
+        SetTopText();
+        SetGoContent();
+
+        toggleCondition.isOn = GlobalVariable.Instance.lstLine[spLI].isAnd;
+
+        void SetTopText()
         {
-            if (line.pre.Equals(stateClass.goItemState))
-                preStateClass = stateClass;
-            if (line.next.Equals(stateClass.goItemState))
-                nextStateClass = stateClass;
+            StateClass preStateClass = null;
+            StateClass nextStateClass = null;
+            foreach (StateClass stateClass in GlobalVariable.Instance.lstState)
+            {
+                if (line.pre.Equals(stateClass.goItemState))
+                    preStateClass = stateClass;
+                if (line.next.Equals(stateClass.goItemState))
+                    nextStateClass = stateClass;
+            }
+            txtTransitionTopic.text = $"From : {preStateClass.iptName.text}\n" +
+                $"    To : {nextStateClass.iptName.text}";
         }
-        txtTransitionTopic.text = $"From : {preStateClass.iptName.text}\n" +
-            $"    To : {nextStateClass.iptName.text}";
+        void SetGoContent()
+        {
+            for (int i = 0; i < goContent.transform.childCount; i++)
+                Destroy(goContent.transform.GetChild(i).gameObject);
+
+            for (int i = 0; i < GlobalVariable.Instance.lstLine[spLI].lstCondt.Count; i++)
+            {
+                GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
+                goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = GlobalVariable.Instance.lstLine[spLI].lstCondt[i];
+            }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(goContent.GetComponent<RectTransform>());
+        }
     }
     #endregion
     private void SetStateTransitionUIShow(bool isState)

@@ -124,7 +124,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //If left-click to the state image gameobject, end drawing ray.
         if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.Instance.curt.isStartPaint)
         {
-            int curtLineIndex = GlobalVariable.Instance.curt.lineIndex;
+            int curtLineIndex = GlobalVariable.Instance.curt.itemStateLineIndex;
             LineClass lineClass = GlobalVariable.Instance.lstLine[curtLineIndex];
             lineClass.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
             GlobalVariable.Instance.curt.isStartPaint = false;
@@ -146,7 +146,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                     DestroyLineAndBtnDel(curtLineIndex);
 
                     //GlobalVariable.Instance.curt.line = null;
-                    //GlobalVariable.Instance.curt.lineIndex = -1;
+                    //GlobalVariable.Instance.curt.itemStateLineIndex = -1;
 
                     //2020-9-2 12:40:01
                     //break is necessary!!!
@@ -182,7 +182,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         GlobalVariable.Instance.curt.line = lineTemp;
         GlobalVariable.Instance.curt.isStartPaint = true;
-        GlobalVariable.Instance.curt.lineIndex = GetCurtLineIndex(lineTemp);
+        GlobalVariable.Instance.curt.itemStateLineIndex = GetCurtLineIndex(lineTemp);
     }
     private void ControlBtnLine(LineClass lineClass, bool isCreate = true)
     {
