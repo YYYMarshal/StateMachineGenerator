@@ -43,7 +43,7 @@ public class SettingPanel : MonoBehaviour
         SetStateUI();
         SetTransitionUI();
 
-        InitDdlActionDdlCondition();
+        InitDdlActionDdlConditionByXml();
 
         void SetTopMenuUI()
         {
@@ -86,7 +86,7 @@ public class SettingPanel : MonoBehaviour
             });
         }
     }
-    private void InitDdlActionDdlCondition()
+    private void InitDdlActionDdlConditionByXml()
     {
         ReadXmlDoc();
         lstXmlAction.ForEach(item => ddlAction.options.Add(new Dropdown.OptionData(item[0].Value)));
@@ -151,15 +151,40 @@ public class SettingPanel : MonoBehaviour
     #endregion
 
     #region Line Methods
+    /// <summary>
+    /// DropDown组件的值改变的时候，同时创建ItemCondition物体
+    /// </summary>
     private void DdlConditionOnValueChanged(int index)
     {
         ddlCondition.gameObject.SetActive(false);
-        GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
-        string str = $"type = {lstXmlCondition[index][0].Value}";
-        goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = str;
 
-        int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
-        GlobalVariable.Instance.lstLine[spLI].lstCondt.Add(str);
+        MyInstantiateItemCondition();
+        void MyInstantiateItemCondition()
+        {
+            GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
+
+            int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
+            List<List<KeyValuePair<string, string>>> lstICStr = GlobalVariable.Instance.lstLine[spLI].lstItemConditionStr;
+            List<KeyValuePair<string, string>> lstTemp = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("type = ", lstXmlCondition[index][0].Value)
+            };
+            goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = lstTemp[0].Key + lstTemp[0].Value;
+
+            GameObject goKVGroup = goItemCondition.transform.Find("KVGroup").gameObject;
+            //i从1开始，即从第二个属性开始，是因为第一个属性为type
+            for (int i = 1; i < lstXmlCondition[index].Count; i++)
+            {
+                GameObject goItemKV = Instantiate(Resources.Load<GameObject>("Prefabs/ItemKV"), goKVGroup.transform);
+                string key = $"{lstXmlCondition[index][i].Key} = ";
+                string value = lstXmlCondition[index][i].Value;
+                lstTemp.Add(new KeyValuePair<string, string>(key, value));
+                goItemKV.transform.Find("TxtKey").GetComponent<Text>().text = key;
+                goItemKV.transform.Find("IptValue").GetComponent<InputField>().text = value;
+            }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(goContent.GetComponent<RectTransform>());
+            lstICStr.Add(lstTemp);
+        }
     }
     private void BtnConditionDelOnClick()
     {
@@ -195,12 +220,25 @@ public class SettingPanel : MonoBehaviour
             for (int i = 0; i < goContent.transform.childCount; i++)
                 Destroy(goContent.transform.GetChild(i).gameObject);
 
-            for (int i = 0; i < GlobalVariable.Instance.lstLine[spLI].lstCondt.Count; i++)
+            MyInstantiateItemCondition();
+            //下面的代码其实与 DdlConditionOnValueChanged(int index) 中生成ItemCondition的代码类似
+            void MyInstantiateItemCondition()
             {
-                GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
-                goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = GlobalVariable.Instance.lstLine[spLI].lstCondt[i];
+                List<List<KeyValuePair<string, string>>> lstICStr = GlobalVariable.Instance.lstLine[spLI].lstItemConditionStr;
+                for (int i = 0; i < lstICStr.Count; i++)
+                {
+                    GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
+                    goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = lstICStr[i][0].Key + lstICStr[i][0].Value;
+                    GameObject goKVGroup = goItemCondition.transform.Find("KVGroup").gameObject;
+                    for (int j = 1; j < lstICStr[i].Count; j++)
+                    {
+                        GameObject goItemKV = Instantiate(Resources.Load<GameObject>("Prefabs/ItemKV"), goKVGroup.transform);
+                        goItemKV.transform.Find("TxtKey").GetComponent<Text>().text = lstICStr[i][j].Key;
+                        goItemKV.transform.Find("IptValue").GetComponent<InputField>().text = lstICStr[i][j].Value;
+                    }
+                }
+                LayoutRebuilder.ForceRebuildLayoutImmediate(goContent.GetComponent<RectTransform>());
             }
-            LayoutRebuilder.ForceRebuildLayoutImmediate(goContent.GetComponent<RectTransform>());
         }
     }
     #endregion

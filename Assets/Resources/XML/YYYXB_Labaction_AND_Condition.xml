@@ -75,7 +75,7 @@
   <Condition type="uiclick" path="PATHPATH"/>
   <Condition type="rightclickmenu" path="MZJC_zh/MZJC_JL_fm/JL_fm_jzf/jzf_sl16" index="0"/>
   <Condition type="timer" name="timer1" timelimit="10"/>
-  <Condition type="equipt" role="内实验人员" itemtype="cegaoqi"/>
+  <Condition type="equipt" role="实验人员" itemtype="cegaoqi"/>
   <Condition type="rightkeyclickmenu" menukey="guananniu"/>
   <Condition type="lookat" targetpos="-1.32,1.11,13.44" radius="15" distance="4"/>
   <Condition type="getlock" key="key1"/>

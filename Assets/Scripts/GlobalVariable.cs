@@ -29,7 +29,8 @@ public class LineClass
     public GameObject pre;
     public GameObject next;
     public bool isAnd;
-    public List<string> lstCondt = new List<string>();
+    //每一个线(Transition)包含多个Condition，且每一个Condition包含多个 键值对类型的 属性
+    public List<List<KeyValuePair<string, string>>> lstItemConditionStr = new List<List<KeyValuePair<string, string>>>();
 }
 public class CurtRelatedClass
 {
