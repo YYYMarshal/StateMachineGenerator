@@ -143,6 +143,9 @@ public class SettingPanel : MonoBehaviour
     {
 
     }
+    /// <summary>
+    /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
+    /// </summary>
     public void SetSettingPanel(StateClass state)
     {
         SetStateTransitionUIShow(true);
@@ -181,6 +184,8 @@ public class SettingPanel : MonoBehaviour
                 lstTemp.Add(new KeyValuePair<string, string>(key, value));
                 goItemKV.transform.Find("TxtKey").GetComponent<Text>().text = key;
                 goItemKV.transform.Find("IptValue").GetComponent<InputField>().text = value;
+                if (goItemKV.GetComponent<ItemKV>() == null)
+                    goItemKV.AddComponent<ItemKV>();
             }
             LayoutRebuilder.ForceRebuildLayoutImmediate(goContent.GetComponent<RectTransform>());
             lstICStr.Add(lstTemp);
@@ -190,11 +195,15 @@ public class SettingPanel : MonoBehaviour
     {
 
     }
+    /// <summary>
+    /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
+    /// </summary>
     public void SetSettingPanel(LineClass line)
     {
         SetStateTransitionUIShow(false);
 
-        int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
+        //int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
+        int spLI = line.line.transform.GetSiblingIndex();
 
         SetTopText();
         SetGoContent();
