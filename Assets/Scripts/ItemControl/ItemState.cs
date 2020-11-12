@@ -60,34 +60,34 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
         void BtnStateDeleteOnClick()
         {
-            Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurtStateIndex()]);
 
             GameObject state = gameObject;
             //若在for循环中动态删除 GlobalVariable.Instance.lstLine 的元素，则会导致循环次数与预期不符，
             //因为 GlobalVariable.Instance.lstLine 的Count在减少
             //If the element of "GlobalVariable.Instance.lstLine" deleted dynamically in the for loop, The number of
             //cycles is not as expected, because "GlobalVariable.Instance.lstLine.Count" is decreasing.
-            List<TransitionEntity> lstLineClassTemp = new List<TransitionEntity>();
+            List<TransitionEntity> listTransitionTemp = new List<TransitionEntity>();
             for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
             {
                 TransitionEntity transition = Entities.Instance.listTransition[i];
                 int curtLineIndex = GetCurtLineIndex(transition.line);
                 if (state == transition.pre)
                 {
-                    lstLineClassTemp.Add(transition);
+                    listTransitionTemp.Add(transition);
                     DestroyLineAndBtnDel(curtLineIndex);
                 }
                 else if (state == transition.next)
                 {
-                    lstLineClassTemp.Add(transition);
+                    listTransitionTemp.Add(transition);
                     DestroyLineAndBtnDel(curtLineIndex);
                 }
             }
-            for (int i = 0; i < lstLineClassTemp.Count; i++)
-                Entities.Instance.listTransition.Remove(lstLineClassTemp[i]);
-            lstLineClassTemp.Clear();
+            for (int i = 0; i < listTransitionTemp.Count; i++)
+                Entities.Instance.listTransition.Remove(listTransitionTemp[i]);
+            listTransitionTemp.Clear();
 
             Destroy(gameObject);
+            Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurtStateIndex()]);
             GlobalObject.Instance.SettingPanel.SetActive(false);
         }
         #endregion
@@ -243,7 +243,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private void DestroyLineAndBtnDel(int curtLineIndex)
     {
-        //Destroy(goPlaneLineGroup.transform.GetChild(curtLineIndex).gameObject);
+        //因为生成LineRenderer物体后，在该LineRenderer物体结束绘制后，会生成BtnLine物体，
+        //则这两个物体在其父物体上的索引是一样的，可以用相同的索引值来删除物体
         Destroy(GlobalObject.Instance.PlaneLineGroup.transform.GetChild(curtLineIndex).gameObject);
         Destroy(GlobalObject.Instance.BtnLineGroup.transform.GetChild(curtLineIndex).gameObject);
     }
