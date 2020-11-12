@@ -82,7 +82,7 @@ public class SettingPanel : MonoBehaviour
             toggleCondition.onValueChanged.AddListener((isChecked) =>
             {
                 int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
-                GlobalVariable.Instance.lstLine[spLI].isAnd = isChecked;
+                Entities.Instance.listTransition[spLI].isAnd = isChecked;
             });
         }
     }
@@ -146,9 +146,9 @@ public class SettingPanel : MonoBehaviour
     /// <summary>
     /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
     /// </summary>
-    public void SetSettingPanel(StateClass state)
+    public void SetSettingPanel(StateEntity state)
     {
-        SetStateTransitionUIShow(true);
+        ShowUI_StateTransition(true);
         txtStateName.text = $"State Name : \n{state.iptName.text}";
     }
     #endregion
@@ -167,7 +167,7 @@ public class SettingPanel : MonoBehaviour
             GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
 
             int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
-            List<List<KeyValuePair<string, string>>> lstICStr = GlobalVariable.Instance.lstLine[spLI].lstItemConditionStr;
+            List<List<KeyValuePair<string, string>>> lstICStr = Entities.Instance.listTransition[spLI].listItemConditionStr;
             List<KeyValuePair<string, string>> lstTemp = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("type = ", lstXmlCondition[index][0].Value)
@@ -198,9 +198,9 @@ public class SettingPanel : MonoBehaviour
     /// <summary>
     /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
     /// </summary>
-    public void SetSettingPanel(LineClass line)
+    public void SetSettingPanel(TransitionEntity line)
     {
-        SetStateTransitionUIShow(false);
+        ShowUI_StateTransition(false);
 
         //int spLI = GlobalVariable.Instance.curt.settingPanelLineIndex;
         int spLI = line.line.transform.GetSiblingIndex();
@@ -208,13 +208,13 @@ public class SettingPanel : MonoBehaviour
         SetTopText();
         SetGoContent();
 
-        toggleCondition.isOn = GlobalVariable.Instance.lstLine[spLI].isAnd;
+        toggleCondition.isOn = Entities.Instance.listTransition[spLI].isAnd;
 
         void SetTopText()
         {
-            StateClass preStateClass = null;
-            StateClass nextStateClass = null;
-            foreach (StateClass stateClass in GlobalVariable.Instance.lstState)
+            StateEntity preStateClass = null;
+            StateEntity nextStateClass = null;
+            foreach (StateEntity stateClass in Entities.Instance.listState)
             {
                 if (line.pre.Equals(stateClass.goItemState))
                     preStateClass = stateClass;
@@ -233,7 +233,7 @@ public class SettingPanel : MonoBehaviour
             //下面的代码其实与 DdlConditionOnValueChanged(int index) 中生成ItemCondition的代码类似
             void MyInstantiateItemCondition()
             {
-                List<List<KeyValuePair<string, string>>> lstICStr = GlobalVariable.Instance.lstLine[spLI].lstItemConditionStr;
+                List<List<KeyValuePair<string, string>>> lstICStr = Entities.Instance.listTransition[spLI].listItemConditionStr;
                 for (int i = 0; i < lstICStr.Count; i++)
                 {
                     GameObject goItemCondition = Instantiate(Resources.Load<GameObject>("Prefabs/ItemCondition"), goContent.transform);
@@ -251,9 +251,11 @@ public class SettingPanel : MonoBehaviour
         }
     }
     #endregion
-    private void SetStateTransitionUIShow(bool isState)
+    #region 公共代码部分
+    private void ShowUI_StateTransition(bool isState)
     {
         goState.SetActive(isState);
         goTransition.SetActive(!isState);
-    }
+    } 
+    #endregion
 }

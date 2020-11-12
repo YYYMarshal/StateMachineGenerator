@@ -63,15 +63,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\BtnLine.cs" />
+    <Compile Include="Assets\Scripts\Entity\CurtRelatedClass.cs" />
+    <Compile Include="Assets\Scripts\Entity\Entities.cs" />
+    <Compile Include="Assets\Scripts\Entity\StateEntity.cs" />
+    <Compile Include="Assets\Scripts\Entity\TransitionEntity.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Scripts\GlobalVariable.cs" />
-    <Compile Include="Assets\Scripts\ItemCondition.cs" />
-    <Compile Include="Assets\Scripts\ItemKV.cs" />
-    <Compile Include="Assets\Scripts\ItemState.cs" />
+    <Compile Include="Assets\Scripts\Global\GlobalObject.cs" />
+    <Compile Include="Assets\Scripts\Global\GlobalVariable.cs" />
+    <Compile Include="Assets\Scripts\ItemControl\BtnLine.cs" />
+    <Compile Include="Assets\Scripts\ItemControl\ItemCondition.cs" />
+    <Compile Include="Assets\Scripts\ItemControl\ItemKV.cs" />
+    <Compile Include="Assets\Scripts\ItemControl\ItemState.cs" />
     <Compile Include="Assets\Scripts\SettingPanel.cs" />
-    <Compile Include="Assets\Scripts\Test.cs" />
-    <None Include="Assets\Resources\XML\YYYXB_Labaction_AND_Condition.xml" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/2019.4.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

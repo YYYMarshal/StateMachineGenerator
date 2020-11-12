@@ -1,5 +1,4 @@
-﻿
-/********************************************************************
+﻿/********************************************************************
 	created:	2020/08/29
 	created:	29:8:2020   22:37
 	filename: 	F:\YYYMARS\DEMO\Unity\StateMachineGenerator\Assets\Scripts\GameManager.cs
@@ -8,32 +7,56 @@
 	file ext:	cs
 	author:		YYYMarshal
 	
-	purpose:	Created before the above time
+	purpose:	BGGameManager UI物体挂载这个脚本
 *********************************************************************/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEditorInternal;
 
 public class GameManager : MonoBehaviour, IPointerClickHandler
 {
-    private GameObject stateGroup;
+    //创建状态的按钮
     private Button btnCreateState;
 
     private void Awake()
     {
-        stateGroup = GameObject.Find("StateGroup");
+        SetGlobalObject();
+        void SetGlobalObject()
+        {
+            GlobalObject.Instance.SettingPanel = GameObject.Find("SettingPanel").gameObject;
+            GlobalObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup").gameObject;
+            GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup").gameObject;
+            GlobalObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup").gameObject;
+        }
+
+        GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup");
+
+        GameObject.Find("SettingPanel").AddComponent<SettingPanel>();
+
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);
 
-        GameObject.Find("SettingPanel").AddComponent<SettingPanel>();
-    }
+        void BtnCreateStateOnClick()
+        {
+            btnCreateState.gameObject.SetActive(false);
+            GameObject newItemState = Instantiate(
+                Resources.Load<GameObject>("Prefabs/ItemState"),
+                new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
+                Quaternion.identity,
+                //将StateGroup作为新生成的ItemState的父物体
+                GlobalObject.Instance.StateGroup.transform);
+            newItemState.AddComponent<ItemState>();
 
-    void Start()
-    {
+            StateEntity state = new StateEntity
+            {
+                goItemState = newItemState,
+                iptName = newItemState.transform.Find("IptName").GetComponent<InputField>()
+            };
+            Entities.Instance.listState.Add(state);
+        }
     }
     void Update()
     {
@@ -53,24 +76,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             btnCreateState.gameObject.SetActive(true);
             btnCreateState.transform.position = Input.mousePosition;
         }
-    }
-    private void BtnCreateStateOnClick()
-    {
-        btnCreateState.gameObject.SetActive(false);
-        GameObject goItemState = Instantiate(
-            Resources.Load<GameObject>("Prefabs/ItemState"),
-            new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
-            Quaternion.identity,
-            //Set Canvas as its parent
-            stateGroup.transform);
-        goItemState.AddComponent<ItemState>();
-
-        StateClass state = new StateClass
-        {
-            goItemState = goItemState,
-            iptName = goItemState.transform.Find("IptName").GetComponent<InputField>()
-        };
-        GlobalVariable.Instance.lstState.Add(state);
     }
 
 }
