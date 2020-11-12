@@ -20,18 +20,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     //创建状态的按钮
     private Button btnCreateState;
 
+    private GameObject imgESC;
     private void Awake()
     {
         SetGlobalObject();
         void SetGlobalObject()
         {
-            GlobalObject.Instance.SettingPanel = GameObject.Find("SettingPanel").gameObject;
-            GlobalObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup").gameObject;
-            GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup").gameObject;
-            GlobalObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup").gameObject;
+            GlobalObject.Instance.SettingPanel = GameObject.Find("SettingPanel");
+            GlobalObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
+            GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup");
+            GlobalObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
         }
 
-        GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup");
 
         GameObject.Find("SettingPanel").AddComponent<SettingPanel>();
 
@@ -39,6 +39,11 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);
 
+        imgESC = transform.parent.Find("ImgESC").gameObject;
+        imgESC.transform.Find("BtnGroup/BtnExit").GetComponent<Button>().onClick.AddListener(BtnExitOnClick);
+        imgESC.transform.Find("BtnGroup/BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
+
+        #region 本地函数：点击事件
         void BtnCreateStateOnClick()
         {
             btnCreateState.gameObject.SetActive(false);
@@ -57,6 +62,21 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             };
             Entities.Instance.listState.Add(state);
         }
+        void BtnExitOnClick()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+        }
+        void BtnHelpOnClick()
+        {
+            string url =
+                "http://note.youdao.com/noteshare?id=776559f906a009afc108ba7aa10ef1c1&sub=C833CC45DFD44CD7B5C39A92024A5CFB";
+            Application.OpenURL(url);
+        }
+        #endregion
     }
     void Update()
     {
@@ -66,7 +86,13 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         //V2.0 : Don't use Input.GetMouseButtonDown(1) method anymore, 
         //so don't need the comments above.
         if (Input.GetMouseButtonUp(0))
+        {
             btnCreateState.gameObject.SetActive(false);
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            imgESC.SetActive(!imgESC.activeSelf);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)

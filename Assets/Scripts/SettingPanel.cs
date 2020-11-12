@@ -33,8 +33,8 @@ public class SettingPanel : MonoBehaviour
     private Toggle toggleCondition;
     #endregion
 
-    readonly List<List<KeyValuePair<string, string>>> lstXmlAction = new List<List<KeyValuePair<string, string>>>();
-    readonly List<List<KeyValuePair<string, string>>> lstXmlCondition = new List<List<KeyValuePair<string, string>>>();
+    readonly List<List<KeyValuePair<string, string>>> listXmlAction = new List<List<KeyValuePair<string, string>>>();
+    readonly List<List<KeyValuePair<string, string>>> listXmlCondition = new List<List<KeyValuePair<string, string>>>();
 
     private void Awake()
     {
@@ -48,7 +48,6 @@ public class SettingPanel : MonoBehaviour
         void SetTopMenuUI()
         {
             transform.Find("TopMenu").Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
-            transform.Find("TopMenu").Find("BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         }
         void SetStateUI()
         {
@@ -89,8 +88,8 @@ public class SettingPanel : MonoBehaviour
     private void InitDdlActionDdlConditionByXml()
     {
         ReadXmlDoc();
-        lstXmlAction.ForEach(item => ddlAction.options.Add(new Dropdown.OptionData(item[0].Value)));
-        lstXmlCondition.ForEach(item => ddlCondition.options.Add(new Dropdown.OptionData(item[0].Value)));
+        listXmlAction.ForEach(item => ddlAction.options.Add(new Dropdown.OptionData(item[0].Value)));
+        listXmlCondition.ForEach(item => ddlCondition.options.Add(new Dropdown.OptionData(item[0].Value)));
 
         void ReadXmlDoc()
         {
@@ -106,36 +105,19 @@ public class SettingPanel : MonoBehaviour
                         //Because elem.Attributes is XmlAttributeCollection Type, so cannot use ForEach()
                         foreach (XmlAttribute item in elem.Attributes)
                             lstTempA.Add(new KeyValuePair<string, string>(item.Name, item.InnerXml));
-                        lstXmlAction.Add(lstTempA);
+                        listXmlAction.Add(lstTempA);
                         break;
                     case "Condition":
                         List<KeyValuePair<string, string>> lstTempB = new List<KeyValuePair<string, string>>();
                         foreach (XmlAttribute item in elem.Attributes)
                             lstTempB.Add(new KeyValuePair<string, string>(item.Name, item.InnerXml));
-                        lstXmlCondition.Add(lstTempB);
+                        listXmlCondition.Add(lstTempB);
                         break;
                 }
             }
         }
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     #region TopMenu
-    private void BtnHelpOnClick()
-    {
-        string url =
-            "http://note.youdao.com/noteshare?id=776559f906a009afc108ba7aa10ef1c1&sub=C833CC45DFD44CD7B5C39A92024A5CFB";
-        Application.OpenURL(url);
-    }
     #endregion
 
     #region State Methods
@@ -170,17 +152,17 @@ public class SettingPanel : MonoBehaviour
             List<List<KeyValuePair<string, string>>> lstICStr = Entities.Instance.listTransition[spLI].listItemConditionStr;
             List<KeyValuePair<string, string>> lstTemp = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("type = ", lstXmlCondition[index][0].Value)
+                new KeyValuePair<string, string>("type = ", listXmlCondition[index][0].Value)
             };
             goItemCondition.transform.Find("TxtTypeKV").GetComponent<Text>().text = lstTemp[0].Key + lstTemp[0].Value;
 
             GameObject goKVGroup = goItemCondition.transform.Find("KVGroup").gameObject;
             //i从1开始，即从第二个属性开始，是因为第一个属性为type
-            for (int i = 1; i < lstXmlCondition[index].Count; i++)
+            for (int i = 1; i < listXmlCondition[index].Count; i++)
             {
                 GameObject goItemKV = Instantiate(Resources.Load<GameObject>("Prefabs/ItemKV"), goKVGroup.transform);
-                string key = $"{lstXmlCondition[index][i].Key} = ";
-                string value = lstXmlCondition[index][i].Value;
+                string key = $"{listXmlCondition[index][i].Key} = ";
+                string value = listXmlCondition[index][i].Value;
                 lstTemp.Add(new KeyValuePair<string, string>(key, value));
                 goItemKV.transform.Find("TxtKey").GetComponent<Text>().text = key;
                 goItemKV.transform.Find("IptValue").GetComponent<InputField>().text = value;

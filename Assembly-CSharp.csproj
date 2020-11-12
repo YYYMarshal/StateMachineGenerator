@@ -63,11 +63,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Entity\CurtRelatedClass.cs" />
     <Compile Include="Assets\Scripts\Entity\Entities.cs" />
     <Compile Include="Assets\Scripts\Entity\StateEntity.cs" />
     <Compile Include="Assets\Scripts\Entity\TransitionEntity.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Global\CurtRelatedClass.cs" />
     <Compile Include="Assets\Scripts\Global\GlobalObject.cs" />
     <Compile Include="Assets\Scripts\Global\GlobalVariable.cs" />
     <Compile Include="Assets\Scripts\ItemControl\BtnLine.cs" />
