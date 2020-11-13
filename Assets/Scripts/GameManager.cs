@@ -26,22 +26,20 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         SetGlobalObject();
         void SetGlobalObject()
         {
-            GlobalObject.Instance.SettingPanel = GameObject.Find("SettingPanel");
-            GlobalObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
-            GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup");
-            GlobalObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
+            HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
+            HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
+            HierarchyObject.Instance.SettingPanel = GameObject.Find("SettingPanel");
+            HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
+
+            HierarchyObject.Instance.SettingPanel.AddComponent<SettingPanelController>();
         }
-
-
-        GameObject.Find("SettingPanel").AddComponent<SettingPanel>();
 
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);
 
         imgESC = transform.parent.Find("ImgESC").gameObject;
-        imgESC.transform.Find("BtnGroup/BtnExit").GetComponent<Button>().onClick.AddListener(BtnExitOnClick);
-        imgESC.transform.Find("BtnGroup/BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
+        imgESC.AddComponent<ImageESCController>();
 
         #region 本地函数：点击事件
         void BtnCreateStateOnClick()
@@ -52,7 +50,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
                 Quaternion.identity,
                 //将StateGroup作为新生成的ItemState的父物体
-                GlobalObject.Instance.StateGroup.transform);
+                HierarchyObject.Instance.StateGroup.transform);
             newItemState.AddComponent<ItemState>();
 
             StateEntity state = new StateEntity
@@ -61,20 +59,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 iptName = newItemState.transform.Find("IptName").GetComponent<InputField>()
             };
             Entities.Instance.listState.Add(state);
-        }
-        void BtnExitOnClick()
-        {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
-        }
-        void BtnHelpOnClick()
-        {
-            string url =
-                "http://note.youdao.com/noteshare?id=776559f906a009afc108ba7aa10ef1c1&sub=C833CC45DFD44CD7B5C39A92024A5CFB";
-            Application.OpenURL(url);
         }
         #endregion
     }

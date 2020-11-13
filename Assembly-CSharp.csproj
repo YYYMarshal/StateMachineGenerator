@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{965B4760-8AD8-792B-9700-1C9873FECE41}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -67,14 +68,15 @@
     <Compile Include="Assets\Scripts\Entity\StateEntity.cs" />
     <Compile Include="Assets\Scripts\Entity\TransitionEntity.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Scripts\Global\CurtRelatedClass.cs" />
-    <Compile Include="Assets\Scripts\Global\GlobalObject.cs" />
+    <Compile Include="Assets\Scripts\Global\CurrentVariable.cs" />
+    <Compile Include="Assets\Scripts\Global\HierarchyObject.cs" />
     <Compile Include="Assets\Scripts\Global\GlobalVariable.cs" />
     <Compile Include="Assets\Scripts\ItemControl\BtnLine.cs" />
     <Compile Include="Assets\Scripts\ItemControl\ItemCondition.cs" />
     <Compile Include="Assets\Scripts\ItemControl\ItemKV.cs" />
     <Compile Include="Assets\Scripts\ItemControl\ItemState.cs" />
-    <Compile Include="Assets\Scripts\SettingPanel.cs" />
+    <Compile Include="Assets\Scripts\UIController\ImageESCController.cs" />
+    <Compile Include="Assets\Scripts\UIController\SettingPanelController.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/2019.4.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
@@ -631,7 +633,8 @@
       <HintPath>E:/DEMO/yuxuebing/StateMachineGenerator/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup></ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

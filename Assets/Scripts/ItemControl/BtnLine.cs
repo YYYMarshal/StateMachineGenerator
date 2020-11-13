@@ -44,8 +44,8 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
             if (!goSettingPanel.activeSelf)
                 goSettingPanel.SetActive(true);
             int index = transform.GetSiblingIndex();
-            GlobalVariable.Instance.curt.settingPanelLineIndex = index;     //这一行代码一定要在下面一行代码的前面  2020-9-15 17:39:26
-            goSettingPanel.GetComponent<SettingPanel>().SetSettingPanel(Entities.Instance.listTransition[index]);
+            CurrentVariable.Instance.settingPanelLineIndex = index;     //这一行代码一定要在下面一行代码的前面  2020-9-15 17:39:26
+            goSettingPanel.GetComponent<SettingPanelController>().SetSettingPanel(Entities.Instance.listTransition[index]);
         }
         void BtnLineDelOnClick()
         {
