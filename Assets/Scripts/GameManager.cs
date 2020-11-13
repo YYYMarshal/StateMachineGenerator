@@ -20,25 +20,28 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     //创建状态的按钮
     private Button btnCreateState;
 
+    private GameObject imgESC;
     private void Awake()
     {
         SetGlobalObject();
         void SetGlobalObject()
         {
-            GlobalObject.Instance.SettingPanel = GameObject.Find("SettingPanel").gameObject;
-            GlobalObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup").gameObject;
-            GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup").gameObject;
-            GlobalObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup").gameObject;
+            HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
+            HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
+            HierarchyObject.Instance.SettingPanel = GameObject.Find("SettingPanel");
+            HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
+
+            HierarchyObject.Instance.SettingPanel.AddComponent<SettingPanelController>();
         }
-
-        GlobalObject.Instance.StateGroup = GameObject.Find("StateGroup");
-
-        GameObject.Find("SettingPanel").AddComponent<SettingPanel>();
 
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);
 
+        imgESC = transform.parent.Find("ImgESC").gameObject;
+        imgESC.AddComponent<ImageESCController>();
+
+        #region 本地函数：点击事件
         void BtnCreateStateOnClick()
         {
             btnCreateState.gameObject.SetActive(false);
@@ -47,7 +50,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
                 Quaternion.identity,
                 //将StateGroup作为新生成的ItemState的父物体
-                GlobalObject.Instance.StateGroup.transform);
+                HierarchyObject.Instance.StateGroup.transform);
             newItemState.AddComponent<ItemState>();
 
             StateEntity state = new StateEntity
@@ -57,6 +60,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             };
             Entities.Instance.listState.Add(state);
         }
+        #endregion
     }
     void Update()
     {
@@ -66,7 +70,13 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         //V2.0 : Don't use Input.GetMouseButtonDown(1) method anymore, 
         //so don't need the comments above.
         if (Input.GetMouseButtonUp(0))
+        {
             btnCreateState.gameObject.SetActive(false);
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            imgESC.SetActive(!imgESC.activeSelf);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)

@@ -53,10 +53,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //ShowSettingPanel
         void BtnSelectedOnClick()
         {
-            if (!GlobalObject.Instance.SettingPanel.activeSelf)
-                GlobalObject.Instance.SettingPanel.SetActive(true);
+            if (!HierarchyObject.Instance.SettingPanel.activeSelf)
+                HierarchyObject.Instance.SettingPanel.SetActive(true);
 
-            GlobalObject.Instance.SettingPanel.GetComponent<SettingPanel>().SetSettingPanel(Entities.Instance.listState[GetCurtStateIndex()]);
+            HierarchyObject.Instance.SettingPanel.GetComponent<SettingPanelController>().SetSettingPanel(Entities.Instance.listState[GetCurtStateIndex()]);
         }
         void BtnStateDeleteOnClick()
         {
@@ -88,15 +88,15 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
             Destroy(gameObject);
             Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurtStateIndex()]);
-            GlobalObject.Instance.SettingPanel.SetActive(false);
+            HierarchyObject.Instance.SettingPanel.SetActive(false);
         }
         #endregion
     }
     private void Update()
     {
-        if (GlobalVariable.Instance.curt.isLineStartPaint)
+        if (CurrentVariable.Instance.isLineStartPaint)
         {
-            GlobalVariable.Instance.curt.line.SetPosition(1, GetRayPoint(Input.mousePosition));
+            CurrentVariable.Instance.line.SetPosition(1, GetRayPoint(Input.mousePosition));
         }
     }
 
@@ -149,12 +149,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //If right-click to the state image gameobject, start drawing ray.
         //如果不加 !isLineStartPaint 的判断，那么两次 右键鼠标，便会出错
         if (eventData.button == PointerEventData.InputButton.Right &&
-            !GlobalVariable.Instance.curt.isLineStartPaint)
+            !CurrentVariable.Instance.isLineStartPaint)
         {
             CreateLine();
         }
         //If left-click to the state image gameobject, end drawing ray.
-        else if (eventData.button == PointerEventData.InputButton.Left && GlobalVariable.Instance.curt.isLineStartPaint)
+        else if (eventData.button == PointerEventData.InputButton.Left && CurrentVariable.Instance.isLineStartPaint)
         {
             EndDrawRay();
         }
@@ -166,7 +166,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 Resources.Load<GameObject>("Prefabs/ItemLine"),
                 Vector3.zero,
                 Quaternion.identity,
-                GlobalObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
+                HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
             TransitionEntity transition = new TransitionEntity()
             {
@@ -178,16 +178,16 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
             Entities.Instance.listTransition.Add(transition);
 
-            GlobalVariable.Instance.curt.line = lineRenderer;
-            GlobalVariable.Instance.curt.isLineStartPaint = true;
-            GlobalVariable.Instance.curt.itemStateLineIndex = GetCurtLineIndex(lineRenderer);
+            CurrentVariable.Instance.line = lineRenderer;
+            CurrentVariable.Instance.isLineStartPaint = true;
+            CurrentVariable.Instance.itemStateLineIndex = GetCurtLineIndex(lineRenderer);
         }
         void EndDrawRay()
         {
-            int curtLineIndex = GlobalVariable.Instance.curt.itemStateLineIndex;
+            int curtLineIndex = CurrentVariable.Instance.itemStateLineIndex;
             TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
             transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
-            GlobalVariable.Instance.curt.isLineStartPaint = false;
+            CurrentVariable.Instance.isLineStartPaint = false;
 
             transition.next = gameObject;
             ControlBtnLine(transition);
@@ -234,19 +234,21 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         if (isCreate)
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
-               new Vector2(x, y), Quaternion.identity, GlobalObject.Instance.BtnLineGroup.transform);
+               new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);
             goBtnLine.AddComponent<BtnLine>();
             transition.btnLine = goBtnLine.GetComponent<Button>();
         }
         else
+        {
             transition.btnLine.transform.position = new Vector2(x, y);
+        }
     }
     private void DestroyLineAndBtnDel(int curtLineIndex)
     {
         //因为生成LineRenderer物体后，在该LineRenderer物体结束绘制后，会生成BtnLine物体，
         //则这两个物体在其父物体上的索引是一样的，可以用相同的索引值来删除物体
-        Destroy(GlobalObject.Instance.PlaneLineGroup.transform.GetChild(curtLineIndex).gameObject);
-        Destroy(GlobalObject.Instance.BtnLineGroup.transform.GetChild(curtLineIndex).gameObject);
+        Destroy(HierarchyObject.Instance.PlaneLineGroup.transform.GetChild(curtLineIndex).gameObject);
+        Destroy(HierarchyObject.Instance.BtnLineGroup.transform.GetChild(curtLineIndex).gameObject);
     }
     /// <summary>
     /// LineRenderer所需的点的位置与UI位置不同，需要转换成RaycastHit.point

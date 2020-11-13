@@ -19,8 +19,7 @@ using UnityEngine.UI;
 public class GlobalVariable
 {
     #region 单例
-    private static readonly Lazy<GlobalVariable> lazy =
-   new Lazy<GlobalVariable>(() => new GlobalVariable());
+    private static readonly Lazy<GlobalVariable> lazy = new Lazy<GlobalVariable>(() => new GlobalVariable());
     public static GlobalVariable Instance
     {
         get
@@ -29,8 +28,6 @@ public class GlobalVariable
         }
     }
     #endregion
-
-    public CurtRelatedClass curt = new CurtRelatedClass();
 
     public string PathXml = $"{Application.dataPath}/../XML/YYYXB_Labaction_AND_Condition.xml";
 }
