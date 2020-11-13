@@ -18,7 +18,8 @@ using System;
 public class CurrentVariable
 {
     #region 单例
-    private static readonly Lazy<CurrentVariable> lazy = new Lazy<CurrentVariable>(() => new CurrentVariable());
+    private static readonly Lazy<CurrentVariable> lazy = 
+        new Lazy<CurrentVariable>(() => new CurrentVariable());
     public static CurrentVariable Instance
     {
         get
@@ -34,6 +35,6 @@ public class CurrentVariable
     public bool isLineStartPaint = false;
     //ItemState中用的：当前的Line索引
     public int itemStateLineIndex = 0;
-    //SettingPanel中用的：当前的Line OR BtnLine索引
-    public int settingPanelLineIndex = 0;
+    //ContentPanel中用的：当前的Line OR BtnLine索引
+    public int contentPanelLineIndex = 0;
 }

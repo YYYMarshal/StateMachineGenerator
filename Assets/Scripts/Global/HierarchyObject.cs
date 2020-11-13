@@ -27,9 +27,10 @@ public class HierarchyObject
     } 
     #endregion
 
-    public GameObject SettingPanel;
     public GameObject BtnLineGroup;
     public GameObject StateGroup;
     public GameObject PlaneLineGroup;
 
+    public GameObject ContentPanel;
+    public GameObject MenuPanel;
 }

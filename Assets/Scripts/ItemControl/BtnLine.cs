@@ -22,7 +22,7 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
     private GameObject goPlaneLineGroup;
     private GameObject goBtnLineGroup;
 
-    private GameObject goSettingPanel;
+    private GameObject goContentPanel;
 
     private Button btnLineDel;
     private void Awake()
@@ -30,7 +30,7 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
         goPlaneLineGroup = GameObject.Find("PlaneLineGroup");
         goBtnLineGroup = GameObject.Find("BtnLineGroup");
 
-        goSettingPanel = transform.parent.parent.Find("SettingPanel").gameObject;
+        goContentPanel = transform.parent.parent.Find("ContentPanel").gameObject;
 
         transform.GetComponent<Button>().onClick.AddListener(BtnLineOnClick);
 
@@ -41,11 +41,11 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
         #region 本地函数：点击事件
         void BtnLineOnClick()
         {
-            if (!goSettingPanel.activeSelf)
-                goSettingPanel.SetActive(true);
+            if (!goContentPanel.activeSelf)
+                goContentPanel.SetActive(true);
             int index = transform.GetSiblingIndex();
-            CurrentVariable.Instance.settingPanelLineIndex = index;     //这一行代码一定要在下面一行代码的前面  2020-9-15 17:39:26
-            goSettingPanel.GetComponent<SettingPanelController>().SetSettingPanel(Entities.Instance.listTransition[index]);
+            CurrentVariable.Instance.contentPanelLineIndex = index;     //这一行代码一定要在下面一行代码的前面  2020-9-15 17:39:26
+            goContentPanel.GetComponent<ContentPanelController>().SetContentPanel(Entities.Instance.listTransition[index]);
         }
         void BtnLineDelOnClick()
         {
@@ -54,7 +54,7 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
             Destroy(goBtnLineGroup.transform.GetChild(index).gameObject);
             Entities.Instance.listTransition.RemoveAt(index);
             //btnLineDel.gameObject.SetActive(false);
-            goSettingPanel.SetActive(false);
+            goContentPanel.SetActive(false);
         }
         #endregion
     }

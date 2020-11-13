@@ -11,7 +11,7 @@ public class ItemKV : MonoBehaviour
     }
     private void IptValueOnEndEdit(string str)
     {
-        int spLI = CurrentVariable.Instance.settingPanelLineIndex;
+        int spLI = CurrentVariable.Instance.contentPanelLineIndex;
         int IndexItemCondition = transform.parent.parent.GetSiblingIndex();
         int IndexItemKV = transform.GetSiblingIndex();
         Debug.Log(IndexItemCondition + "      " + IndexItemKV);

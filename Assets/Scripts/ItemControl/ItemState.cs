@@ -53,10 +53,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //ShowSettingPanel
         void BtnSelectedOnClick()
         {
-            if (!HierarchyObject.Instance.SettingPanel.activeSelf)
-                HierarchyObject.Instance.SettingPanel.SetActive(true);
+            if (!HierarchyObject.Instance.ContentPanel.activeSelf)
+                HierarchyObject.Instance.ContentPanel.SetActive(true);
 
-            HierarchyObject.Instance.SettingPanel.GetComponent<SettingPanelController>().SetSettingPanel(Entities.Instance.listState[GetCurtStateIndex()]);
+            HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().SetContentPanel(Entities.Instance.listState[GetCurtStateIndex()]);
         }
         void BtnStateDeleteOnClick()
         {
@@ -88,7 +88,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
             Destroy(gameObject);
             Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurtStateIndex()]);
-            HierarchyObject.Instance.SettingPanel.SetActive(false);
+            HierarchyObject.Instance.ContentPanel.SetActive(false);
         }
         #endregion
     }

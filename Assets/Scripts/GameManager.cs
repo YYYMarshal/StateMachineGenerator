@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     //创建状态的按钮
     private Button btnCreateState;
 
-    private GameObject imgESC;
+    private GameObject goSettingPanel;
     private void Awake()
     {
         SetGlobalObject();
@@ -28,18 +28,22 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         {
             HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
             HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
-            HierarchyObject.Instance.SettingPanel = GameObject.Find("SettingPanel");
             HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
 
-            HierarchyObject.Instance.SettingPanel.AddComponent<SettingPanelController>();
+            HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
+            HierarchyObject.Instance.MenuPanel = transform.parent.Find("MenuPanel").gameObject;
+
+            HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
+            HierarchyObject.Instance.MenuPanel.SetActive(false);
         }
 
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);
 
-        imgESC = transform.parent.Find("ImgESC").gameObject;
-        imgESC.AddComponent<ImageESCController>();
+        goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
+        goSettingPanel.AddComponent<SettingPanelController>();
+        goSettingPanel.SetActive(false);
 
         #region 本地函数：点击事件
         void BtnCreateStateOnClick()
@@ -75,7 +79,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
-            imgESC.SetActive(!imgESC.activeSelf);
+            goSettingPanel.SetActive(!goSettingPanel.activeSelf);
         }
     }
 
