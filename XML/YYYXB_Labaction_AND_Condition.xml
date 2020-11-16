@@ -10,7 +10,7 @@
 
   <Action type="anim" path="PATHPATH" anim="kaiguan1" />
   <Action type="animation" path="PATHPATH" anim="ANIMANIM" state="0"/>
-
+<!--fdasdfsa -->
   <Action type="roleplayeranim" anim="Jump" />
   <Action type="rotate" path="CJY_project/CJY_fm/CJY_fm/fm_zf/zf_299/zf_sl 124" from="0" to="-180" speed="60" axi="up"/>
 

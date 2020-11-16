@@ -70,11 +70,10 @@
     <Compile Include="Assets\Scripts\Global\CurrentVariable.cs" />
     <Compile Include="Assets\Scripts\Global\GlobalVariable.cs" />
     <Compile Include="Assets\Scripts\Global\HierarchyObject.cs" />
-    <Compile Include="Assets\Scripts\ItemControl\BtnLine.cs" />
-    <Compile Include="Assets\Scripts\ItemControl\ItemCondition.cs" />
-    <Compile Include="Assets\Scripts\ItemControl\ItemKV.cs" />
     <Compile Include="Assets\Scripts\ItemControl\ItemState.cs" />
+    <Compile Include="Assets\Scripts\ItemControl\ItemTransition.cs" />
     <Compile Include="Assets\Scripts\UIController\ContentPanelController.cs" />
+    <Compile Include="Assets\Scripts\UIController\MenuPanelController.cs" />
     <Compile Include="Assets\Scripts\UIController\SettingPanelController.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/2019.4.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>

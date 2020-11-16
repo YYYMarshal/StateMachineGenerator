@@ -14,6 +14,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Net;
+using System.IO;
+using System.Text;
 
 public class GameManager : MonoBehaviour, IPointerClickHandler
 {
@@ -23,18 +26,41 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     private GameObject goSettingPanel;
     private void Awake()
     {
-        SetGlobalObject();
-        void SetGlobalObject()
+        Debug.Log(Test());
+        string Test()
         {
-            HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
+            string sa = "";
+            WebRequest wr = WebRequest.Create("http://note.youdao.com/noteshare?id=776559f906a009afc108ba7aa10ef1c1&sub=C833CC45DFD44CD7B5C39A92024A5CFB");
+            Stream s = wr.GetResponse().GetResponseStream();
+            StreamReader sr = new StreamReader(s, Encoding.Default);
+            string all = sr.ReadToEnd(); //读取网站的数据
+            int start = 0;
+            int end = 0;
+            while (all.Contains("<i>"))
+            {
+                start = all.IndexOf("<i>");
+                end = all.IndexOf("</i>");
+                string content = all.Substring(start + 3, end - start - 3);
+                all = all.Substring(end + 1, all.Length - (end + 1));
+                sa += content + "。                    ";
+            }
+            sr.Close();
+            s.Close();
+            return sa;
+        }
+
+        SetHierarchyObject();
+        void SetHierarchyObject()
+        {
             HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
+            HierarchyObject.Instance.TransitionGroup = GameObject.Find("TransitionGroup");
             HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
 
             HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
             HierarchyObject.Instance.MenuPanel = transform.parent.Find("MenuPanel").gameObject;
 
             HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
-            HierarchyObject.Instance.MenuPanel.SetActive(false);
+            HierarchyObject.Instance.MenuPanel.AddComponent<MenuPanelController>();
         }
 
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
@@ -43,7 +69,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
         goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
         goSettingPanel.AddComponent<SettingPanelController>();
-        goSettingPanel.SetActive(false);
 
         #region 本地函数：点击事件
         void BtnCreateStateOnClick()
