@@ -18,18 +18,6 @@ public class MenuPanelController : MonoBehaviour
 
         InitListByXmlFile();
     }
-    public void ShowMenuPanel(bool isAction)
-    {
-        gameObject.SetActive(true);
-        Transform imgBg = transform.Find("ImgBg");
-
-        foreach (KeyValuePair<string,string> item in listAction)
-        {
-            GameObject btn = Instantiate(
-                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
-            btn.transform.GetChild(0).GetComponent<Text>().text = item.Key;
-        }
-    }
     private void InitListByXmlFile()
     {
         XmlReaderSettings settings = new XmlReaderSettings()
@@ -55,6 +43,30 @@ public class MenuPanelController : MonoBehaviour
                             elem.Attributes["type"].InnerXml, elem.OuterXml));
                     break;
             }
+        }
+    }
+
+    /// <summary>
+    /// 公开函数：设置MenuPanelUI
+    /// </summary>
+    /// <param name="isAction"></param>
+    public void ShowMenuPanel(bool isAction)
+    {
+        if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
+        Transform imgBg = transform.Find("ImgBg");
+
+        for (int i = 0; i < imgBg.childCount; i++)
+        {
+            Destroy(imgBg.GetChild(i).gameObject);
+        }
+
+        foreach (KeyValuePair<string, string> item in isAction ? listAction : listCondition)
+        {
+            GameObject goBtnAC = Instantiate(
+                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
+            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = item.Key;
+            //goBtnAC.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
         }
     }
 }

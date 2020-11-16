@@ -53,14 +53,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //ShowSettingPanel
         void BtnSelectedOnClick()
         {
-            if (!HierarchyObject.Instance.ContentPanel.activeSelf)
-                HierarchyObject.Instance.ContentPanel.SetActive(true);
-
-            HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().SetContentPanel(Entities.Instance.listState[GetCurtStateIndex()]);
+            HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listState[GetCurtStateIndex()]);
         }
         void BtnStateDeleteOnClick()
         {
-
             GameObject state = gameObject;
             //若在for循环中动态删除 GlobalVariable.Instance.lstLine 的元素，则会导致循环次数与预期不符，
             //因为 GlobalVariable.Instance.lstLine 的Count在减少
@@ -103,7 +99,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #region Interface
     public void OnDrag(PointerEventData eventData)
     {
-        if (Input.GetMouseButton(0))
+        //2020-11-16 15:26:39
+        //如果不加 !isLineStartPaint 的判断，那么在LineRenderer的绘制过程中（LineRenderer只开始，未结束）去拖拽StateUI，则会报错。
+        if (Input.GetMouseButton(0) && !CurrentVariable.Instance.isLineStartPaint)
         {
             Vector2 targetPos = Input.mousePosition;
             RectTransform stateRectTrans = gameObject.GetComponent<RectTransform>();
@@ -180,11 +178,11 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
             CurrentVariable.Instance.line = lineRenderer;
             CurrentVariable.Instance.isLineStartPaint = true;
-            CurrentVariable.Instance.itemStateLineIndex = GetCurtLineIndex(lineRenderer);
+            CurrentVariable.Instance.itemLineIndex = GetCurtLineIndex(lineRenderer);
         }
         void EndDrawRay()
         {
-            int curtLineIndex = CurrentVariable.Instance.itemStateLineIndex;
+            int curtLineIndex = CurrentVariable.Instance.itemLineIndex;
             TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
             transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
             CurrentVariable.Instance.isLineStartPaint = false;

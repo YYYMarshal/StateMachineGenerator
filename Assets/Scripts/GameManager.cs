@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     private GameObject goSettingPanel;
     private void Awake()
     {
-        SetGlobalObject();
-        void SetGlobalObject()
+        SetHierarchyObject();
+        void SetHierarchyObject()
         {
             HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
             HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
@@ -32,17 +32,25 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
             HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
             HierarchyObject.Instance.MenuPanel = transform.parent.Find("MenuPanel").gameObject;
+            goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
+
+            //先让其开启一下，是为了让其启用脚本
+            //顺序：查找物体---启用物体---添加脚本
+            HierarchyObject.Instance.ContentPanel.SetActive(true);
+            HierarchyObject.Instance.MenuPanel.SetActive(true);
+            goSettingPanel.SetActive(true);
 
             HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
             HierarchyObject.Instance.MenuPanel.AddComponent<MenuPanelController>();
+            goSettingPanel.AddComponent<SettingPanelController>();
+
+
+            btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
+            btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
+            btnCreateState.gameObject.SetActive(false);
+
         }
 
-        btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
-        btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
-        btnCreateState.gameObject.SetActive(false);
-
-        goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
-        goSettingPanel.AddComponent<SettingPanelController>();
 
         #region 本地函数：点击事件
         void BtnCreateStateOnClick()

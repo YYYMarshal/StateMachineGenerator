@@ -31,11 +31,8 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
         #region 本地函数：点击事件
         void BtnLineOnClick()
         {
-            if (!HierarchyObject.Instance.ContentPanel.activeSelf)
-                HierarchyObject.Instance.ContentPanel.SetActive(true);
             int index = transform.GetSiblingIndex();
-            CurrentVariable.Instance.contentPanelLineIndex = index;     //这一行代码一定要在下面一行代码的前面  2020-9-15 17:39:26
-            HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().SetContentPanel(Entities.Instance.listTransition[index]);
+            HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listTransition[index]);
         }
         void BtnLineDelOnClick()
         {
@@ -43,7 +40,6 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
             Destroy(HierarchyObject.Instance.PlaneLineGroup.transform.GetChild(index).gameObject);
             Destroy(HierarchyObject.Instance.BtnLineGroup.transform.GetChild(index).gameObject);
             Entities.Instance.listTransition.RemoveAt(index);
-            //btnLineDel.gameObject.SetActive(false);
             HierarchyObject.Instance.ContentPanel.SetActive(false);
         }
         #endregion
