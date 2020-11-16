@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 public class ContentPanelController : MonoBehaviour
 {
-    private InputField iptContent;
+    public InputField iptContent;
 
     private StateEntity curtState;
     private TransitionEntity curtTransition;

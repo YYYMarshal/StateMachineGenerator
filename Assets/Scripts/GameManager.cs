@@ -73,6 +73,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         }
         #endregion
     }
+
     void Update()
     {
         //Using up is to close the button after the click event of 

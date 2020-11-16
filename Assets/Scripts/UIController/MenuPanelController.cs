@@ -67,6 +67,10 @@ public class MenuPanelController : MonoBehaviour
                 Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
             goBtnAC.transform.GetChild(0).GetComponent<Text>().text = item.Key;
             //goBtnAC.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().iptContent.text += item.Value + "\n";
+            });
         }
     }
 }
