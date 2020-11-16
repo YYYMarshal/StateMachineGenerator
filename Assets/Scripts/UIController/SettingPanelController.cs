@@ -7,8 +7,6 @@ public class SettingPanelController : MonoBehaviour
 {
     private void Awake()
     {
-        gameObject.SetActive(false);
-
         transform.Find("BtnGroup/BtnExit").GetComponent<Button>().onClick.AddListener(BtnExitOnClick);
         transform.Find("BtnGroup/BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
 

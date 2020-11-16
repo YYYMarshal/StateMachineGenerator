@@ -11,6 +11,7 @@
 *********************************************************************/
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +28,11 @@ public class ContentPanelController : MonoBehaviour
     private Text txtTransitionTopic;
     #endregion
 
+    private readonly List<List<KeyValuePair<string, string>>> listXmlAction =
+        new List<List<KeyValuePair<string, string>>>();
+    private readonly List<List<KeyValuePair<string, string>>> listXmlCondition =
+        new List<List<KeyValuePair<string, string>>>();
+
     private void Awake()
     {
         gameObject.SetActive(false);
@@ -34,6 +40,8 @@ public class ContentPanelController : MonoBehaviour
 
         SetStateUI();
         SetTransitionUI();
+
+        InitListXmlByXmlFile();
 
         void SetStateUI()
         {
@@ -43,16 +51,40 @@ public class ContentPanelController : MonoBehaviour
             goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(() =>
             {
                 if (!HierarchyObject.Instance.MenuPanel.activeSelf)
-                {
-                    HierarchyObject.Instance.MenuPanel.GetComponent<MenuPanelController>().ShowMenuPanel(true);
-                }
+                    HierarchyObject.Instance.MenuPanel.SetActive(true);
             });
         }
         void SetTransitionUI()
         {
             goTransition = transform.Find("Transition").gameObject;
             txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
-
+        }
+    }
+    private void InitListXmlByXmlFile()
+    {
+        XmlDocument xmlFile = new XmlDocument();
+        xmlFile.Load(GlobalVariable.Instance.PathXml);
+        XmlNodeList nodLst = xmlFile.SelectSingleNode("YYYXB").ChildNodes;
+        foreach (XmlElement elem in nodLst)
+        {
+            switch (elem.Name)
+            {
+                case "Action":
+                    List<KeyValuePair<string, string>> listAction =
+                        new List<KeyValuePair<string, string>>();
+                    //Because elem.Attributes is XmlAttributeCollection Type, so cannot use ForEach()
+                    foreach (XmlAttribute item in elem.Attributes)
+                        listAction.Add(new KeyValuePair<string, string>(item.Name, item.InnerXml));
+                    listXmlAction.Add(listAction);
+                    break;
+                case "Condition":
+                    List<KeyValuePair<string, string>> listCondition =
+                        new List<KeyValuePair<string, string>>();
+                    foreach (XmlAttribute item in elem.Attributes)
+                        listCondition.Add(new KeyValuePair<string, string>(item.Name, item.InnerXml));
+                    listXmlCondition.Add(listCondition);
+                    break;
+            }
         }
     }
     #region State Methods

@@ -103,18 +103,15 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #region Interface
     public void OnDrag(PointerEventData eventData)
     {
-        //2020-11-16 10:40:58
-        //如果不加后面的 !isLineStartPaint 的判定，则在右键生成LineRenderer后（LineRenderer在绘制过程中），左键点击某个状态的标题去拖拽这个状态UI，便会报错。
-        if (Input.GetMouseButton(0) && !CurrentVariable.Instance.isLineStartPaint)
+        if (Input.GetMouseButton(0))
         {
-            gameObject.GetComponent<RectTransform>().position = StateDragLimit();
-            OnStateDrag_LineControl();
+            Vector2 targetPos = Input.mousePosition;
+            RectTransform stateRectTrans = gameObject.GetComponent<RectTransform>();
 
-            #region 本地函数
+            StateDragLimit();
             //Control state objects will not move out of the window
-            Vector2 StateDragLimit()
+            void StateDragLimit()
             {
-                Vector2 targetPos = Input.mousePosition;
                 if (Input.mousePosition.x - pivotFromBorder.halfWidth < 0)
                     targetPos.x = pivotFromBorder.halfWidth;
                 if (Input.mousePosition.x + pivotFromBorder.halfWidth > Screen.width)
@@ -124,8 +121,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                     targetPos.y = pivotFromBorder.bottom;
                 if (Input.mousePosition.y + pivotFromBorder.top > Screen.height)
                     targetPos.y = Screen.height - pivotFromBorder.top;
-                return targetPos;
             }
+            stateRectTrans.position = targetPos;
+
+            OnStateDrag_LineControl();
             void OnStateDrag_LineControl()
             {
                 GameObject goState = gameObject;
@@ -142,7 +141,6 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                     ControlBtnLine(transitionClass, false);
                 }
             }
-            #endregion
 
         }
     }
@@ -165,7 +163,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         void CreateLine()
         {
             LineRenderer lineRenderer = Instantiate(
-                Resources.Load<GameObject>("Prefabs/ObjectLineRenderer"),
+                Resources.Load<GameObject>("Prefabs/ItemLine"),
                 Vector3.zero,
                 Quaternion.identity,
                 HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
@@ -235,9 +233,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             transition.next.transform.Find("StartPaintPos").position.y) / 2f;
         if (isCreate)
         {
-            GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/ItemTransitionBtnLine"),
-               new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.TransitionGroup.transform);
-            goBtnLine.AddComponent<ItemTransition>();
+            GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
+               new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);
+            goBtnLine.AddComponent<BtnLine>();
             transition.btnLine = goBtnLine.GetComponent<Button>();
         }
         else
@@ -250,7 +248,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //因为生成LineRenderer物体后，在该LineRenderer物体结束绘制后，会生成BtnLine物体，
         //则这两个物体在其父物体上的索引是一样的，可以用相同的索引值来删除物体
         Destroy(HierarchyObject.Instance.PlaneLineGroup.transform.GetChild(curtLineIndex).gameObject);
-        Destroy(HierarchyObject.Instance.TransitionGroup.transform.GetChild(curtLineIndex).gameObject);
+        Destroy(HierarchyObject.Instance.BtnLineGroup.transform.GetChild(curtLineIndex).gameObject);
     }
     /// <summary>
     /// LineRenderer所需的点的位置与UI位置不同，需要转换成RaycastHit.point
