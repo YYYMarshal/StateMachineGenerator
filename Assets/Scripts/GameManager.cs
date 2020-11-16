@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             HierarchyObject.Instance.MenuPanel = transform.parent.Find("MenuPanel").gameObject;
 
             HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
-            HierarchyObject.Instance.MenuPanel.SetActive(false);
+            HierarchyObject.Instance.MenuPanel.AddComponent<MenuPanelController>();
         }
 
         btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
         goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
         goSettingPanel.AddComponent<SettingPanelController>();
-        goSettingPanel.SetActive(false);
 
         #region 本地函数：点击事件
         void BtnCreateStateOnClick()

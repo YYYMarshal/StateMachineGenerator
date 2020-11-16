@@ -235,7 +235,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
                new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);
-            goBtnLine.AddComponent<BtnLine>();
+            goBtnLine.AddComponent<ItemTransitionBtnLine>();
             transition.btnLine = goBtnLine.GetComponent<Button>();
         }
         else

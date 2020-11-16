@@ -17,21 +17,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BtnLine : MonoBehaviour, IPointerClickHandler
+public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
 {
-    private GameObject goPlaneLineGroup;
-    private GameObject goBtnLineGroup;
-
-    private GameObject goContentPanel;
-
     private Button btnLineDel;
     private void Awake()
     {
-        goPlaneLineGroup = GameObject.Find("PlaneLineGroup");
-        goBtnLineGroup = GameObject.Find("BtnLineGroup");
-
-        goContentPanel = transform.parent.parent.Find("ContentPanel").gameObject;
-
         transform.GetComponent<Button>().onClick.AddListener(BtnLineOnClick);
 
         btnLineDel = transform.Find("BtnLineDel").GetComponent<Button>();
@@ -41,20 +31,20 @@ public class BtnLine : MonoBehaviour, IPointerClickHandler
         #region 本地函数：点击事件
         void BtnLineOnClick()
         {
-            if (!goContentPanel.activeSelf)
-                goContentPanel.SetActive(true);
+            if (!HierarchyObject.Instance.ContentPanel.activeSelf)
+                HierarchyObject.Instance.ContentPanel.SetActive(true);
             int index = transform.GetSiblingIndex();
             CurrentVariable.Instance.contentPanelLineIndex = index;     //这一行代码一定要在下面一行代码的前面  2020-9-15 17:39:26
-            goContentPanel.GetComponent<ContentPanelController>().SetContentPanel(Entities.Instance.listTransition[index]);
+            HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().SetContentPanel(Entities.Instance.listTransition[index]);
         }
         void BtnLineDelOnClick()
         {
             int index = transform.GetSiblingIndex();
-            Destroy(goPlaneLineGroup.transform.GetChild(index).gameObject);
-            Destroy(goBtnLineGroup.transform.GetChild(index).gameObject);
+            Destroy(HierarchyObject.Instance.PlaneLineGroup.transform.GetChild(index).gameObject);
+            Destroy(HierarchyObject.Instance.BtnLineGroup.transform.GetChild(index).gameObject);
             Entities.Instance.listTransition.RemoveAt(index);
             //btnLineDel.gameObject.SetActive(false);
-            goContentPanel.SetActive(false);
+            HierarchyObject.Instance.ContentPanel.SetActive(false);
         }
         #endregion
     }
