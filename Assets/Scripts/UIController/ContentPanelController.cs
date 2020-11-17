@@ -18,11 +18,23 @@ using UnityEngine.UI;
 
 public class ContentPanelController : MonoBehaviour
 {
-    public InputField iptContent;
+    #region Hierarchy Object
+    private InputField iptContent;
+    private GameObject menuGroup;
+    #endregion
 
+    #region Menu Releated
+    private readonly List<KeyValuePair<string, string>> listAction =
+        new List<KeyValuePair<string, string>>();
+    private readonly List<KeyValuePair<string, string>> listCondition =
+        new List<KeyValuePair<string, string>>();
+    #endregion
+
+    #region Curt
     private StateEntity curtState;
     private TransitionEntity curtTransition;
     private bool isInputState = false;
+    #endregion
 
     #region State Properties
     private GameObject goState;
@@ -37,16 +49,18 @@ public class ContentPanelController : MonoBehaviour
     private void Awake()
     {
         gameObject.SetActive(false);
-        transform.Find("BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+        transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
 
-        iptContent = transform.Find("IptContent").GetComponent<InputField>();
+        iptContent = transform.Find("BottomGroup/IptContent").GetComponent<InputField>();
         iptContent.onEndEdit.AddListener((value) =>
         {
-            if (isInputState)
-                curtState.content = value;
-            else
-                curtTransition.content = value;
+            SetEntityContent(value);
         });
+
+        menuGroup = transform.Find("MenuGroup").gameObject;
+        menuGroup.GetComponent<Button>().onClick.AddListener(() => menuGroup.SetActive(false));
+        menuGroup.SetActive(false);
+        InitListByXmlFile();
 
         SetStateUI();
         SetTransitionUI();
@@ -54,23 +68,50 @@ public class ContentPanelController : MonoBehaviour
         #region 本地函数
         void SetStateUI()
         {
-            goState = transform.Find("State").gameObject;
+            goState = transform.Find("BottomGroup/State").gameObject;
             txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
 
             goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(() =>
             {
-                HierarchyObject.Instance.MenuPanel.GetComponent<MenuPanelController>().ShowMenuPanel(true);
+                ShowMenuGroup(true);
             });
         }
         void SetTransitionUI()
         {
-            goTransition = transform.Find("Transition").gameObject;
+            goTransition = transform.Find("BottomGroup/Transition").gameObject;
             txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
 
             goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(() =>
             {
-                HierarchyObject.Instance.MenuPanel.GetComponent<MenuPanelController>().ShowMenuPanel(false);
+                ShowMenuGroup(false);
             });
+        }
+        void InitListByXmlFile()
+        {
+            XmlReaderSettings settings = new XmlReaderSettings()
+            {
+                IgnoreComments = true
+            };
+            XmlReader reader = XmlReader.Create(GlobalVariable.Instance.PathXml, settings);
+            XmlDocument doc = new XmlDocument();
+            doc.Load(reader);
+            XmlNodeList nodLst = doc.SelectSingleNode("YYYXB").ChildNodes;
+            foreach (XmlElement elem in nodLst)
+            {
+                switch (elem.Name)
+                {
+                    case "Action":
+                        listAction.Add(
+                            new KeyValuePair<string, string>(
+                                elem.Attributes["type"].InnerXml, elem.OuterXml));
+                        break;
+                    case "Condition":
+                        listCondition.Add(
+                            new KeyValuePair<string, string>(
+                                elem.Attributes["type"].InnerXml, elem.OuterXml));
+                        break;
+                }
+            }
         }
         #endregion
     }
@@ -104,7 +145,7 @@ public class ContentPanelController : MonoBehaviour
         }
         txtTransitionTopic.text = $"From : {preState.iptName.text}\n" +
             $"    To : {nextState.iptName.text}";
-        transition.topic = preState.iptName.text + "###" + nextState.iptName.text;
+        transition.topic = preState.iptName.text + "#" + nextState.iptName.text;
     }
 
     #region 公共代码部分
@@ -121,6 +162,39 @@ public class ContentPanelController : MonoBehaviour
         curtState = state;
         curtTransition = transition;
         iptContent.text = isState ? state.content : transition.content;
+    }
+
+    private void ShowMenuGroup(bool isAction)
+    {
+        if (!menuGroup.activeSelf)
+            menuGroup.SetActive(true);
+        Transform imgBg = transform.Find("MenuGroup/ImgBg");
+
+        for (int i = 0; i < imgBg.childCount; i++)
+        {
+            Destroy(imgBg.GetChild(i).gameObject);
+        }
+
+        foreach (KeyValuePair<string, string> item in isAction ? listAction : listCondition)
+        {
+            GameObject goBtnAC = Instantiate(
+                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
+            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = item.Key;
+            //goBtnAC.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
+            {
+                //HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().iptContent.text += item.Value + "\n";
+                iptContent.text += item.Value + "\n";
+                SetEntityContent(iptContent.text);
+            });
+        }
+    }
+    private void SetEntityContent(string value)
+    {
+        if (isInputState)
+            curtState.content = value;
+        else
+            curtTransition.content = value;
     }
     #endregion
 }

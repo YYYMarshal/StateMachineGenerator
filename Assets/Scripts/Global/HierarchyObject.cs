@@ -32,5 +32,4 @@ public class HierarchyObject
     public GameObject PlaneLineGroup;
 
     public GameObject ContentPanel;
-    public GameObject MenuPanel;
 }
