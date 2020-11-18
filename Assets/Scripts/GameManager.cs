@@ -40,10 +40,8 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
                 StopAllCoroutines();
             }
             animation.Play("TextTipAni");
-            StartCoroutine(AnimationPlayDone(animation.GetClip("TextTipAni").length, () =>
-             {
-                 textTip.SetActive(false);
-             }));
+            StartCoroutine(AnimationPlayDone(animation.GetClip("TextTipAni").length,
+                () => textTip.SetActive(false)));
         });
 
         SetHierarchyObject();
@@ -121,5 +119,4 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             btnCreateState.transform.position = Input.mousePosition;
         }
     }
-
 }

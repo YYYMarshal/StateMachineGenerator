@@ -11,6 +11,7 @@ public class SettingPanelController : MonoBehaviour
     {
         gameObject.SetActive(false);
         transform.Find("BtnGroup/BtnExport").GetComponent<Button>().onClick.AddListener(BtnExportOnClick);
+        transform.Find("BtnGroup/BtnNew").GetComponent<Button>().onClick.AddListener(BtnNewOnClick);
         transform.Find("BtnGroup/BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         transform.Find("BtnGroup/BtnExit").GetComponent<Button>().onClick.AddListener(BtnExitOnClick);
     }
@@ -113,6 +114,26 @@ public class SettingPanelController : MonoBehaviour
         }
     }
     #endregion
+    private void BtnNewOnClick()
+    {
+        if (HierarchyObject.Instance.ContentPanel.activeSelf)
+            HierarchyObject.Instance.ContentPanel.SetActive(false);
+
+        Entities.Instance.listState.Clear();
+        Entities.Instance.listTransition.Clear();
+
+        DestroyAllChilds(HierarchyObject.Instance.StateGroup);
+        DestroyAllChilds(HierarchyObject.Instance.BtnLineGroup);
+        DestroyAllChilds(HierarchyObject.Instance.PlaneLineGroup);
+
+        void DestroyAllChilds(GameObject go)
+        {
+            for (int i = 0; i < go.transform.childCount; i++)
+            {
+                Destroy(go.transform.GetChild(i).gameObject);
+            }
+        }
+    }
     private void BtnHelpOnClick()
     {
         string url =
