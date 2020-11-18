@@ -39,8 +39,11 @@ public class SettingPanelController : MonoBehaviour
         {
             Debug.Log("Export Failure");
         }
+
         xmlDoc.Save(destFileName);
-        GUIUtility.systemCopyBuffer = element.InnerXml;
+
+        //SelectSingleNode("XXX")：只能选择某结点的第一子级层级的结点
+        GUIUtility.systemCopyBuffer = (xmlDoc.SelectSingleNode("AppData").SelectSingleNode("CustomStateMachine") as XmlElement).OuterXml;
 
         void SetTransitionTopic()
         {

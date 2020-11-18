@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 
 public class GameManager : MonoBehaviour, IPointerClickHandler
 {
@@ -24,52 +25,77 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
     private void Awake()
     {
-        SetHierarchyObject();
-        void SetHierarchyObject()
+        GameObject textTip = transform.Find("TextTip").gameObject;
+        textTip.SetActive(false);
+        gameObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
-            HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
-            HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
+            if (!textTip.activeSelf)
+                textTip.SetActive(true);
 
-            HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
-            goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
-
-            //先让其开启一下，是为了让其启用脚本
-            //顺序：查找物体---启用物体---添加脚本
-            HierarchyObject.Instance.ContentPanel.SetActive(true);
-            goSettingPanel.SetActive(true);
-
-            HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
-            goSettingPanel.AddComponent<SettingPanelController>();
-            goSettingPanel.AddComponent<DialogTest>();
-
-            btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
-            btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
-            btnCreateState.gameObject.SetActive(false);
-        }
-
-        #region 本地函数：点击事件
-        void BtnCreateStateOnClick()
-        {
-            btnCreateState.gameObject.SetActive(false);
-            GameObject newItemState = Instantiate(
-                Resources.Load<GameObject>("Prefabs/ItemState"),
-                new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
-                Quaternion.identity,
-                //将StateGroup作为新生成的ItemState的父物体
-                HierarchyObject.Instance.StateGroup.transform);
-            newItemState.AddComponent<ItemState>();
-
-            StateEntity state = new StateEntity
+            Animation animation = textTip.GetComponent<Animation>();
+            if (animation.isPlaying)
             {
-                goItemState = newItemState,
-                iptName = newItemState.transform.Find("IptName").GetComponent<InputField>()
-            };
-            Entities.Instance.listState.Add(state);
-        }
-        #endregion
-    }
+                animation.Stop();
+                //始终保持：最后一次点击后，才开始倒计时关闭 TextTip游戏物体
+                StopAllCoroutines();
+            }
+            animation.Play("TextTipAni");
+            StartCoroutine(AnimationPlayDone(animation.GetClip("TextTipAni").length, () =>
+             {
+                 textTip.SetActive(false);
+             }));
+        });
 
+        SetHierarchyObject();
+
+    }
+    private IEnumerator AnimationPlayDone(float second, Action callback)
+    {
+        yield return new WaitForSeconds(second);
+        callback?.Invoke();
+    }
+    #region Awake()
+    private void SetHierarchyObject()
+    {
+        HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
+        HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
+        HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
+
+        HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
+        goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
+
+        //先让其开启一下，是为了让其启用脚本
+        //顺序：查找物体---启用物体---添加脚本
+        HierarchyObject.Instance.ContentPanel.SetActive(true);
+        goSettingPanel.SetActive(true);
+
+        HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
+        goSettingPanel.AddComponent<SettingPanelController>();
+        goSettingPanel.AddComponent<DialogTest>();
+
+        btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
+        btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
+        btnCreateState.gameObject.SetActive(false);
+    }
+    private void BtnCreateStateOnClick()
+    {
+        btnCreateState.gameObject.SetActive(false);
+        GameObject newItemState = Instantiate(
+            Resources.Load<GameObject>("Prefabs/ItemState"),
+            new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
+            Quaternion.identity,
+            //将StateGroup作为新生成的ItemState的父物体
+            HierarchyObject.Instance.StateGroup.transform);
+        newItemState.AddComponent<ItemState>();
+
+        StateEntity state = new StateEntity
+        {
+            goItemState = newItemState,
+            iptName = newItemState.transform.Find("IptName").GetComponent<InputField>()
+        };
+        Entities.Instance.listState.Add(state);
+    }
+    #endregion
     void Update()
     {
         //Using up is to close the button after the click event of 
