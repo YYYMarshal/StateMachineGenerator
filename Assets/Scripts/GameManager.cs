@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     private Button btnCreateState;
 
     private GameObject goSettingPanel;
+
     private void Awake()
     {
         SetHierarchyObject();
@@ -40,13 +41,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
             HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
             goSettingPanel.AddComponent<SettingPanelController>();
+            goSettingPanel.AddComponent<DialogTest>();
 
             btnCreateState = GameObject.Find("BtnCreateState").GetComponent<Button>();
             btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
             btnCreateState.gameObject.SetActive(false);
-
         }
-
 
         #region 本地函数：点击事件
         void BtnCreateStateOnClick()

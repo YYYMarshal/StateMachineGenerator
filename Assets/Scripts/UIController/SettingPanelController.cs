@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Xml;
+using System.IO;
 
 public class SettingPanelController : MonoBehaviour
 {
@@ -14,25 +15,83 @@ public class SettingPanelController : MonoBehaviour
         transform.Find("BtnGroup/BtnExit").GetComponent<Button>().onClick.AddListener(BtnExitOnClick);
     }
 
+    private bool isFirst = true;
+    private string destFileName = "";
     #region 点击事件
     private void BtnExportOnClick()
     {
+        if (isFirst)
+        {
+            destFileName = gameObject.GetComponent<DialogTest>().OpenSelectFileDialog();
+            File.Copy(GlobalVariable.Instance.sourceXmlPath, destFileName, true);
+            isFirst = false;
+        }
+
+        SetTransitionTopic();
+
+        XmlDocument xmlDoc = CreateXmlDoc();
+        XmlElement element = CreateXmlTopic(xmlDoc);
+        try
+        {
+            CreateXmlContent(element, xmlDoc);
+        }
+        catch (System.Exception)
+        {
+            Debug.Log("Export Failure");
+        }
+        xmlDoc.Save(destFileName);
+        GUIUtility.systemCopyBuffer = element.InnerXml;
+
+        void SetTransitionTopic()
+        {
+            foreach (TransitionEntity transition in Entities.Instance.listTransition)
+            {
+                transition.topic = transition.pre.transform.Find("IptName").GetComponent<InputField>().text + "#" + transition.next.transform.Find("IptName").GetComponent<InputField>().text;
+            }
+        }
+    }
+
+    #region 创建Xml
+    private XmlDocument CreateXmlDoc()
+    {
+        XmlReaderSettings settings = new XmlReaderSettings()
+        {
+            IgnoreComments = true
+        };
+
         XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(XmlReader.Create(GlobalVariable.Instance.sourceXmlPath, settings));
+        return xmlDoc;
+    }
+    /// <summary>
+    /// AppData/CustomStateMachine/StateMachine/StateMachine/
+    /// </summary>
+    /// <param name="xmlDoc"></param>
+    /// <returns></returns>
+    private XmlElement CreateXmlTopic(XmlDocument xmlDoc)
+    {
+        XmlElement elemAppdata = xmlDoc.SelectSingleNode("AppData") as XmlElement;
 
-        //XmlDeclaration xmlDec = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null);
-        //xmlDoc.AppendChild(xmlDec);
-
-        XmlElement elemRoot = xmlDoc.CreateElement("CustomStateMachine");
-        xmlDoc.AppendChild(elemRoot);
+        XmlElement elemA = xmlDoc.CreateElement("CustomStateMachine");
+        elemAppdata.AppendChild(elemA);
 
         XmlElement elemB = xmlDoc.CreateElement("StateMachine");
-        elemRoot.AppendChild(elemB);
+        elemA.AppendChild(elemB);
 
         XmlElement elemC = xmlDoc.CreateElement("StateMachine");
         elemC.SetAttribute("name", "StateMachineName");
         elemC.SetAttribute("sceneid", "1");
         elemB.AppendChild(elemC);
 
+        return elemC;
+    }
+    /// <summary>
+    /// 每一个State
+    /// </summary>
+    /// <param name="elemC"></param>
+    /// <param name="xmlDoc"></param>
+    private void CreateXmlContent(XmlElement elemC, XmlDocument xmlDoc)
+    {
         foreach (StateEntity state in Entities.Instance.listState)
         {
             XmlElement elem = xmlDoc.CreateElement("State");
@@ -49,8 +108,8 @@ public class SettingPanelController : MonoBehaviour
             elem.InnerXml = transition.content;
             elemC.AppendChild(elem);
         }
-        GUIUtility.systemCopyBuffer = xmlDoc.InnerXml;
     }
+    #endregion
     private void BtnHelpOnClick()
     {
         string url =

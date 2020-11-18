@@ -14,6 +14,9 @@ public class TransitionEntity
     //ItemState.OnPointerClick(PointerEventData eventData).EndDrawRay()
     public GameObject next;
 
-    public string topic = "";
+    //2020-11-18 13:07:42
+    //# 是需要的：防止在未给 pre 和 next 赋名称时，引起的报错
+    //SettingPanelController.BtnExportOnClick().SetTransitionTopic()
+    public string topic = "#";
     public string content = "";
 }

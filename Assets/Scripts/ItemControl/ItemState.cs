@@ -126,17 +126,17 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             void OnStateDrag_LineControl()
             {
                 GameObject goState = gameObject;
-                foreach (TransitionEntity transitionClass in Entities.Instance.listTransition)
+                foreach (TransitionEntity transition in Entities.Instance.listTransition)
                 {
-                    if (goState == transitionClass.pre)
+                    if (goState == transition.pre)
                     {
-                        transitionClass.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+                        transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
                     }
-                    if (goState == transitionClass.next)
+                    if (goState == transition.next)
                     {
-                        transitionClass.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+                        transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
                     }
-                    ControlBtnLine(transitionClass, false);
+                    ControlBtnLine(transition, false);
                 }
             }
 

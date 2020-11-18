@@ -48,6 +48,43 @@ public class ContentPanelController : MonoBehaviour
 
     private void Awake()
     {
+        InitListByXmlFile();
+
+        SetCommonUI();
+        SetStateUI();
+        SetTransitionUI();
+
+    }
+    private void InitListByXmlFile()
+    {
+        XmlReaderSettings settings = new XmlReaderSettings()
+        {
+            IgnoreComments = true
+        };
+        XmlReader reader = XmlReader.Create(GlobalVariable.Instance.itemXmlPath, settings);
+        XmlDocument doc = new XmlDocument();
+        doc.Load(reader);
+        XmlNodeList nodLst = doc.SelectSingleNode("YYYXB").ChildNodes;
+        foreach (XmlElement elem in nodLst)
+        {
+            switch (elem.Name)
+            {
+                case "Action":
+                    listAction.Add(
+                        new KeyValuePair<string, string>(
+                            elem.Attributes["type"].InnerXml, elem.OuterXml));
+                    break;
+                case "Condition":
+                    listCondition.Add(
+                        new KeyValuePair<string, string>(
+                            elem.Attributes["type"].InnerXml, elem.OuterXml));
+                    break;
+            }
+        }
+    }
+    #region Awake()：UI初始化
+    private void SetCommonUI()
+    {
         gameObject.SetActive(false);
         transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
 
@@ -60,61 +97,30 @@ public class ContentPanelController : MonoBehaviour
         menuGroup = transform.Find("MenuGroup").gameObject;
         menuGroup.GetComponent<Button>().onClick.AddListener(() => menuGroup.SetActive(false));
         menuGroup.SetActive(false);
-        InitListByXmlFile();
 
-        SetStateUI();
-        SetTransitionUI();
-
-        #region 本地函数
-        void SetStateUI()
-        {
-            goState = transform.Find("BottomGroup/State").gameObject;
-            txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
-
-            goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(() =>
-            {
-                ShowMenuGroup(true);
-            });
-        }
-        void SetTransitionUI()
-        {
-            goTransition = transform.Find("BottomGroup/Transition").gameObject;
-            txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
-
-            goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(() =>
-            {
-                ShowMenuGroup(false);
-            });
-        }
-        void InitListByXmlFile()
-        {
-            XmlReaderSettings settings = new XmlReaderSettings()
-            {
-                IgnoreComments = true
-            };
-            XmlReader reader = XmlReader.Create(GlobalVariable.Instance.PathXml, settings);
-            XmlDocument doc = new XmlDocument();
-            doc.Load(reader);
-            XmlNodeList nodLst = doc.SelectSingleNode("YYYXB").ChildNodes;
-            foreach (XmlElement elem in nodLst)
-            {
-                switch (elem.Name)
-                {
-                    case "Action":
-                        listAction.Add(
-                            new KeyValuePair<string, string>(
-                                elem.Attributes["type"].InnerXml, elem.OuterXml));
-                        break;
-                    case "Condition":
-                        listCondition.Add(
-                            new KeyValuePair<string, string>(
-                                elem.Attributes["type"].InnerXml, elem.OuterXml));
-                        break;
-                }
-            }
-        }
-        #endregion
     }
+    private void SetStateUI()
+    {
+        goState = transform.Find("BottomGroup/State").gameObject;
+        txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
+
+        goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            ShowMenuGroup(true);
+        });
+    }
+    private void SetTransitionUI()
+    {
+        goTransition = transform.Find("BottomGroup/Transition").gameObject;
+        txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
+
+        goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            ShowMenuGroup(false);
+        });
+    }
+    #endregion
+    #region 公开的重载函数
     /// <summary>
     /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
     /// </summary>
@@ -132,8 +138,6 @@ public class ContentPanelController : MonoBehaviour
     {
         ShowUI_StateTransition(false, null, transition);
 
-        int spLI = transition.line.transform.GetSiblingIndex();
-
         StateEntity preState = null;
         StateEntity nextState = null;
         foreach (StateEntity state in Entities.Instance.listState)
@@ -143,10 +147,11 @@ public class ContentPanelController : MonoBehaviour
             if (transition.next.Equals(state.goItemState))
                 nextState = state;
         }
-        txtTransitionTopic.text = $"From : {preState.iptName.text}\n" +
-            $"    To : {nextState.iptName.text}";
-        transition.topic = preState.iptName.text + "#" + nextState.iptName.text;
+        txtTransitionTopic.text = $" src : {preState.iptName.text}\n" +
+            $"dest : {nextState.iptName.text}";
     }
+
+    #endregion
 
     #region 公共代码部分
     private void ShowUI_StateTransition(bool isState, StateEntity state, TransitionEntity transition)

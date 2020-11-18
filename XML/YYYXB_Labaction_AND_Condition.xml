@@ -1,84 +1,154 @@
 <YYYXB>
   <Action type="group" seq="1">
   </Action>
+
+  <!--等待5秒-->
   <Action type="hold" time="5"/>
 
-  <Action type="active" path="PATHPATHPATH" targetactive="1" />
+  <!--物体显隐，1为出现，0为隐藏-->
+  <Action type="active" path="PATH" targetactive="1" />
 
-  <Action type="setvar" name="valve_famen2" value="1"/>
-  <Action type="setouttervar" name="valve_famen2" value="1"/>
+  <!--定义一个内部变量，名为 InnerVariable ，值为1-->
+  <Action type="setvar" name="InnerVariable" value="1"/>
+  <!--将名为 ExternalVariable 的外部（后台）变量的值置为1-->
+  <Action type="setouttervar" name="ExternalVariable" value="1"/>
 
-  <Action type="anim" path="PATHPATH" anim="kaiguan1" />
-  <Action type="animation" path="PATHPATH" anim="ANIMANIM" state="0"/>
+  <!--播放物体的一段动画-->
+  <Action type="anim" path="PATH" anim="ANIM" />
+  <!--让物体的某一个动画停止播放-->
+  <Action type="animation" path="PATH" anim="ANIM" state="0"/>
 
+  <!--播放人物的一段动画，动画播放完成前，人物暂时不可控制-->
   <Action type="roleplayeranim" anim="Jump" />
-  <Action type="rotate" path="CJY_project/CJY_fm/CJY_fm/fm_zf/zf_299/zf_sl 124" from="0" to="-180" speed="60" axi="up"/>
+  <!--物体绕着上（y）轴以60度/秒的速度从度转到-180度-->
+  <Action type="rotate" path="PATH" from="0" to="-180" speed="60" axi="up"/>
 
-  <Action type="highlight" path="MZJC_zh/MZJC_JL_fm/JL_fm_jzf/jzf_sl16" color="0,255,0,255" duration="2" />
-  <Action type="highlight" path="PATHPATHPATH" color="0,255,0,255" duration="-1" constantOn="true" />
+  <!--物体轮廓按指定颜色高亮闪烁，持续两秒-->
+  <Action type="highlight" path="PATH" color="0,255,0,255" duration="2" />
+  <!--物体轮廓按指定颜色持续高亮-->
+  <Action type="highlight" path="PATH" color="0,255,0,255" duration="-1" constantOn="true" />
 
-  <Action type="rightclickmenu" path="MZJC_zh/MZJC_JL_fm/JL_fm_jzf/jzf_sl16"  value="1,2,3"/>
+  <!--给物体添加一个右键菜单，每一个选项之间用逗号隔开-->
+  <Action type="rightclickmenu" path="PATH"  value="1,2,3"/>
 
-  <Action type="audio" path="Main Camera" audio="实验准备就绪" op="play" loop="false" />
+  <!--在指定物体上挂一个Audio组件，播放名为“HHH”的音频，不循环播放。音频文件打成bundle放到taskX/audio文件夹下-->
+  <Action type="audio" path="Main Camera" audio="HHH" op="play" loop="false" />
 
-  <Action type="videoA" video="视频.mp4" op="play_autoclose" size="100,100"/>
-  <Action type="videoB" video="视频.mp4" op="play" size="100,100"/>
-  <Action type="videoC" video="视频.mp4" op="stop"/>
+  <!--播放名为"VVV"的视频，视频显示的尺寸为100*100.视频要放在taskX/video文件夹下，不用打成bundle-->
+  <Action type="video" video="VVV.mp4" op="play" size="100,100"/>
+  <!--结束名为"VVV"的视频的播放，并隐藏播放窗口-->
+  <Action type="video" video="VVV.mp4" op="stop"/>
+  <!--与上面的播放类似，区别在于视频播放结束后会自动隐藏窗口-->
+  <Action type="video" video="VVV.mp4" op="play_autoclose" size="100,100"/>
 
-  <Action type="texture" texturename="头像1" size="100,100" bshow="true"/>
+  <!--显示一张名为“TEXTURE”的图片，图片显示尺寸为100*100-->
+  <Action type="texture" texturename="TEXTURE" size="100,100" bshow="true"/>
 
-  <Action type="dlgshow" name="dlgminimap" show="1"/>
+  <!--显示 DlgY_Main 的UI-->
+  <Action type="dlgshow" name="DlgY_Main" show="1"/>
 
-  <Action type="tag_3d" path="MZJC_zh/MZJC_JL_ylb/ylb_zz/tmthlba_zz" text="zhizhen1" offset="0,0,0" bshow="true"/>
-  <Action type="tag2d" path="sysaq_dthc/dtzb_jyzl/jyzl/jyzl_tjt" text="铁架台" offset="0,0,0" fontsize="30"  bshow="true"/>
+  <!--给物体添加一个3D标签，标签的内容为"zhizhen1",可以通过offset对标签的位置进行调整-->
+  <Action type="tag_3d" path="PATH" text="zhizhen1" offset="0,0,0" bshow="true"/>
+  <!--给物体添加一个2D标签-->
+  <Action type="tag2d" path="PATH" text="铁架台" offset="0,0,0" fontsize="30"  bshow="true"/>
 
-  <Action type="tipA" text="已烘干至恒重" bshow="true"/>
-  <Action type="tipB" text="如未烘干无水碳酸钠，用此试剂标定盐酸浓度时结果会" buttonText="偏大,偏小" bshow="true" />
-  <Action type="tipC" text="hello,welcome" buttonText="按键1,按键2" bshow="true" bgSize="800,600" useblock="true" uiinfo="DuoXuanKuang"/>
+  <!--弹出一个提示框，上面的提示文字为“hello,welcome”,两个按钮，按钮上的文字分别是“按键1和按键2”，
+        提示框的背景图片大小为800*600,当提示框显示时自动遮挡其他物体，点击按钮时，在OnUIClick识别的路径尾端加上DuoXuanKuang-->
+  <Action type="tip" text="hello,welcome" buttonText="按键1,按键2" bshow="true" bgSize="800,600" useblock="true" uiinfo="DuoXuanKuang"/>
+  <Action type="tip" text="如未烘干无水碳酸钠，用此试剂标定盐酸浓度时结果会" buttonText="偏大,偏小" bshow="true" />
+  <Action type="tip" text="已烘干至恒重" bshow="true"/>
 
+  <!--进入飞行模式,可以控制镜头的移动，但摄像机上的射线失效-->
   <Action type="flyingmode" enable="true" controlable="true" useraycast="false"/>
+  <!--将指定物体移动到指定位置并使其朝向指定方向，速度可调，速度为0表示瞬间完成-->
   <Action type="move" path="Main Camera" pos="7.688791,1.119859,9.105009" euler="0,0,0" moveSpeed="1" rotateSpeed="1"/>
+  <!--开启一个名为timer1的计时器-->
   <Action type="timer" name="timer1" op="start"/>
+  <!--失去对角色移动的控制-->
   <Action type="rolestopctl"/>
+  <!--恢复对角色移动的控制-->
   <Action type="rolebeginctl"/>
+  <!--物体的旋转角度根据给定的后台变量进行改变，变量的取值范围是0-100，对应的角度范围是0-180，旋转轴是物体的y轴-->
   <Action type="UpdateDirAccordingToVar" path="CJY_project/CJY_fm/CJY_fm/fm_zf/zf_299/zf_sl 124" var="ssssss" MinDegree="0" MaxDegree="180" MaxValue="100" axi="up"/>
+  <!--在指定物体附近添加一个聚光灯光源，颜色可指定，位置是沿物体自身坐标z轴正反向1单位距离处，照向物体-->
   <Action type="light" path="EnterS2" color="255,0,0,255" distance="1" range="10" spotangle="1" intensity="1" bounceIntensity="0" enabled="true" axi="right"/>
+  <!--当前控制的人物拾取ID为1的道具-->
   <Action type="setplayerequipt" itemID="1" isEquipted="true"/>
+  <!--指定物体上的menuKey为guananniu的选项禁用-->
   <Action type="SetRightMenuState" devicePath="ZWGCnl_zwgc_cf/zwgc_yyys/zwgc_yyys_sm/zwgc_yyys_sm_b" menuKey="guananniu" menuState="0" />
+  <!--将ID为1的角色传送至指定位置、朝向-->
   <Action type="moveplayer" playerid="1" pos="4.67,0.83,-58.87" euler="0,0,0" />
-  <Action type="colliderA" path="xxxxxxx" enable="true" collidertype="box" center="0,0,0" size="1,1,1" layerName="ObjLayer" />
-  <Action type="colliderB" path="CYJQ/CYJQ_sq/MXK_sq27" enable="true" collidertype="mesh" size="0,0,0" layerName="ObjLayer"/>
-  <Action type="reglockA" key="key1" sceneid="" locked="false"/>
-  <Action type="reqlockB" key="key1" sceneid="" getlock="true"/>
+  <!--给指定物体添加/删除BoxCollider-->
+  <Action type="collider" path="xxxxxxx" enable="true" collidertype="box" center="0,0,0" size="1,1,1" layerName="ObjLayer" />
+  <!--给指定物体添加/删除MeshCollider-->
+  <Action type="collider" path="CYJQ/CYJQ_sq/MXK_sq27" enable="true" collidertype="mesh" size="0,0,0" layerName="ObjLayer"/>
+  <!--往场景ID为1的场景的锁列表中添加一个键值为key1的键，默认还未被获取-->
+  <Action type="reglock" key="key1" sceneid="" locked="false"/>
+  <!--获取场景ID为1的场景的锁列表中键值为key1的键-->
+  <Action type="reqlock" key="key1" sceneid="" getlock="true"/>
+  <!--1为串行组，非1为并行组-->
+  <Action type="group" seq="1">
+    <Action type="active" path="PATHPATH" targetactive="0" />
+    <Action type="active" path="GMP_rjnj_texiao/GMP_ruanjiaonang_keli/GMP_rjnkl_1" targetactive="0" />
+  </Action>
+  <!--单独起一个进程播放视频或flash，视频文件需要将放到task*/flash文件夹中，0表示swf,1表示exe-->
   <Action type="flash" path="穿戴规则讲解.swf" mode="0" />
+  <!--显示一个5秒的进度条同时显示文字aaaa-->
   <Action type="processbar" time="5" tip="aaaa"/>
+  <!--显示设备展示id为1的那一个页面-->
   <Action type="showdeviceknowlage" id="1" bshow="true"/>
+  <!--将指定物体变成红色的液位，液位高度为原模型高度的70%-->
   <Action type="liquid" path="ani/sysaq_tkhl_lt/lt_gt1" height="0.7" color="255,0,0,255"/>
+  <!--将物体的材质颜色变为红色-->
   <Action type="color" path="ani/sysaq_tkhl_lt/lt_gt1" color="255,0,0,255"/>
 
+  <!--原来的注释：打开 程序所在目录/xx文件夹中的a.exe 此处的a.exe可以换成任意在windows下可双击打开的文件(.txt,.doc,.ppt,....）-->
+  <!--YYYXB的注释：打开 data/taskX/xx文件夹中的a.exe 此处的a.exe可以换成任意在windows下可双击打开的文件(.txt,.doc,.ppt,....）-->
   <Action type="startprocess" path="xx/a.exe" />
+  <!--也可以直接放在taskX文件夹下，然后path写法如下-->
+  <Action type="startprocess" path="实验报告.docx" />
 
+  <!--打开一个带输入框的界面，界面的标题为XXX输入框，按确认键后名为HYYW_A的后台变量会被赋值-->
   <Action type="showAdjustVarInput" varname="HYYW_A" title="XXX输入框" isinnervar="false"/>
 
+  <!--显示题目（taskX/question文件夹）-->
   <Action type="showquestion" fromID="1" toID="2"  randomCount="2"/>
 
+  <!--所有子条件满足时，该条件满足-->
   <Condition type="and">
   </Condition>
+  <!--条件总是满足-->
   <Condition type="auto"/>
-  <Condition type="iVar" path="valve_famen1" valvalue="1" valtype="0" valop="0"  />
-  <Condition type="oVar" path="valve_famen1" valvalue="1" valtype="0" valop="0"  />
+  <!--当内部变量valve_famen1的值等于1时，条件满足-->
+  <Condition type="iVar" path="InternalVariables" valvalue="1" valtype="0" valop="0"  />
+  <!--当外部（后台）变量valve_famen1的值等于1时，条件满足-->
+  <Condition type="oVar" path="ExtraneousVariable" valvalue="1" valtype="0" valop="0"  />
+  <!--当 实验人员 在2个单元距离内点击指定物体时，条件满足-->
   <Condition type="objclick" path="PATHPATHPATH" role="实验人员" distance="5"/>
+  <!--当 实验人员 在点击了指定物体或他的子物体时，条件满足    ***常用这个***-->
   <Condition type="groupobjclick" path="RZ_smj_collision" role="实验人员"/>
-  <Condition type="roleposin" role="班长" destpos="-68.31588|-0.00190424|-28.91604" radius="1.5"/>
-  <Condition type="roleposout" role="班长" destpos="-68.31588|-0.00190424|-28.91604" radius="1.5"/>
+  <!--当 实验人员 角色进入点（-68.31588,-0.00190424,-28.91604）水平半径1.5个单位距离时，条件满足-->
+  <Condition type="roleposin" role="实验人员" destpos="-68.31588|-0.00190424|-28.91604" radius="1.5"/>
+  <!--当 实验人员 角色离开点（-68.31588,-0.00190424,-28.91604）水平半径1.5个单位距离时，条件满足-->
+  <Condition type="roleposout" role="实验人员" destpos="-68.31588|-0.00190424|-28.91604" radius="1.5"/>
+  <!--当名为jinshuifa的状态机处于jinshuifa_Open状态时，条件满足-->
   <Condition type="statemachine" name="jinshuifa" statename="jinshuifa_Open"/>
+  <!--当点击指定UI时，条件满足-->
   <Condition type="uiclick" path="PATHPATH"/>
+  <!--当选择指定物体右键菜单的第0项（右键菜单从上到下是0,1,2……），条件满足-->
   <Condition type="rightclickmenu" path="MZJC_zh/MZJC_JL_fm/JL_fm_jzf/jzf_sl16" index="0"/>
+  <!--当名为timer1的定时器计时满10秒时，条件满足-->
   <Condition type="timer" name="timer1" timelimit="10"/>
-  <Condition type="equipt" role="实验人员" itemtype="cegaoqi"/>
+  <!--当内实验人员拾取了cegaoqi类型的道具时，条件满足-->
+  <Condition type="equipt" role="内实验人员" itemtype="cegaoqi"/>
+  <!--当选择了menukey为guananniu的右键菜单时，条件满足-->
   <Condition type="rightkeyclickmenu" menukey="guananniu"/>
+  <!--当当前控制的人物面向目标点，朝向偏差不超过15度，距离不超过4时，条件满足-->
   <Condition type="lookat" targetpos="-1.32,1.11,13.44" radius="15" distance="4"/>
+  <!--当取得键值为key1的锁时，条件满足-->
   <Condition type="getlock" key="key1"/>
+  <!--当本机控制的角色名为韩梅梅时，条件满足-->
   <Condition type="controledplayer" role="韩梅梅"/>
+  <!--modeid 1为考核模式，0为非考核模式-->
   <Condition type="operationmode" modeid="1"/>
 </YYYXB>

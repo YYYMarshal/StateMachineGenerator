@@ -29,5 +29,6 @@ public class GlobalVariable
     }
     #endregion
 
-    public string PathXml = $"{Application.dataPath}/../XML/YYYXB_Labaction_AND_Condition.xml";
+    public string itemXmlPath = $"{Application.dataPath}/../XML/YYYXB_Labaction_AND_Condition.xml"; 
+    public string sourceXmlPath = $"{Application.dataPath}/../XML/appdata.xml";
 }

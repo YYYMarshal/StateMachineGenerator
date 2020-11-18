@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppData>
+  <Camera></Camera>
+  <ExperimentData>
+    <Mode>OffLine</Mode>
+    <SkipSelectRole>true</SkipSelectRole>
+    <UseDlgDirection>true</UseDlgDirection>
+    <UseDlgBottomRight>true</UseDlgBottomRight>
+    <UseScore>true</UseScore>
+    <!--是否使用背包-->
+    <UseDlgBackPack>false</UseDlgBackPack>
+    <DlgBotomRightItems>设备,设置</DlgBotomRightItems>
+
+  </ExperimentData>
+  <Scene>
+    <ID>1</ID>
+    <SceneName>SceneName</SceneName>
+    <SceneLoadingImage>SceneLoadingImage</SceneLoadingImage>
+
+    <Player>
+      <ID>1</ID>
+    </Player>
+    
+  </Scene>
+
+  <Player>
+    <ID>1</ID>
+    <Tip>实验人员</Tip>
+    <Pos>-5.292637,-1.419943,-0.4709843</Pos>
+    <Dir>0,0,0</Dir>
+    <Image>头像2</Image>
+    <SelectCharacterID>1</SelectCharacterID>
+    <DefaultCharacterID>1</DefaultCharacterID>
+    <CharacterData>
+      <ID>1</ID>
+      <Path>shiyanfu_woman</Path>
+      <SpecialStateData>
+        <SpecialStateName>none</SpecialStateName>
+        <BasicStateData>
+          <BasicStateDataName>idle</BasicStateDataName>
+          <Animation>idle</Animation>
+        </BasicStateData>
+        <BasicStateData>
+          <BasicStateDataName>walk</BasicStateDataName>
+          <Animation>walk</Animation>
+        </BasicStateData>
+        <BasicStateData>
+          <BasicStateDataName>run</BasicStateDataName>
+          <Animation>walk</Animation>
+        </BasicStateData>
+      </SpecialStateData>
+    </CharacterData>
+  </Player>
+
+</AppData>
+
