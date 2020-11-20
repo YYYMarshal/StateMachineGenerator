@@ -162,66 +162,66 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             EndDrawRay();
         }
 
-        #region 本地函数
-        void CreateLine()
+    }
+    #region OnPointerClick()
+    void CreateLine()
+    {
+        LineRenderer lineRenderer = Instantiate(
+            Resources.Load<GameObject>("Prefabs/ItemLine"),
+            Vector3.zero,
+            Quaternion.identity,
+            HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
+
+        TransitionEntity transition = new TransitionEntity()
         {
-            LineRenderer lineRenderer = Instantiate(
-                Resources.Load<GameObject>("Prefabs/ItemLine"),
-                Vector3.zero,
-                Quaternion.identity,
-                HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
+            line = lineRenderer,
+            pre = gameObject
+        };
 
-            TransitionEntity transition = new TransitionEntity()
-            {
-                line = lineRenderer,
-                pre = gameObject
-            };
+        transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
 
-            transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+        Entities.Instance.listTransition.Add(transition);
 
-            Entities.Instance.listTransition.Add(transition);
+        CurrentVariable.Instance.line = lineRenderer;
+        CurrentVariable.Instance.isLineStartPaint = true;
+        CurrentVariable.Instance.itemLineIndex = GetCurtLineIndex(lineRenderer);
+    }
+    void EndDrawRay()
+    {
+        int curtLineIndex = CurrentVariable.Instance.itemLineIndex;
+        TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
+        transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+        CurrentVariable.Instance.isLineStartPaint = false;
 
-            CurrentVariable.Instance.line = lineRenderer;
-            CurrentVariable.Instance.isLineStartPaint = true;
-            CurrentVariable.Instance.itemLineIndex = GetCurtLineIndex(lineRenderer);
-        }
-        void EndDrawRay()
+        transition.next = gameObject;
+        BtnLinePositionControl(transition);
+
+        bool isRepeated = false;
+        //If the line is repeated, it will be deleted.
+        for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
         {
-            int curtLineIndex = CurrentVariable.Instance.itemLineIndex;
-            TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
-            transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
-            CurrentVariable.Instance.isLineStartPaint = false;
-
-            transition.next = gameObject;
-            BtnLinePositionControl(transition);
-
-            bool isRepeated = false;
-            //If the line is repeated, it will be deleted.
-            for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
+            if (curtLineIndex == i)
+                continue;
+            if (Entities.Instance.listTransition[i].pre == transition.pre &&
+                Entities.Instance.listTransition[i].next == transition.next)
             {
-                if (curtLineIndex == i)
-                    continue;
-                if (Entities.Instance.listTransition[i].pre == transition.pre &&
-                    Entities.Instance.listTransition[i].next == transition.next)
-                {
-                    isRepeated = true;
-                    Entities.Instance.listTransition.Remove(transition);
-                    DestroyLineAndBtnDel(curtLineIndex);
-
-                    //2020-9-2 12:40:01
-                    //break is necessary!!!
-                    break;
-                }
-            }
-            //If the line is not repeated, it is judged whether it is self jump. If so, delete.
-            if (!isRepeated && transition.pre == transition.next)
-            {
+                isRepeated = true;
                 Entities.Instance.listTransition.Remove(transition);
                 DestroyLineAndBtnDel(curtLineIndex);
+
+                //2020-9-2 12:40:01
+                //break is necessary!!!
+                break;
             }
         }
-        #endregion
+        //If the line is not repeated, it is judged whether it is self jump. If so, delete.
+        if (!isRepeated && transition.pre == transition.next)
+        {
+            Entities.Instance.listTransition.Remove(transition);
+            DestroyLineAndBtnDel(curtLineIndex);
+        }
     }
+    #endregion
     #endregion
     #region 公共代码部分
     /// <summary>

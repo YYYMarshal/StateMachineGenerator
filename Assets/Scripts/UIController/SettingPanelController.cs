@@ -46,6 +46,8 @@ public class SettingPanelController : MonoBehaviour
         //SelectSingleNode("XXX")：只能选择某结点的第一子级层级的结点
         GUIUtility.systemCopyBuffer = (xmlDoc.SelectSingleNode("AppData").SelectSingleNode("CustomStateMachine") as XmlElement).OuterXml;
 
+        gameObject.SetActive(false);
+
         void SetTransitionTopic()
         {
             foreach (TransitionEntity transition in Entities.Instance.listTransition)
@@ -126,6 +128,8 @@ public class SettingPanelController : MonoBehaviour
         DestroyAllChilds(HierarchyObject.Instance.BtnLineGroup);
         DestroyAllChilds(HierarchyObject.Instance.PlaneLineGroup);
 
+        gameObject.SetActive(false);
+
         void DestroyAllChilds(GameObject go)
         {
             for (int i = 0; i < go.transform.childCount; i++)
@@ -136,6 +140,8 @@ public class SettingPanelController : MonoBehaviour
     }
     private void BtnHelpOnClick()
     {
+        gameObject.SetActive(false);
+
         string url =
             "http://note.youdao.com/noteshare?id=776559f906a009afc108ba7aa10ef1c1&sub=C833CC45DFD44CD7B5C39A92024A5CFB";
         Application.OpenURL(url);

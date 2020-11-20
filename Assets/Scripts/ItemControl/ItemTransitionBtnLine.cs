@@ -18,14 +18,14 @@ using UnityEngine.UI;
 
 public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
 {
-    private Button btnLineDel;
+    private Button btnDelete;
     private void Awake()
     {
         transform.GetComponent<Button>().onClick.AddListener(BtnLineOnClick);
 
-        btnLineDel = transform.Find("BtnLineDel").GetComponent<Button>();
-        btnLineDel.onClick.AddListener(BtnLineDelOnClick);
-        btnLineDel.gameObject.SetActive(false);
+        btnDelete = transform.Find("BtnLineDel").GetComponent<Button>();
+        btnDelete.onClick.AddListener(BtnLineDelOnClick);
+        btnDelete.gameObject.SetActive(false);
     }
 
     #region 点击事件
@@ -46,6 +46,6 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
-            btnLineDel.gameObject.SetActive(!btnLineDel.gameObject.activeSelf);
+            btnDelete.gameObject.SetActive(!btnDelete.gameObject.activeSelf);
     }
 }
