@@ -137,11 +137,13 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             if (goState == transition.pre)
             {
-                transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+                //transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+                transition.line.SetPosition(0, GetRayPoint(transform.Find("PaintPos").position));
             }
             if (goState == transition.next)
             {
-                transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+                //transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+                transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
             }
             BtnLinePositionControl(transition, false);
         }
@@ -178,7 +180,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             pre = gameObject
         };
 
-        transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+        //transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
+        transition.line.SetPosition(0, GetRayPoint(transform.Find("PaintPos").position));
 
         Entities.Instance.listTransition.Add(transition);
 
@@ -190,7 +193,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         int curtLineIndex = CurrentVariable.Instance.itemLineIndex;
         TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
-        transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+        //transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
+        transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
         CurrentVariable.Instance.isLineStartPaint = false;
 
         transition.next = gameObject;
@@ -229,10 +233,23 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     /// </summary>
     private void BtnLinePositionControl(TransitionEntity transition, bool isCreate = true)
     {
-        float x = (transition.pre.transform.Find("EndPaintPos").position.x +
-            transition.next.transform.Find("StartPaintPos").position.x) / 2f;
-        float y = (transition.pre.transform.Find("EndPaintPos").position.y +
-            transition.next.transform.Find("StartPaintPos").position.y) / 2f;
+        //float x = (transition.pre.transform.Find("StartPaintPos").position.x +
+        //    transition.next.transform.Find("EndPaintPos").position.x) * 0.5f;
+        //float y = (transition.pre.transform.Find("StartPaintPos").position.y +
+        //    transition.next.transform.Find("EndPaintPos").position.y) * 0.5f;
+
+        //Vector2 prePos = new Vector2(
+        //    transition.pre.transform.Find("StartPaintPos").position.x,
+        //    transition.pre.transform.Find("StartPaintPos").position.y);
+        //Vector2 nextPos = new Vector2(
+        //    transition.next.transform.Find("EndPaintPos").position.x,
+        //    transition.next.transform.Find("EndPaintPos").position.y);
+
+        Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
+        Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
+        float distanceScale = 0.2f;
+        float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
+        float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
         if (isCreate)
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
