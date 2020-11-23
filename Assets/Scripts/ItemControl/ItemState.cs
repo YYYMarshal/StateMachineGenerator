@@ -22,26 +22,8 @@ using UnityEngine.UI;
 
 public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 {
-    private struct PivotFromBorder
-    {
-        public float halfWidth;
-        public float top;
-        public float bottom;
-    }
-    private PivotFromBorder pivotFromBorder;
-
     private void Awake()
     {
-        SetPivotFromBorder();
-        void SetPivotFromBorder()
-        {
-            Rect rt = GetComponent<RectTransform>().rect;
-            pivotFromBorder.halfWidth = rt.width / 2f;
-            //因为ItemState预制体的Pivot的水平位置，不是在中央，而是偏上
-            pivotFromBorder.top = rt.height * (1 - GetComponent<RectTransform>().pivot.y);
-            pivotFromBorder.bottom = rt.height * GetComponent<RectTransform>().pivot.y;
-        }
-
         transform.Find("IptName").GetComponent<InputField>().onEndEdit.AddListener(
             (value) => Entities.Instance.listState[GetCurtStateIndex()].iptName.text = value);
 
@@ -105,29 +87,36 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             RectTransform stateRectTrans = gameObject.GetComponent<RectTransform>();
 
-            stateRectTrans.position = StatePositionControl();
+            stateRectTrans.position = StatePositionControl(eventData);
 
             LinePositionControl();
         }
     }
 
-    #region OnDarg()
+    #region Method:OnDarg()
     /// <summary>
     /// Control state objects will not move out of the window
     /// </summary>
     /// <returns></returns>
-    private Vector2 StatePositionControl()
+    private Vector2 StatePositionControl(PointerEventData eventData)
     {
-        Vector2 targetPos = Input.mousePosition;
-        if (Input.mousePosition.x - pivotFromBorder.halfWidth < 0)
-            targetPos.x = pivotFromBorder.halfWidth;
-        if (Input.mousePosition.x + pivotFromBorder.halfWidth > Screen.width)
-            targetPos.x = Screen.width - pivotFromBorder.halfWidth;
+        //2020-11-23 16:28:42
+        //新的解决方案
+        Vector3 pos = transform.position;
+        Vector2 targetPos = new Vector2(pos.x + eventData.delta.x, pos.y + eventData.delta.y);
+        Vector2 half = new Vector2(
+            gameObject.GetComponent<RectTransform>().rect.width * 0.5f,
+            gameObject.GetComponent<RectTransform>().rect.height * 0.5f);
 
-        if (Input.mousePosition.y - pivotFromBorder.bottom < 0)
-            targetPos.y = pivotFromBorder.bottom;
-        if (Input.mousePosition.y + pivotFromBorder.top > Screen.height)
-            targetPos.y = Screen.height - pivotFromBorder.top;
+        if (targetPos.x - half.x < 0)
+            targetPos.x = half.x;
+        if (targetPos.x + half.x > Screen.width)
+            targetPos.x = Screen.width - half.x;
+
+        if (targetPos.y - half.y < 0)
+            targetPos.y = half.y;
+        if (targetPos.y + half.y > Screen.height)
+            targetPos.y = Screen.height - half.y;
         return targetPos;
     }
     private void LinePositionControl()
@@ -137,12 +126,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             if (goState == transition.pre)
             {
-                //transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
                 transition.line.SetPosition(0, GetRayPoint(transform.Find("PaintPos").position));
             }
             if (goState == transition.next)
             {
-                //transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
                 transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
             }
             BtnLinePositionControl(transition, false);
@@ -165,7 +152,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
 
     }
-    #region OnPointerClick()
+    #region Method:OnPointerClick()
     void CreateLine()
     {
         LineRenderer lineRenderer = Instantiate(
@@ -180,7 +167,6 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             pre = gameObject
         };
 
-        //transition.line.SetPosition(0, GetRayPoint(transform.Find("StartPaintPos").position));
         transition.line.SetPosition(0, GetRayPoint(transform.Find("PaintPos").position));
 
         Entities.Instance.listTransition.Add(transition);
@@ -193,7 +179,6 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         int curtLineIndex = CurrentVariable.Instance.itemLineIndex;
         TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
-        //transition.line.SetPosition(1, GetRayPoint(transform.Find("EndPaintPos").position));
         transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
         CurrentVariable.Instance.isLineStartPaint = false;
 
@@ -233,23 +218,23 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     /// </summary>
     private void BtnLinePositionControl(TransitionEntity transition, bool isCreate = true)
     {
-        //float x = (transition.pre.transform.Find("StartPaintPos").position.x +
-        //    transition.next.transform.Find("EndPaintPos").position.x) * 0.5f;
-        //float y = (transition.pre.transform.Find("StartPaintPos").position.y +
-        //    transition.next.transform.Find("EndPaintPos").position.y) * 0.5f;
-
-        //Vector2 prePos = new Vector2(
-        //    transition.pre.transform.Find("StartPaintPos").position.x,
-        //    transition.pre.transform.Find("StartPaintPos").position.y);
-        //Vector2 nextPos = new Vector2(
-        //    transition.next.transform.Find("EndPaintPos").position.x,
-        //    transition.next.transform.Find("EndPaintPos").position.y);
-
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
         float distanceScale = 0.2f;
         float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
         float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
+
+        Rect rect = GetComponent<RectTransform>().rect;
+        Vector2 leftBottom = new Vector2(prePos.x - rect.width * 0.5f, prePos.y - rect.height * 0.5f);
+        Vector2 rightTop = new Vector2(prePos.x + rect.width * 0.5f, prePos.y + rect.height * 0.5f);
+        if (x > leftBottom.x && x < rightTop.x)
+        {
+            x = leftBottom.x;
+        }
+        if (y > leftBottom.y && y < rightTop.y)
+        {
+            y = leftBottom.y;
+        }
         if (isCreate)
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
@@ -261,6 +246,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             transition.btnLine.transform.position = new Vector2(x, y);
         }
+
     }
     private void DestroyLineAndBtnDel(int curtLineIndex)
     {

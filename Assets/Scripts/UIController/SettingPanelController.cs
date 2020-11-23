@@ -52,7 +52,9 @@ public class SettingPanelController : MonoBehaviour
         {
             foreach (TransitionEntity transition in Entities.Instance.listTransition)
             {
-                transition.topic = transition.pre.transform.Find("IptName").GetComponent<InputField>().text + "#" + transition.next.transform.Find("IptName").GetComponent<InputField>().text;
+                transition.topic =
+                    transition.pre.transform.Find("IptName").GetComponent<InputField>().text + "#" +
+                    transition.next.transform.Find("IptName").GetComponent<InputField>().text;
             }
         }
     }
