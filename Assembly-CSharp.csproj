@@ -75,6 +75,7 @@
     <Compile Include="Assets\Scripts\OpenFolder\DialogTest.cs" />
     <Compile Include="Assets\Scripts\OpenFolder\LocalDialog.cs" />
     <Compile Include="Assets\Scripts\OpenFolder\OpenFileName.cs" />
+    <Compile Include="Assets\Scripts\Tools.cs" />
     <Compile Include="Assets\Scripts\UIController\ContentPanelController.cs" />
     <Compile Include="Assets\Scripts\UIController\SettingPanelController.cs" />
     <Reference Include="UnityEngine">

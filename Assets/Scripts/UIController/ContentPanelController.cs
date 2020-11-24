@@ -61,7 +61,7 @@ public class ContentPanelController : MonoBehaviour
         {
             IgnoreComments = true
         };
-        XmlReader reader = XmlReader.Create(GlobalVariable.Instance.itemXmlPath, settings);
+        XmlReader reader = XmlReader.Create(GlobalVariable.Instance.ItemXmlPath, settings);
         XmlDocument doc = new XmlDocument();
         doc.Load(reader);
         XmlNodeList nodLst = doc.SelectSingleNode("YYYXB").ChildNodes;
@@ -182,11 +182,11 @@ public class ContentPanelController : MonoBehaviour
 
         foreach (KeyValuePair<string, string> item in isAction ? listAction : listCondition)
         {
-            GameObject goBtnAC = Instantiate(
-                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
-            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = item.Key;
+            GameObject goBtnMenuItem = Instantiate(
+                Resources.Load<GameObject>("Prefabs/BtnMenuItem"), Vector3.zero, Quaternion.identity, imgBg);
+            goBtnMenuItem.transform.GetChild(0).GetComponent<Text>().text = item.Key;
             //goBtnAC.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
-            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
+            goBtnMenuItem.GetComponent<Button>().onClick.AddListener(() =>
             {
                 //HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().iptContent.text += item.Value + "\n";
                 iptContent.text += item.Value + "\n";

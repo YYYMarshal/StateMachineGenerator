@@ -7,24 +7,59 @@ using System.IO;
 
 public class SettingPanelController : MonoBehaviour
 {
+    private GameObject btnGroup;
+    private GameObject topicInfo;
     private void Awake()
     {
-        gameObject.SetActive(false);
+        FindObject();
+        ObjectEvent();
+        InitObjectActive();
+    }
+    #region Method:Awake()
+    private void FindObject()
+    {
+        btnGroup = transform.Find("BtnGroup").gameObject;
+        topicInfo = transform.Find("TopicInfo").gameObject;
+    }
+    private void ObjectEvent()
+    {
         transform.Find("BtnGroup/BtnExport").GetComponent<Button>().onClick.AddListener(BtnExportOnClick);
         transform.Find("BtnGroup/BtnNew").GetComponent<Button>().onClick.AddListener(BtnNewOnClick);
         transform.Find("BtnGroup/BtnHelp").GetComponent<Button>().onClick.AddListener(BtnHelpOnClick);
         transform.Find("BtnGroup/BtnExit").GetComponent<Button>().onClick.AddListener(BtnExitOnClick);
     }
+    private void InitObjectActive()
+    {
+        gameObject.SetActive(false);
+        btnGroup.SetActive(true);
+        topicInfo.SetActive(false);
+    }
 
+    #endregion
+    #region 点击事件：BtnGroup
     private bool isFirst = true;
     private string destFileName = "";
-    #region 点击事件
     private void BtnExportOnClick()
     {
+        if (Entities.Instance.listState.Count == 0)
+        {
+            HierarchyObject.Instance.GameManagerObject.GetComponent<GameManager>().PlayTipAnimation(GlobalVariable.Instance.NoState);
+            return;
+        }
+        foreach (StateEntity state in Entities.Instance.listState)
+        {
+            if (state.goItemState.transform.Find("IptName").GetComponent<InputField>().text == "")
+            {
+                HierarchyObject.Instance.GameManagerObject.GetComponent<GameManager>().PlayTipAnimation(GlobalVariable.Instance.StateName);
+                return;
+            }
+        }
         if (isFirst)
         {
             destFileName = gameObject.GetComponent<DialogTest>().OpenSelectFileDialog();
-            File.Copy(GlobalVariable.Instance.sourceXmlPath, destFileName, true);
+            if (destFileName == "")
+                return;
+            File.Copy(GlobalVariable.Instance.SourceXmlPath, destFileName, true);
             isFirst = false;
         }
 
@@ -68,7 +103,7 @@ public class SettingPanelController : MonoBehaviour
         };
 
         XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(XmlReader.Create(GlobalVariable.Instance.sourceXmlPath, settings));
+        xmlDoc.Load(XmlReader.Create(GlobalVariable.Instance.SourceXmlPath, settings));
         return xmlDoc;
     }
     /// <summary>

@@ -24,12 +24,16 @@ public class HierarchyObject
         {
             return lazy.Value;
         }
-    } 
+    }
     #endregion
+
+    public GameObject GameManagerObject;
 
     public GameObject BtnLineGroup;
     public GameObject StateGroup;
     public GameObject PlaneLineGroup;
 
     public GameObject ContentPanel;
+
+    public GameObject TextTip;
 }

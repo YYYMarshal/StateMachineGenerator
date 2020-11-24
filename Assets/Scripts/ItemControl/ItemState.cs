@@ -30,12 +30,18 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         transform.Find("BtnSelected").GetComponent<Button>().onClick.AddListener(BtnStateSelectedOnClick);
 
         transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);
-
     }
     #region 点击事件
     //ShowSettingPanel
     void BtnStateSelectedOnClick()
     {
+        if (transform.Find("IptName").GetComponent<InputField>().text == "")
+        {
+            HierarchyObject.Instance.GameManagerObject.GetComponent<GameManager>().PlayTipAnimation(GlobalVariable.Instance.StateName);
+            if (HierarchyObject.Instance.ContentPanel.activeSelf)
+                HierarchyObject.Instance.ContentPanel.SetActive(false);
+            return;
+        }
         HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listState[GetCurtStateIndex()]);
     }
     void BtnStateDeleteOnClick()
@@ -229,11 +235,11 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         Vector2 rightTop = new Vector2(prePos.x + rect.width * 0.5f, prePos.y + rect.height * 0.5f);
         if (x > leftBottom.x && x < rightTop.x)
         {
-            x = leftBottom.x;
+            //x = leftBottom.x;
         }
         if (y > leftBottom.y && y < rightTop.y)
         {
-            y = leftBottom.y;
+            //y = leftBottom.y;
         }
         if (isCreate)
         {

@@ -32,6 +32,14 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
     void BtnLineOnClick()
     {
         int index = transform.GetSiblingIndex();
+        if (Entities.Instance.listTransition[index].pre.transform.Find("IptName").GetComponent<InputField>().text == "" ||
+           Entities.Instance.listTransition[index].next.transform.Find("IptName").GetComponent<InputField>().text == "")
+        {
+            HierarchyObject.Instance.GameManagerObject.GetComponent<GameManager>().PlayTipAnimation(GlobalVariable.Instance.StateName);
+            if (HierarchyObject.Instance.ContentPanel.activeSelf)
+                HierarchyObject.Instance.ContentPanel.SetActive(false);
+            return;
+        }
         HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listTransition[index]);
     }
     void BtnLineDelOnClick()

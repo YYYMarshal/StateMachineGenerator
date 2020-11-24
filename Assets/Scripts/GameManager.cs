@@ -23,44 +23,31 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
     private GameObject goSettingPanel;
 
+    private GameObject textTip;
     private void Awake()
     {
-        GameObject textTip = transform.Find("TextTip").gameObject;
-        textTip.SetActive(false);
-        gameObject.GetComponent<Button>().onClick.AddListener(() =>
-        {
-            if (!textTip.activeSelf)
-                textTip.SetActive(true);
-
-            Animation animation = textTip.GetComponent<Animation>();
-            if (animation.isPlaying)
-            {
-                animation.Stop();
-                //始终保持：最后一次点击后，才开始倒计时关闭 TextTip游戏物体
-                StopAllCoroutines();
-            }
-            animation.Play("TextTipAni");
-            StartCoroutine(AnimationPlayDone(animation.GetClip("TextTipAni").length,
-                () => textTip.SetActive(false)));
-        });
-
         SetHierarchyObject();
 
+        //textTip = transform.parent.Find("TextTip").gameObject;
+        textTip = transform.Find("TextTip").gameObject;
+        textTip.SetActive(false);
+        gameObject.GetComponent<Button>().onClick.AddListener(() =>
+            PlayTipAnimation(GlobalVariable.Instance.Save));
+        //gameObject.GetComponent<Button>().onClick.AddListener(() =>
+        //  Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.Save));
     }
-    private IEnumerator AnimationPlayDone(float second, Action callback)
-    {
-        yield return new WaitForSeconds(second);
-        callback?.Invoke();
-    }
-    #region Awake()
+    #region Method:Awake()
     private void SetHierarchyObject()
     {
+        HierarchyObject.Instance.GameManagerObject = gameObject;
+
         HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
         HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
         HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
 
         HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
         goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
+        HierarchyObject.Instance.TextTip = transform.parent.Find("TextTip").gameObject;
 
         //先让其开启一下，是为了让其启用脚本
         //顺序：查找物体---启用物体---添加脚本
@@ -119,4 +106,28 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             btnCreateState.transform.position = Input.mousePosition;
         }
     }
+    #region 公开函数：Tip动画
+    public void PlayTipAnimation(string content)
+    {
+        textTip.GetComponent<Text>().text = content;
+        if (!textTip.activeSelf)
+            textTip.SetActive(true);
+
+        Animation animation = textTip.GetComponent<Animation>();
+        if (animation.isPlaying)
+        {
+            animation.Stop();
+            //始终保持：最后一次点击后，才开始倒计时关闭 TextTip游戏物体
+            StopAllCoroutines();
+        }
+        animation.Play("TextTipAni");
+        StartCoroutine(AnimationPlayDone(animation.GetClip("TextTipAni").length,
+            () => textTip.SetActive(false)));
+    }
+    private IEnumerator AnimationPlayDone(float second, Action callback)
+    {
+        yield return new WaitForSeconds(second);
+        callback?.Invoke();
+    }
+    #endregion
 }
