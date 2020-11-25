@@ -6,21 +6,18 @@ using UnityEngine.UI;
 
 public class Tools : MonoBehaviour
 {
-    #region 单例
-    private static readonly Lazy<Tools> lazy = new Lazy<Tools>(() => new Tools());
-    public static Tools Instance
+    private GameObject textTip;
+    public static Tools Instance = null;
+    private void Awake()
     {
-        get
-        {
-            return lazy.Value;
-        }
+        Instance = this;
+        textTip = transform.Find("TextTip").gameObject;
+        textTip.SetActive(false);
     }
-    #endregion
 
     #region 公开函数：Tip动画
     public void PlayTipAnimation(string content)
     {
-        GameObject textTip = HierarchyObject.Instance.TextTip;
         textTip.GetComponent<Text>().text = content;
         if (!textTip.activeSelf)
             textTip.SetActive(true);

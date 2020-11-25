@@ -35,9 +35,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     //ShowSettingPanel
     void BtnStateSelectedOnClick()
     {
-        if (transform.Find("IptName").GetComponent<InputField>().text == "")
+        if (transform.Find("IptName").GetComponent<InputField>().text.Trim() == "")
         {
-            HierarchyObject.Instance.GameManagerObject.GetComponent<GameManager>().PlayTipAnimation(GlobalVariable.Instance.StateName);
+            Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.StateNameEmpty);
             if (HierarchyObject.Instance.ContentPanel.activeSelf)
                 HierarchyObject.Instance.ContentPanel.SetActive(false);
             return;

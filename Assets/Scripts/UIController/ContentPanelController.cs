@@ -33,7 +33,8 @@ public class ContentPanelController : MonoBehaviour
     #region Curt
     private StateEntity curtState;
     private TransitionEntity curtTransition;
-    private bool isInputState = false;
+    //判断当前是否是state在输入
+    private bool isStateInput = false;
     #endregion
 
     #region State Properties
@@ -50,9 +51,9 @@ public class ContentPanelController : MonoBehaviour
     {
         InitListByXmlFile();
 
-        SetCommonUI();
-        SetStateUI();
-        SetTransitionUI();
+        InitCommonUI();
+        InitStateUI();
+        InitTransitionUI();
 
     }
     private void InitListByXmlFile()
@@ -82,8 +83,8 @@ public class ContentPanelController : MonoBehaviour
             }
         }
     }
-    #region Awake()：UI初始化
-    private void SetCommonUI()
+    #region UI初始化:Awake()
+    private void InitCommonUI()
     {
         gameObject.SetActive(false);
         transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
@@ -99,7 +100,7 @@ public class ContentPanelController : MonoBehaviour
         menuGroup.SetActive(false);
 
     }
-    private void SetStateUI()
+    private void InitStateUI()
     {
         goState = transform.Find("BottomGroup/State").gameObject;
         txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
@@ -109,7 +110,7 @@ public class ContentPanelController : MonoBehaviour
             ShowMenuGroup(true);
         });
     }
-    private void SetTransitionUI()
+    private void InitTransitionUI()
     {
         goTransition = transform.Find("BottomGroup/Transition").gameObject;
         txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
@@ -120,23 +121,24 @@ public class ContentPanelController : MonoBehaviour
         });
     }
     #endregion
+
     #region 公开的重载函数
     /// <summary>
-    /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
+    /// 由State的 √按钮 点击调用
     /// </summary>
     public void ShowContentPanel(StateEntity state)
     {
-        ShowUI_StateTransition(true, state, null);
+        SetSTUIObjectActive(true, state, null);
 
         txtStateName.text = $"State Name : \n{state.iptName.text}";
     }
 
     /// <summary>
-    /// 重载函数：从 GlobalVariable.Instance.lstLine 中读取数据，并显示到右侧面板上
+    /// 由 BtnLine按钮 点击调用
     /// </summary>
     public void ShowContentPanel(TransitionEntity transition)
     {
-        ShowUI_StateTransition(false, null, transition);
+        SetSTUIObjectActive(false, null, transition);
 
         StateEntity preState = null;
         StateEntity nextState = null;
@@ -147,14 +149,20 @@ public class ContentPanelController : MonoBehaviour
             if (transition.next.Equals(state.goItemState))
                 nextState = state;
         }
-        txtTransitionTopic.text = $" src : {preState.iptName.text}\n" +
+        txtTransitionTopic.text = $"  src : {preState.iptName.text}\n" +
             $"dest : {nextState.iptName.text}";
     }
 
     #endregion
 
     #region 公共代码部分
-    private void ShowUI_StateTransition(bool isState, StateEntity state, TransitionEntity transition)
+    /// <summary>
+    /// 设置 state和transition ui面板的显隐
+    /// </summary>
+    /// <param name="isState"></param>
+    /// <param name="state"></param>
+    /// <param name="transition"></param>
+    private void SetSTUIObjectActive(bool isState, StateEntity state, TransitionEntity transition)
     {
         if (!gameObject.activeSelf)
             gameObject.SetActive(true);
@@ -163,7 +171,7 @@ public class ContentPanelController : MonoBehaviour
         goTransition.SetActive(!isState);
 
         //2020-11-16 15:46:31
-        isInputState = isState;
+        isStateInput = isState;
         curtState = state;
         curtTransition = transition;
         iptContent.text = isState ? state.content : transition.content;
@@ -194,9 +202,13 @@ public class ContentPanelController : MonoBehaviour
             });
         }
     }
+    /// <summary>
+    /// 设置Entities中的State OR Transition 的Content变量
+    /// </summary>
+    /// <param name="value"></param>
     private void SetEntityContent(string value)
     {
-        if (isInputState)
+        if (isStateInput)
             curtState.content = value;
         else
             curtTransition.content = value;

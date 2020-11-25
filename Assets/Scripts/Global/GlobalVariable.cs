@@ -33,6 +33,8 @@ public class GlobalVariable
     public string SourceXmlPath = $"{Application.dataPath}/../XML/Template.xml";
 
     public string Save = "Save Successfully";
-    public string StateName = "The status name cannot be empty!";
+    public string StateNameEmpty = "The status name cannot be empty";
     public string NoState = "There is no state";
+    public string NoSelectXml = "No selected file";
+    public string IptValuteEmpty = "The two input fields below cannot be empty";
 }

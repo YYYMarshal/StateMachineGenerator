@@ -22,8 +22,8 @@ public class DialogTest : MonoBehaviour
         openFileName.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000008;
         if (LocalDialog.GetSaveFileName(openFileName))
         {
-            Debug.Log(openFileName.file);
-            Debug.Log(openFileName.fileTitle);
+            //Debug.Log(openFileName.file);
+            //Debug.Log(openFileName.fileTitle);
             return openFileName.file;
         }
         return "";
