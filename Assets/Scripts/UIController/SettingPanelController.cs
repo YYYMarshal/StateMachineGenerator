@@ -49,6 +49,10 @@ public class SettingPanelController : MonoBehaviour
     #endregion
 
     #region BtnGroup
+    /// <summary>
+    /// 主要检查面板中所有的状态名是否符合要求；
+    /// 并对Entities中的所有数据进行排序
+    /// </summary>
     private void BtnExportOnClick()
     {
         if (!CheckStateName())
@@ -56,9 +60,12 @@ public class SettingPanelController : MonoBehaviour
             return;
         }
         SetOneTwoActive(false);
+
+        STListSort();
+
         ShowSelctDefaultStateMenu();
     }
-    #region Method:BtnExportOnClick()
+    #region ↑↑↑Method↑↑↑
     /// <summary>
     /// 检查所有状态的名称是否为空
     /// </summary>
@@ -70,15 +77,52 @@ public class SettingPanelController : MonoBehaviour
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoState);
             return false;
         }
+
+        HashSet<string> checkSameName = new HashSet<string>();
         foreach (StateEntity state in Entities.Instance.listState)
         {
-            if (state.goItemState.transform.Find("IptName").GetComponent<InputField>().text.Trim() == "")
+            InputField ipt = state.goItemState.transform.Find("IptName").GetComponent<InputField>();
+            if (ipt.text.Trim() == "")
             {
                 Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.StateNameEmpty);
                 return false;
             }
+            if (!checkSameName.Add(ipt.text.Trim()))
+            {
+                Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.SameName);
+                return false;
+            }
         }
+
         return true;
+    }
+    /// <summary>
+    /// 逐个设置Entities中的 所有 Transition 的topic字段；
+    /// 将ListState和ListTransition按照 StateName 进行排序
+    /// </summary>
+    private void STListSort()
+    {
+        SetTransitionTopic();
+        void SetTransitionTopic()
+        {
+            foreach (TransitionEntity transition in Entities.Instance.listTransition)
+            {
+                transition.topic =
+                    transition.pre.transform.Find("IptName").GetComponent<InputField>().text + "#" +
+                    transition.next.transform.Find("IptName").GetComponent<InputField>().text;
+            }
+        }
+        Entities.Instance.listState.Sort((StateEntity x, StateEntity y) =>
+        {
+            return x.iptName.text.Trim().CompareTo(y.iptName.text.Trim());
+        });
+        Entities.Instance.listTransition.Sort((TransitionEntity x,TransitionEntity y) =>
+        {
+            int result= x.topic.Trim().Split('#')[0].CompareTo(y.topic.Trim().Split('#')[0]);
+            if (result != 0)
+                return result;
+            return x.topic.Trim().Split('#')[1].CompareTo(y.topic.Trim().Split('#')[1]);
+        });
     }
     /// <summary>
     /// 打开选择默认状态的UI
@@ -142,6 +186,9 @@ public class SettingPanelController : MonoBehaviour
 
     #region TopicInfo
     private XmlDocument xmlDoc = null;
+    /// <summary>
+    /// 主要跟xml文件有关
+    /// </summary>
     private void BtnOKOnClick()
     {
         if (iptSMName.text.Trim() == "" || iptSceneID.text.Trim() == "")
@@ -154,8 +201,6 @@ public class SettingPanelController : MonoBehaviour
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoSelectXml);
             return;
         }
-
-        SetTransitionTopic();
 
         //2020-11-26 08:45:29
         //下面这样实现向同一个xml文件中多次写入 xml内容
@@ -182,16 +227,7 @@ public class SettingPanelController : MonoBehaviour
         gameObject.SetActive(false);
 
     }
-    #region Method:BtnOKOnClick()
-    private void SetTransitionTopic()
-    {
-        foreach (TransitionEntity transition in Entities.Instance.listTransition)
-        {
-            transition.topic =
-                transition.pre.transform.Find("IptName").GetComponent<InputField>().text + "#" +
-                transition.next.transform.Find("IptName").GetComponent<InputField>().text;
-        }
-    }
+    #region ↑↑↑Method↑↑↑
     private string destFileName = "";
     /// <summary>
     /// 选择目标xml文件
@@ -243,18 +279,18 @@ public class SettingPanelController : MonoBehaviour
         return elemC;
     }
     /// <summary>
-    /// 每一个State
+    /// xml的每一个State
     /// </summary>
     /// <param name="elemC"></param>
     /// <param name="xmlDoc"></param>
     private void CreateItemContent(XmlElement elemC, XmlDocument xmlDoc)
     {
-        int index = 0;
+        string defaultStateName = "";
         for (int i = 0; i < imgBg.childCount; i++)
         {
             if (imgBg.GetChild(i).GetComponent<Toggle>().isOn)
             {
-                index = i;
+                defaultStateName = imgBg.GetChild(i).Find("Label").GetComponent<Text>().text;
                 break;
             }
         }
@@ -263,7 +299,7 @@ public class SettingPanelController : MonoBehaviour
             StateEntity state = Entities.Instance.listState[i];
             XmlElement elem = xmlDoc.CreateElement("State");
             elem.SetAttribute("name", state.iptName.text);
-            if (i == index)
+            if (state.iptName.text.Trim() == defaultStateName)
                 elem.SetAttribute("isDefaultState", "");
             elem.InnerXml = state.content;
             elemC.AppendChild(elem);
