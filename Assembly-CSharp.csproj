@@ -76,8 +76,9 @@
     <Compile Include="Assets\Scripts\OpenFolder\LocalDialog.cs" />
     <Compile Include="Assets\Scripts\OpenFolder\OpenFileName.cs" />
     <Compile Include="Assets\Scripts\UIController\ContentPanelController.cs" />
-    <Compile Include="Assets\Scripts\UIController\SettingPanelController.cs" />
+    <Compile Include="Assets\Scripts\UIController\MenuPanelController.cs" />
     <Compile Include="Assets\Scripts\UIController\Tools.cs" />
+    <Compile Include="Assets\Scripts\UIController\TopicInfoPanel.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/2019.4.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

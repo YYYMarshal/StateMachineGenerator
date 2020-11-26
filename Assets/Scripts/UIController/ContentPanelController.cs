@@ -20,7 +20,7 @@ public class ContentPanelController : MonoBehaviour
 {
     #region Hierarchy Object
     private InputField iptContent;
-    private GameObject menuGroup;
+    private GameObject btnACGroup;
     #endregion
 
     #region Menu Releated
@@ -95,9 +95,9 @@ public class ContentPanelController : MonoBehaviour
             SetEntityContent(value);
         });
 
-        menuGroup = transform.Find("MenuGroup").gameObject;
-        menuGroup.GetComponent<Button>().onClick.AddListener(() => menuGroup.SetActive(false));
-        menuGroup.SetActive(false);
+        btnACGroup = transform.Find("BtnACGroup").gameObject;
+        btnACGroup.GetComponent<Button>().onClick.AddListener(() => btnACGroup.SetActive(false));
+        btnACGroup.SetActive(false);
 
     }
     private void InitStateUI()
@@ -107,7 +107,7 @@ public class ContentPanelController : MonoBehaviour
 
         goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(() =>
         {
-            ShowMenuGroup(true);
+            ShowBtnACGroup(true);
         });
     }
     private void InitTransitionUI()
@@ -117,7 +117,7 @@ public class ContentPanelController : MonoBehaviour
 
         goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(() =>
         {
-            ShowMenuGroup(false);
+            ShowBtnACGroup(false);
         });
     }
     #endregion
@@ -177,11 +177,11 @@ public class ContentPanelController : MonoBehaviour
         iptContent.text = isState ? state.content : transition.content;
     }
 
-    private void ShowMenuGroup(bool isAction)
+    private void ShowBtnACGroup(bool isAction)
     {
-        if (!menuGroup.activeSelf)
-            menuGroup.SetActive(true);
-        Transform imgBg = transform.Find("MenuGroup/ImgBg");
+        if (!btnACGroup.activeSelf)
+            btnACGroup.SetActive(true);
+        Transform imgBg = transform.Find("BtnACGroup/ImgBg");
 
         for (int i = 0; i < imgBg.childCount; i++)
         {
@@ -191,7 +191,7 @@ public class ContentPanelController : MonoBehaviour
         foreach (KeyValuePair<string, string> item in isAction ? listAction : listCondition)
         {
             GameObject goBtnMenuItem = Instantiate(
-                Resources.Load<GameObject>("Prefabs/BtnMenuItem"), Vector3.zero, Quaternion.identity, imgBg);
+                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
             goBtnMenuItem.transform.GetChild(0).GetComponent<Text>().text = item.Key;
             //goBtnAC.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
             goBtnMenuItem.GetComponent<Button>().onClick.AddListener(() =>

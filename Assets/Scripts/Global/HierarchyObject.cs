@@ -32,6 +32,7 @@ public class HierarchyObject
     public GameObject BtnLineGroup;
     public GameObject StateGroup;
     public GameObject PlaneLineGroup;
+    public GameObject TopicInfoPanel;
 
     public GameObject ContentPanel;
 }

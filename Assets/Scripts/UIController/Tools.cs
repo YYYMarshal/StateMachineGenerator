@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Tools : MonoBehaviour
+public class Tools : DialogTest
 {
     private GameObject textTip;
     public static Tools Instance = null;
     private void Awake()
     {
         Instance = this;
+
+        gameObject.SetActive(true);
         textTip = transform.Find("TextTip").gameObject;
         textTip.SetActive(false);
     }

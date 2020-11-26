@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     //创建状态的按钮
     private Button btnCreateState;
 
-    private GameObject goSettingPanel;
+    private GameObject goMenuPanel;
 
     private void Awake()
     {
@@ -42,16 +42,18 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
 
         HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
-        goSettingPanel = transform.parent.Find("SettingPanel").gameObject;
+        goMenuPanel = transform.parent.Find("MenuPanel").gameObject;
+        HierarchyObject.Instance.TopicInfoPanel = transform.parent.Find("TopicInfoPanel").gameObject;
 
         //先让其开启一下，是为了让其启用脚本
         //顺序：查找物体---启用物体---添加脚本
         HierarchyObject.Instance.ContentPanel.SetActive(true);
-        goSettingPanel.SetActive(true);
+        goMenuPanel.SetActive(true);
+        HierarchyObject.Instance.TopicInfoPanel.SetActive(true);
 
         HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
-        goSettingPanel.AddComponent<SettingPanelController>();
-        goSettingPanel.AddComponent<DialogTest>();
+        goMenuPanel.AddComponent<MenuPanelController>();
+        HierarchyObject.Instance.TopicInfoPanel.AddComponent<TopicInfoPanel>();
 
         btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
@@ -89,7 +91,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
-            goSettingPanel.SetActive(!goSettingPanel.activeSelf);
+            goMenuPanel.SetActive(!goMenuPanel.activeSelf);
         }
     }
 
