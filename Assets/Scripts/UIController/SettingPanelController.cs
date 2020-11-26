@@ -10,6 +10,8 @@ public class SettingPanelController : MonoBehaviour
     private GameObject btnGroup;
     private GameObject topicInfo;
 
+    private Transform imgBg;
+
     private InputField iptSMName;
     private InputField iptSceneID;
     private void Awake()
@@ -23,6 +25,8 @@ public class SettingPanelController : MonoBehaviour
     {
         btnGroup = transform.Find("BtnGroup").gameObject;
         topicInfo = transform.Find("TopicInfo").gameObject;
+
+        imgBg = transform.Find("TopicInfo/SelctDefaultStateMenu/ImgBg");
 
         iptSMName = transform.Find("TopicInfo/TopicMenu/SMName/IptSMName").GetComponent<InputField>();
         iptSceneID = transform.Find("TopicInfo/TopicMenu/SceneID/IptSceneID").GetComponent<InputField>();
@@ -45,8 +49,6 @@ public class SettingPanelController : MonoBehaviour
     #endregion
 
     #region BtnGroup
-    private bool isFirst = true;
-    private string destFileName = "";
     private void BtnExportOnClick()
     {
         if (!CheckStateName())
@@ -83,8 +85,6 @@ public class SettingPanelController : MonoBehaviour
     /// </summary>
     private void ShowSelctDefaultStateMenu()
     {
-        Transform imgBg = transform.Find("TopicInfo/SelctDefaultStateMenu/ImgBg");
-
         for (int i = 0; i < imgBg.childCount; i++)
         {
             Destroy(imgBg.GetChild(i).gameObject);
@@ -141,6 +141,7 @@ public class SettingPanelController : MonoBehaviour
     #endregion
 
     #region TopicInfo
+    private XmlDocument xmlDoc = null;
     private void BtnOKOnClick()
     {
         if (iptSMName.text.Trim() == "" || iptSceneID.text.Trim() == "")
@@ -156,7 +157,12 @@ public class SettingPanelController : MonoBehaviour
 
         SetTransitionTopic();
 
-        XmlDocument xmlDoc = CreateXmlDoc();
+        //2020-11-26 08:45:29
+        //下面这样实现向同一个xml文件中多次写入 xml内容
+        if (xmlDoc == null)
+        {
+            xmlDoc = CreateXmlDoc();
+        }
         XmlElement element = CreateItemTopic(xmlDoc);
         try
         {
@@ -186,19 +192,19 @@ public class SettingPanelController : MonoBehaviour
                 transition.next.transform.Find("IptName").GetComponent<InputField>().text;
         }
     }
+    private string destFileName = "";
     /// <summary>
     /// 选择目标xml文件
     /// </summary>
     /// <returns></returns>
     private bool SelectXmlFile()
     {
-        if (isFirst)
+        if (destFileName == "")
         {
             destFileName = gameObject.GetComponent<DialogTest>().OpenSelectFileDialog();
             if (destFileName == "")
                 return false;
             File.Copy(GlobalVariable.Instance.SourceXmlPath, destFileName, true);
-            isFirst = false;
         }
         return true;
     }
@@ -243,10 +249,22 @@ public class SettingPanelController : MonoBehaviour
     /// <param name="xmlDoc"></param>
     private void CreateItemContent(XmlElement elemC, XmlDocument xmlDoc)
     {
-        foreach (StateEntity state in Entities.Instance.listState)
+        int index = 0;
+        for (int i = 0; i < imgBg.childCount; i++)
         {
+            if (imgBg.GetChild(i).GetComponent<Toggle>().isOn)
+            {
+                index = i;
+                break;
+            }
+        }
+        for (int i = 0; i < Entities.Instance.listState.Count; i++)
+        {
+            StateEntity state = Entities.Instance.listState[i];
             XmlElement elem = xmlDoc.CreateElement("State");
             elem.SetAttribute("name", state.iptName.text);
+            if (i == index)
+                elem.SetAttribute("isDefaultState", "");
             elem.InnerXml = state.content;
             elemC.AppendChild(elem);
         }

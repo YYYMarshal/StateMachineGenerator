@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     {
         SetHierarchyObject();
 
-        transform.parent.Find("Tools").gameObject.AddComponent<Tools>();
+        transform.parent.Find("ToolsPanel").gameObject.AddComponent<Tools>();
 
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.Save));
