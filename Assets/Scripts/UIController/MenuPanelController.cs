@@ -101,7 +101,7 @@ public class MenuPanelController : MonoBehaviour
             }
             if (!checkSameStateName.Add(ipt.text.Trim()))
             {
-                Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.SameName);
+                Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.SameStateName);
                 return false;
             }
         }

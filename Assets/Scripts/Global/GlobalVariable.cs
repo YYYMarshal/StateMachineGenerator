@@ -37,5 +37,6 @@ public class GlobalVariable
     public string NoState = "There is no state";
     public string NoSelectXml = "No selected file";
     public string IptValuteEmpty = "The two input fields below cannot be empty";
-    public string SameName = "State name cannot be repeated";
+    public string SameStateName = "State name cannot be repeated";
+    public string SameStateMachine = "State Machine name cannot be repeated";
 }

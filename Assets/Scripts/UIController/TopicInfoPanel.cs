@@ -32,12 +32,17 @@ public class TopicInfoPanel : MonoBehaviour
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.IptValuteEmpty);
             return;
         }
+
         //2020-11-26 08:45:29
         //下面这样实现向同一个xml文件中多次写入 xml内容
         if (xmlDoc == null)
         {
             xmlDoc = CreateXmlDoc();
         }
+
+        if (!HaveSameStateMachineName(xmlDoc))
+            return;
+
         XmlElement element = CreateItemTopic(xmlDoc);
         try
         {
@@ -130,7 +135,20 @@ public class TopicInfoPanel : MonoBehaviour
         }
     }
     #endregion
-
+    private bool HaveSameStateMachineName(XmlDocument xmlDoc)
+    {
+        XmlNodeList nodeList = xmlDoc.SelectSingleNode("AppData").SelectNodes("CustomStateMachine");
+        foreach (XmlElement item in nodeList)
+        {
+            XmlElement elem = item.SelectSingleNode("StateMachine").SelectSingleNode("StateMachine") as XmlElement;
+            if (iptSMName.text.Trim() == elem.GetAttribute("name"))
+            {
+                Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.SameStateMachine);
+                return false;
+            }
+        }
+        return true;
+    }
     /// <summary>
     /// 打开选择默认状态的UI
     /// </summary>
