@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,6 +40,26 @@ public class Tools : DialogTest
     {
         yield return new WaitForSeconds(second);
         callback?.Invoke();
+    }
+    #endregion
+
+    #region 公开函数：文件选择
+    /// <summary>
+    /// 选择目标xml文件
+    /// </summary>
+    /// <returns></returns>
+    public bool SelectXmlFile(bool isImport)
+    {
+        CurrentVariable.Instance.TargetFileName = Instance.OpenSelectFileDialog();
+        if (CurrentVariable.Instance.TargetFileName == "")
+        {
+            Instance.PlayTipAnimation(GlobalVariable.Instance.NoSelectXml);
+            return false;
+        }
+        if (!isImport)
+            File.Copy(
+                GlobalVariable.Instance.TemplateXmlPath, CurrentVariable.Instance.TargetFileName, true);
+        return true;
     }
     #endregion
 }

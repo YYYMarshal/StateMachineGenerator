@@ -36,4 +36,5 @@ public class CurrentVariable
     //ItemState中用的：当前的Line索引
     public int itemLineIndex = 0;
 
+    public string TargetFileName = "";
 }

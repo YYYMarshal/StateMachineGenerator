@@ -91,7 +91,11 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
-            goMenuPanel.SetActive(!goMenuPanel.activeSelf);
+            if (!goMenuPanel.transform.GetChild(1).gameObject.activeSelf &&
+                !HierarchyObject.Instance.TopicInfoPanel.activeSelf)
+            {
+                goMenuPanel.SetActive(!goMenuPanel.activeSelf);
+            }
         }
     }
 

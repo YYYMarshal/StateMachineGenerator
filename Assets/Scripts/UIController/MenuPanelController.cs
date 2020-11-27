@@ -71,6 +71,9 @@ public class MenuPanelController : MonoBehaviour
         }
 
         STListSort();
+
+        HierarchyObject.Instance.TopicInfoPanel.SetActive(true);
+        gameObject.SetActive(false);
     }
     #region ↑↑↑Method↑↑↑
     /// <summary>
@@ -121,6 +124,7 @@ public class MenuPanelController : MonoBehaviour
                     transition.next.transform.Find("IptName").GetComponent<InputField>().text;
             }
         }
+
         Entities.Instance.listState.Sort((StateEntity x, StateEntity y) =>
         {
             return x.iptName.text.Trim().CompareTo(y.iptName.text.Trim());
@@ -174,15 +178,19 @@ public class MenuPanelController : MonoBehaviour
     }
     private void BtnNewOnClick()
     {
-        SetChildActive(true);
+        if (Tools.Instance.SelectXmlFile(false))
+        {
+            SetChildActive(true);
+            gameObject.SetActive(false);
+        }
     }
     private void BtnImportOnClick()
     {
-        SetChildActive(true);
-    }
-
-    private void OnEnable()
-    {
+        if (Tools.Instance.SelectXmlFile(true))
+        {
+            SetChildActive(true);
+            gameObject.SetActive(false);
+        }
     }
     #region 公共函数
     private void SetChildActive(bool isOne)

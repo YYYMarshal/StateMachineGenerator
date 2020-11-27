@@ -190,13 +190,11 @@ public class ContentPanelController : MonoBehaviour
 
         foreach (KeyValuePair<string, string> item in isAction ? listAction : listCondition)
         {
-            GameObject goBtnMenuItem = Instantiate(
+            GameObject goBtnAC = Instantiate(
                 Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
-            goBtnMenuItem.transform.GetChild(0).GetComponent<Text>().text = item.Key;
-            //goBtnAC.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
-            goBtnMenuItem.GetComponent<Button>().onClick.AddListener(() =>
+            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = item.Key;
+            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
             {
-                //HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().iptContent.text += item.Value + "\n";
                 iptContent.text += item.Value + "\n";
                 SetEntityContent(iptContent.text);
             });
