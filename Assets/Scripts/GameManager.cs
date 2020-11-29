@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     private void BtnCreateStateOnClick()
     {
         btnCreateState.gameObject.SetActive(false);
+
         GameObject newItemState = Instantiate(
             Resources.Load<GameObject>("Prefabs/ItemState"),
             new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0),
@@ -73,7 +74,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         StateEntity state = new StateEntity
         {
             goItemState = newItemState,
-            iptName = newItemState.transform.Find("IptName").GetComponent<InputField>()
         };
         Entities.Instance.listState.Add(state);
     }

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class StateEntity
 {
     public GameObject goItemState = null;
-    public InputField iptName = null;
 
+    public string stateName = "";
     public string content = "";
 }

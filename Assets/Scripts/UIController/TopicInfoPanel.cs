@@ -16,6 +16,8 @@ public class TopicInfoPanel : MonoBehaviour
     {
         gameObject.SetActive(false);
 
+        gameObject.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+
         defaultUI = transform.Find("SelctDefaultStateUI");
         iptSMName = transform.Find("TopicInfoEditUI/SMName/IptSMName").GetComponent<InputField>();
         iptSceneID = transform.Find("TopicInfoEditUI/SceneID/IptSceneID").GetComponent<InputField>();
@@ -118,8 +120,8 @@ public class TopicInfoPanel : MonoBehaviour
         {
             StateEntity state = Entities.Instance.listState[i];
             XmlElement elem = xmlDoc.CreateElement("State");
-            elem.SetAttribute("name", state.iptName.text);
-            if (state.iptName.text.Trim() == defaultStateName)
+            elem.SetAttribute("name", state.stateName);
+            if (state.stateName.Trim() == defaultStateName)
                 elem.SetAttribute("isDefaultState", "");
             elem.InnerXml = state.content;
             elemC.AppendChild(elem);
@@ -164,7 +166,7 @@ public class TopicInfoPanel : MonoBehaviour
             GameObject toggleState = Instantiate(
                 Resources.Load<GameObject>("Prefabs/ToggleState"), Vector3.zero, Quaternion.identity, defaultUI);
             toggleState.GetComponent<Toggle>().group = defaultUI.GetComponent<ToggleGroup>();
-            toggleState.transform.Find("Label").GetComponent<Text>().text = state.iptName.text;
+            toggleState.transform.Find("Label").GetComponent<Text>().text = state.stateName;
         }
     }
 }

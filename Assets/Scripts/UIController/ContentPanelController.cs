@@ -65,6 +65,7 @@ public class ContentPanelController : MonoBehaviour
         XmlReader reader = XmlReader.Create(GlobalVariable.Instance.ItemXmlPath, settings);
         XmlDocument doc = new XmlDocument();
         doc.Load(reader);
+        reader.Close();
         XmlNodeList nodLst = doc.SelectSingleNode("YYYXB").ChildNodes;
         foreach (XmlElement elem in nodLst)
         {
@@ -130,7 +131,7 @@ public class ContentPanelController : MonoBehaviour
     {
         SetSTUIObjectActive(true, state, null);
 
-        txtStateName.text = $"State Name : \n{state.iptName.text}";
+        txtStateName.text = $"State Name : \n{state.stateName}";
     }
 
     /// <summary>
@@ -149,8 +150,8 @@ public class ContentPanelController : MonoBehaviour
             if (transition.next.Equals(state.goItemState))
                 nextState = state;
         }
-        txtTransitionTopic.text = $"  src : {preState.iptName.text}\n" +
-            $"dest : {nextState.iptName.text}";
+        txtTransitionTopic.text = $"  src : {preState.stateName}\n" +
+            $"dest : {nextState.stateName}";
     }
 
     #endregion

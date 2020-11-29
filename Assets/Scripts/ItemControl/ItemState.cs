@@ -25,7 +25,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     private void Awake()
     {
         transform.Find("IptName").GetComponent<InputField>().onEndEdit.AddListener(
-            (value) => Entities.Instance.listState[GetCurtStateIndex()].iptName.text = value);
+            (value) => Entities.Instance.listState[GetCurtStateIndex()].stateName = value);
 
         transform.Find("BtnSelected").GetComponent<Button>().onClick.AddListener(BtnStateSelectedOnClick);
 
@@ -177,9 +177,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         Entities.Instance.listTransition.Add(transition);
 
-        CurrentVariable.Instance.line = lineRenderer;
+        CurrentVariable.Instance.line = transition.line;
         CurrentVariable.Instance.isLineStartPaint = true;
-        CurrentVariable.Instance.itemLineIndex = GetCurtLineIndex(lineRenderer);
+        CurrentVariable.Instance.itemLineIndex = GetCurtLineIndex(transition.line);
     }
     void EndDrawRay()
     {

@@ -62,4 +62,5 @@ public class Tools : DialogTest
         return true;
     }
     #endregion
+    
 }

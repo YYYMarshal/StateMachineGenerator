@@ -21,6 +21,7 @@ public class MenuPanelController : MonoBehaviour
     private Button btnImport;
     #endregion
 
+    private Transform stateMachineUI;
 
     private void Awake()
     {
@@ -41,6 +42,8 @@ public class MenuPanelController : MonoBehaviour
 
         btnNew = btnGroupTwo.transform.Find("BtnNew").GetComponent<Button>();
         btnImport = btnGroupTwo.transform.Find("BtnImport").GetComponent<Button>();
+
+        stateMachineUI = transform.Find("SelctStateMachineUI");
     }
     private void ObjectEvent()
     {
@@ -54,7 +57,7 @@ public class MenuPanelController : MonoBehaviour
     }
     private void InitObjectActive()
     {
-        SetChildActive(false);
+        SetChildUIActive(false, true, false);
     }
 
     #endregion
@@ -127,7 +130,7 @@ public class MenuPanelController : MonoBehaviour
 
         Entities.Instance.listState.Sort((StateEntity x, StateEntity y) =>
         {
-            return x.iptName.text.Trim().CompareTo(y.iptName.text.Trim());
+            return x.stateName.Trim().CompareTo(y.stateName.Trim());
         });
         Entities.Instance.listTransition.Sort((TransitionEntity x, TransitionEntity y) =>
         {
@@ -176,41 +179,198 @@ public class MenuPanelController : MonoBehaviour
         Application.Quit();
 #endif
     }
+    #region 公共函数
+    private void SetChildUIActive(params bool[] vs)
+    {
+        btnGroupOne.SetActive(vs[0]);
+        btnGroupTwo.SetActive(vs[1]);
+        stateMachineUI.gameObject.SetActive(vs[2]);
+    }
+    #endregion
     private void BtnNewOnClick()
     {
         if (Tools.Instance.SelectXmlFile(false))
         {
-            SetChildActive(true);
+            SetChildUIActive(true, false, false);
             gameObject.SetActive(false);
         }
     }
     private void BtnImportOnClick()
     {
-        if (Tools.Instance.SelectXmlFile(true))
+        if (!Tools.Instance.SelectXmlFile(true))
+            return;
+
+        SetChildUIActive(false, false, true);
+
+        XmlReaderSettings settings = new XmlReaderSettings()
         {
-            XmlReaderSettings settings = new XmlReaderSettings()
+            IgnoreComments = true
+        };
+
+        XmlDocument xmlDoc = new XmlDocument();
+        XmlReader reader = XmlReader.Create(CurrentVariable.Instance.TargetFileName, settings);
+        xmlDoc.Load(reader);
+        reader.Close();
+
+        XmlElement elemAppData = xmlDoc.SelectSingleNode("AppData") as XmlElement;
+
+        ShowCustomSelctStateMachineUI(elemAppData);
+    }
+    #region 导入xml文件后的物体生成
+    private void ShowCustomSelctStateMachineUI(XmlElement elemAppData)
+    {
+        for (int i = 0; i < stateMachineUI.childCount; i++)
+        {
+            Destroy(stateMachineUI.GetChild(i).gameObject);
+        }
+
+        //通过多个CustomStateMachine的StateMachine/StateMachine的name属性的值，生成可供选择的按钮菜单
+        foreach (XmlElement csmElem in elemAppData.ChildNodes)
+        {
+            if (csmElem.Name != "CustomStateMachine")
+                continue;
+            XmlElement elem = csmElem.SelectSingleNode("StateMachine").SelectSingleNode("StateMachine") as XmlElement;
+
+            string name = elem.GetAttribute("name");
+            GameObject goBtnAC = Instantiate(
+                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero,
+                Quaternion.identity, stateMachineUI);
+
+            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = name;
+            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
             {
-                IgnoreComments = true
-            };
-
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlReader reader = XmlReader.Create(CurrentVariable.Instance.TargetFileName, settings);
-            xmlDoc.Load(reader);
-            reader.Close();
-
-            XmlElement elemAppdata = xmlDoc.SelectSingleNode("AppData") as XmlElement;
-
-
-
-            SetChildActive(true);
-            gameObject.SetActive(false);
+                BtnOnClick(elemAppData, name);
+            });
         }
     }
-    #region 公共函数
-    private void SetChildActive(bool isOne)
+    private void BtnOnClick(XmlElement elemAppData, string name)
     {
-        btnGroupOne.SetActive(isOne);
-        btnGroupTwo.SetActive(!isOne);
+        XmlElement elemSMChild = null;
+        //寻找目标 CustomStateMachine
+        foreach (XmlElement csmElem in elemAppData.ChildNodes)
+        {
+            if (csmElem.Name != "CustomStateMachine")
+                continue;
+            XmlElement elem = csmElem.SelectSingleNode("StateMachine").SelectSingleNode("StateMachine") as XmlElement;
+            if (name == elem.GetAttribute("name"))
+            {
+                elemSMChild = elem;
+                break;
+            }
+        }
+
+        //重头戏：实例化 state 和 transition
+        foreach (XmlElement elem in elemSMChild.ChildNodes)
+        {
+            if (elem.Name == "State")
+            {
+                InstantiateState(elem);
+            }
+            else if (elem.Name == "Transition")
+            {
+                InstantiateTransition(elem);
+            }
+        }
+
+        SetChildUIActive(true, false, false);
+        gameObject.SetActive(false);
+    }
+    private void InstantiateState(XmlElement elem)
+    {
+        GameObject newItemState = Instantiate(
+            Resources.Load<GameObject>("Prefabs/ItemState"),
+            new Vector3(Random.Range(0, Screen.width), Random.Range(0, Screen.height), 0),
+            Quaternion.identity,
+            //将StateGroup作为新生成的ItemState的父物体
+            HierarchyObject.Instance.StateGroup.transform);
+
+        string stateName = elem.GetAttribute("name");
+        newItemState.transform.Find("IptName").GetComponent<InputField>().text = stateName;
+        newItemState.AddComponent<ItemState>();
+
+        StateEntity state = new StateEntity
+        {
+            goItemState = newItemState,
+            stateName = stateName,
+            content = elem.InnerXml
+        };
+        Entities.Instance.listState.Add(state);
+    }
+    private void InstantiateTransition(XmlElement elem)
+    {
+        LineRenderer lineRenderer = Instantiate(
+            Resources.Load<GameObject>("Prefabs/ItemLine"),
+            Vector3.zero,
+            Quaternion.identity,
+            HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
+
+        GameObject pre = null;
+        GameObject next = null;
+        string src = elem.GetAttribute("src");
+        string dest = elem.GetAttribute("dest");
+        foreach (StateEntity state in Entities.Instance.listState)
+        {
+            if (state.stateName == src)
+            {
+                pre = state.goItemState;
+            }
+            else if (state.stateName == dest)
+            {
+                next = state.goItemState;
+            }
+        }
+
+        TransitionEntity transition = new TransitionEntity()
+        {
+            line = lineRenderer,
+            btnLine = null,
+            pre = pre,
+            next = next,
+            topic = src + "#" + dest,
+            content = elem.InnerXml
+        };
+
+        transition.line.SetPosition(0, GetRayPoint(pre.transform.Find("PaintPos").position));
+        transition.line.SetPosition(1, GetRayPoint(next.transform.Find("PaintPos").position));
+
+        InstantiateBtnLine(transition);
+
+        Entities.Instance.listTransition.Add(transition);
+
+        Vector3 GetRayPoint(Vector3 vector3)
+        {
+            Ray ray = Camera.main.ScreenPointToRay(vector3);
+            bool isCollider = Physics.Raycast(ray, out RaycastHit hitInfo);
+            if (isCollider)
+                return hitInfo.point;
+            return Vector3.zero;
+        }
+    }
+    private void InstantiateBtnLine(TransitionEntity transition)
+    {
+        Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
+        Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
+        float distanceScale = 0.2f;
+        float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
+        float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
+
+        Rect rect = GetComponent<RectTransform>().rect;
+        Vector2 leftBottom = new Vector2(prePos.x - rect.width * 0.5f, prePos.y - rect.height * 0.5f);
+        Vector2 rightTop = new Vector2(prePos.x + rect.width * 0.5f, prePos.y + rect.height * 0.5f);
+        if (x > leftBottom.x && x < rightTop.x)
+        {
+            //x = leftBottom.x;
+        }
+        if (y > leftBottom.y && y < rightTop.y)
+        {
+            //y = leftBottom.y;
+        }
+
+        GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
+           new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);
+        goBtnLine.AddComponent<ItemTransitionBtnLine>();
+        transition.btnLine = goBtnLine.GetComponent<Button>();
     }
     #endregion
+
 }
