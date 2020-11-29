@@ -18,7 +18,7 @@ public class DialogTest : MonoBehaviour
         openFileName.fileTitle = new string(new char[64]);
         openFileName.maxFileTitle = openFileName.fileTitle.Length;
         openFileName.initialDir = Application.streamingAssetsPath.Replace('/', '\\');//默认路径
-        openFileName.title = "窗口标题";
+        openFileName.title = "选择xml文件";
         openFileName.flags = 0x00080000 | 0x00001000 | 0x00000800 | 0x00000008;
         if (LocalDialog.GetSaveFileName(openFileName))
         {

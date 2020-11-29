@@ -40,7 +40,7 @@ public class TopicInfoPanel : MonoBehaviour
             xmlDoc = CreateXmlDoc();
         }
 
-        if (!HaveSameStateMachineName(xmlDoc))
+        if (HaveSameStateMachineName(xmlDoc))
             return;
 
         XmlElement element = CreateItemTopic(xmlDoc);
@@ -144,10 +144,10 @@ public class TopicInfoPanel : MonoBehaviour
             if (iptSMName.text.Trim() == elem.GetAttribute("name"))
             {
                 Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.SameStateMachine);
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
     /// <summary>
     /// 打开选择默认状态的UI

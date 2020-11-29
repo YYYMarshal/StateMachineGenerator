@@ -29,8 +29,9 @@ public class GlobalVariable
     }
     #endregion
 
-    public string ItemXmlPath = $"{Application.dataPath}/../XML/YYYXB_Labaction_AND_Condition.xml"; 
-    public string TemplateXmlPath = $"{Application.dataPath}/../XML/Template.xml";
+    public string ItemXmlPath = $"{Application.dataPath}/../xml/YYYXB_Labaction_AND_Condition.xml"; 
+    public string TemplateXmlPath = $"{Application.dataPath}/../xml/Template.xml";
+    public string DataJsonPath = $"{Application.dataPath}/../json/data.json";
 
     public string Save = "Save Successfully";
     public string StateNameEmpty = "The status name cannot be empty";

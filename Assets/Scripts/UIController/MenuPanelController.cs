@@ -188,6 +188,20 @@ public class MenuPanelController : MonoBehaviour
     {
         if (Tools.Instance.SelectXmlFile(true))
         {
+            XmlReaderSettings settings = new XmlReaderSettings()
+            {
+                IgnoreComments = true
+            };
+
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlReader reader = XmlReader.Create(CurrentVariable.Instance.TargetFileName, settings);
+            xmlDoc.Load(reader);
+            reader.Close();
+
+            XmlElement elemAppdata = xmlDoc.SelectSingleNode("AppData") as XmlElement;
+
+
+
             SetChildActive(true);
             gameObject.SetActive(false);
         }
