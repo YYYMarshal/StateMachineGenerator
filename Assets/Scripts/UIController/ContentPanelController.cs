@@ -88,6 +88,8 @@ public class ContentPanelController : MonoBehaviour
     private void InitCommonUI()
     {
         gameObject.SetActive(false);
+
+        transform.Find("BottomGroup").gameObject.SetActive(true);
         transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
 
         iptContent = transform.Find("BottomGroup/IptContent").GetComponent<InputField>();
