@@ -94,6 +94,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (!goMenuPanel.transform.GetChild(1).gameObject.activeSelf &&
+                !goMenuPanel.transform.GetChild(2).gameObject.activeSelf &&
                 !HierarchyObject.Instance.TopicInfoPanel.activeSelf)
             {
                 goMenuPanel.SetActive(!goMenuPanel.activeSelf);

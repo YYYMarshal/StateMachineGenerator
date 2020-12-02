@@ -167,6 +167,14 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
+        //随机颜色的RGB值。即刻得到一个随机的颜色
+        float r = UnityEngine.Random.Range(0f, 1f);
+        float g = UnityEngine.Random.Range(0f, 1f);
+        float b = UnityEngine.Random.Range(0f, 1f);
+        Color randomColor = new Color(r, g, b);
+        lineRenderer.startColor = randomColor;
+        lineRenderer.endColor = randomColor;
+
         TransitionEntity transition = new TransitionEntity()
         {
             line = lineRenderer,
@@ -226,21 +234,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
-        float distanceScale = 0.2f;
+        float distanceScale = 0.3f;
         float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
         float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
 
-        Rect rect = GetComponent<RectTransform>().rect;
-        Vector2 leftBottom = new Vector2(prePos.x - rect.width * 0.5f, prePos.y - rect.height * 0.5f);
-        Vector2 rightTop = new Vector2(prePos.x + rect.width * 0.5f, prePos.y + rect.height * 0.5f);
-        if (x > leftBottom.x && x < rightTop.x)
-        {
-            //x = leftBottom.x;
-        }
-        if (y > leftBottom.y && y < rightTop.y)
-        {
-            //y = leftBottom.y;
-        }
         if (isCreate)
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),

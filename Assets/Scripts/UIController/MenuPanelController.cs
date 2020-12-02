@@ -232,18 +232,19 @@ public class MenuPanelController : MonoBehaviour
             XmlElement elem = csmElem.SelectSingleNode("StateMachine").SelectSingleNode("StateMachine") as XmlElement;
 
             string name = elem.GetAttribute("name");
-            GameObject goBtnAC = Instantiate(
+            GameObject goBtnCSMItem = Instantiate(
                 Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero,
                 Quaternion.identity, stateMachineUI);
 
-            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = name;
-            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
+            goBtnCSMItem.transform.GetChild(0).GetComponent<Text>().text = name;
+            goBtnCSMItem.GetComponent<Button>().onClick.AddListener(() =>
             {
-                BtnOnClick(elemAppData, name);
+                BtnCSMItemOnClick(elemAppData, name);
+                HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>().enabled = false;
             });
         }
     }
-    private void BtnOnClick(XmlElement elemAppData, string name)
+    private void BtnCSMItemOnClick(XmlElement elemAppData, string name)
     {
         XmlElement elemSMChild = null;
         //寻找目标 CustomStateMachine
@@ -279,10 +280,12 @@ public class MenuPanelController : MonoBehaviour
     {
         GameObject newItemState = Instantiate(
             Resources.Load<GameObject>("Prefabs/ItemState"),
-            new Vector3(Random.Range(0, Screen.width), Random.Range(0, Screen.height), 0),
-            Quaternion.identity,
             //将StateGroup作为新生成的ItemState的父物体
             HierarchyObject.Instance.StateGroup.transform);
+
+        HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>().cellSize =
+            newItemState.transform.GetComponent<RectTransform>().rect.size;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
 
         string stateName = elem.GetAttribute("name");
         newItemState.transform.Find("IptName").GetComponent<InputField>().text = stateName;
@@ -298,11 +301,19 @@ public class MenuPanelController : MonoBehaviour
     }
     private void InstantiateTransition(XmlElement elem)
     {
+        //return;
         LineRenderer lineRenderer = Instantiate(
             Resources.Load<GameObject>("Prefabs/ItemLine"),
             Vector3.zero,
             Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
+
+        float r = UnityEngine.Random.Range(0f, 1f);
+        float g = UnityEngine.Random.Range(0f, 1f);
+        float b = UnityEngine.Random.Range(0f, 1f);
+        Color randomColor = new Color(r, g, b);
+        lineRenderer.startColor = randomColor;
+        lineRenderer.endColor = randomColor;
 
         GameObject pre = null;
         GameObject next = null;
@@ -350,21 +361,21 @@ public class MenuPanelController : MonoBehaviour
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
-        float distanceScale = 0.2f;
+        float distanceScale = 0.3f;
         float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
         float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
 
-        Rect rect = GetComponent<RectTransform>().rect;
-        Vector2 leftBottom = new Vector2(prePos.x - rect.width * 0.5f, prePos.y - rect.height * 0.5f);
-        Vector2 rightTop = new Vector2(prePos.x + rect.width * 0.5f, prePos.y + rect.height * 0.5f);
-        if (x > leftBottom.x && x < rightTop.x)
-        {
-            //x = leftBottom.x;
-        }
-        if (y > leftBottom.y && y < rightTop.y)
-        {
-            //y = leftBottom.y;
-        }
+        //Rect rect = GetComponent<RectTransform>().rect;
+        //Vector2 leftBottom = new Vector2(prePos.x - rect.width * 0.5f, prePos.y - rect.height * 0.5f);
+        //Vector2 rightTop = new Vector2(prePos.x + rect.width * 0.5f, prePos.y + rect.height * 0.5f);
+        //if (x > leftBottom.x && x < rightTop.x)
+        //{
+        //    //x = leftBottom.x;
+        //}
+        //if (y > leftBottom.y && y < rightTop.y)
+        //{
+        //    //y = leftBottom.y;
+        //}
 
         GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
            new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);

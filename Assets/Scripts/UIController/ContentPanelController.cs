@@ -177,7 +177,8 @@ public class ContentPanelController : MonoBehaviour
         isStateInput = isState;
         curtState = state;
         curtTransition = transition;
-        iptContent.text = isState ? state.content : transition.content;
+        string str = isState ? state.content : transition.content;
+        iptContent.text = str;
     }
 
     private void ShowBtnACGroup(bool isAction)
