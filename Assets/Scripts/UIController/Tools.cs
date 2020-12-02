@@ -48,7 +48,7 @@ public class Tools : DialogTest
     /// 选择目标xml文件
     /// </summary>
     /// <returns></returns>
-    public bool SelectXmlFile(bool isImport)
+    public bool SelectXmlFile()
     {
         CurrentVariable.Instance.TargetFileName = Instance.OpenSelectFileDialog();
         if (CurrentVariable.Instance.TargetFileName == "")
@@ -56,9 +56,6 @@ public class Tools : DialogTest
             Instance.PlayTipAnimation(GlobalVariable.Instance.NoSelectXml);
             return false;
         }
-        if (!isImport)
-            File.Copy(
-                GlobalVariable.Instance.TemplateXmlPath, CurrentVariable.Instance.TargetFileName, true);
         return true;
     }
     #endregion

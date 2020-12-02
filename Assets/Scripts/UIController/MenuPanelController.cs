@@ -4,12 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Xml;
 using System.IO;
+using System;
 
 public class MenuPanelController : MonoBehaviour
 {
     #region BtnGroupOne
     private GameObject btnGroupOne;
     private Button btnExport;
+    private Button btnFormat;
+    private Button btnSwitch;
     private Button btnClear;
     private Button btnHelp;
     private Button btnExit;
@@ -36,6 +39,8 @@ public class MenuPanelController : MonoBehaviour
         btnGroupTwo = transform.Find("BtnGroupTwo").gameObject;
 
         btnExport = btnGroupOne.transform.Find("BtnExport").GetComponent<Button>();
+        btnFormat = btnGroupOne.transform.Find("BtnFormat").GetComponent<Button>();
+        btnSwitch = btnGroupOne.transform.Find("BtnSwitch").GetComponent<Button>();
         btnClear = btnGroupOne.transform.Find("BtnClear").GetComponent<Button>();
         btnHelp = btnGroupOne.transform.Find("BtnHelp").GetComponent<Button>();
         btnExit = btnGroupOne.transform.Find("BtnExit").GetComponent<Button>();
@@ -48,6 +53,8 @@ public class MenuPanelController : MonoBehaviour
     private void ObjectEvent()
     {
         btnExport.onClick.AddListener(BtnExportOnClick);
+        btnFormat.onClick.AddListener(BtnFormatOnClick);
+        btnSwitch.onClick.AddListener(BtnSwitchOnClick);
         btnClear.onClick.AddListener(BtnClearOnClick);
         btnHelp.onClick.AddListener(BtnHelpOnClick);
         btnExit.onClick.AddListener(BtnExitOnClick);
@@ -141,6 +148,44 @@ public class MenuPanelController : MonoBehaviour
         });
     }
     #endregion
+    private void BtnFormatOnClick()
+    {
+        GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
+        grid.enabled = true;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
+        grid.enabled = false;
+
+        foreach (TransitionEntity transition in Entities.Instance.listTransition)
+        {
+            //if (transition.pre == null || transition.next == null)
+            //    break;
+
+            Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
+            Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
+            float distanceScale = 0.3f;
+            float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
+            float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
+
+            transition.btnLine.transform.position = new Vector2(x, y);
+
+            transition.line.SetPosition(0, GetRayPoint(prePos));
+            transition.line.SetPosition(1, GetRayPoint(nextPos));
+
+        }
+
+        gameObject.SetActive(false);
+    }
+    /// <summary>
+    /// 切换CustomStateMachine：执行Clear和Import函数即可
+    /// </summary>
+    private void BtnSwitchOnClick()
+    {
+        BtnClearOnClick();
+        //2020-12-2 14:47:12
+        //因为Clear函数关闭了物体自身，所以需要再打开
+        gameObject.SetActive(true);
+        BtnImportOnClick();
+    }
     private void BtnClearOnClick()
     {
         if (HierarchyObject.Instance.ContentPanel.activeSelf)
@@ -186,19 +231,48 @@ public class MenuPanelController : MonoBehaviour
         btnGroupTwo.SetActive(vs[1]);
         stateMachineUI.gameObject.SetActive(vs[2]);
     }
+    private Vector3 GetRayPoint(Vector3 vector3)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(vector3);
+        bool isCollider = Physics.Raycast(ray, out RaycastHit hitInfo);
+        if (isCollider)
+            return hitInfo.point;
+        return Vector3.zero;
+    }
+    private void SetGridLayoutGroup(RectTransform rectTransform, bool isImport)
+    {
+        GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
+
+        grid.enabled = true;
+        grid.cellSize =
+            rectTransform.rect.size;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
+    }
     #endregion
     private void BtnNewOnClick()
     {
-        if (Tools.Instance.SelectXmlFile(false))
-        {
-            SetChildUIActive(true, false, false);
-            gameObject.SetActive(false);
-        }
+        CurrentVariable.Instance.TargetFileName =
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}" +
+            $"/appdata_{DateTime.Now.ToString().Replace('/', '-').Replace(":", "")}.xml";
+        File.Copy(GlobalVariable.Instance.TemplateXmlPath,
+            CurrentVariable.Instance.TargetFileName,
+            File.Exists(CurrentVariable.Instance.TargetFileName));
+
+        GameObject newItemState = Instantiate(
+            Resources.Load<GameObject>("Prefabs/ItemState"));
+        //HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>().enabled = false;
+        SetGridLayoutGroup(newItemState.GetComponent<RectTransform>(), false);
+
+        SetChildUIActive(true, false, false);
+        gameObject.SetActive(false);
     }
     private void BtnImportOnClick()
     {
-        if (!Tools.Instance.SelectXmlFile(true))
-            return;
+        if (CurrentVariable.Instance.TargetFileName == "")
+        {
+            if (!Tools.Instance.SelectXmlFile())
+                return;
+        }
 
         SetChildUIActive(false, false, true);
 
@@ -283,9 +357,7 @@ public class MenuPanelController : MonoBehaviour
             //将StateGroup作为新生成的ItemState的父物体
             HierarchyObject.Instance.StateGroup.transform);
 
-        HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>().cellSize =
-            newItemState.transform.GetComponent<RectTransform>().rect.size;
-        LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
+        SetGridLayoutGroup(newItemState.GetComponent<RectTransform>(), true);
 
         string stateName = elem.GetAttribute("name");
         newItemState.transform.Find("IptName").GetComponent<InputField>().text = stateName;
@@ -301,7 +373,6 @@ public class MenuPanelController : MonoBehaviour
     }
     private void InstantiateTransition(XmlElement elem)
     {
-        //return;
         LineRenderer lineRenderer = Instantiate(
             Resources.Load<GameObject>("Prefabs/ItemLine"),
             Vector3.zero,
@@ -331,6 +402,9 @@ public class MenuPanelController : MonoBehaviour
             }
         }
 
+        if (pre == null || next == null)
+            return;
+
         TransitionEntity transition = new TransitionEntity()
         {
             line = lineRenderer,
@@ -348,14 +422,6 @@ public class MenuPanelController : MonoBehaviour
 
         Entities.Instance.listTransition.Add(transition);
 
-        Vector3 GetRayPoint(Vector3 vector3)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(vector3);
-            bool isCollider = Physics.Raycast(ray, out RaycastHit hitInfo);
-            if (isCollider)
-                return hitInfo.point;
-            return Vector3.zero;
-        }
     }
     private void InstantiateBtnLine(TransitionEntity transition)
     {
