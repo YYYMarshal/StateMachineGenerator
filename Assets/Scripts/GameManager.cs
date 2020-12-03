@@ -21,8 +21,6 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     //创建状态的按钮
     private Button btnCreateState;
 
-    private GameObject goMenuPanel;
-
     private void Awake()
     {
         SetHierarchyObject();
@@ -44,17 +42,17 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
 
         HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
-        goMenuPanel = transform.parent.Find("MenuPanel").gameObject;
+        HierarchyObject.Instance.MenuPanel = transform.parent.Find("MenuPanel").gameObject;
         HierarchyObject.Instance.TopicInfoPanel = transform.parent.Find("TopicInfoPanel").gameObject;
 
         //先让其开启一下，是为了让其启用脚本
         //顺序：查找物体---启用物体---添加脚本
         HierarchyObject.Instance.ContentPanel.SetActive(true);
-        goMenuPanel.SetActive(true);
+        HierarchyObject.Instance.MenuPanel.SetActive(true);
         HierarchyObject.Instance.TopicInfoPanel.SetActive(true);
 
         HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
-        goMenuPanel.AddComponent<MenuPanelController>();
+        HierarchyObject.Instance.MenuPanel.AddComponent<MenuPanelController>();
         HierarchyObject.Instance.TopicInfoPanel.AddComponent<TopicInfoPanel>();
 
         btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
@@ -93,11 +91,15 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!goMenuPanel.transform.GetChild(1).gameObject.activeSelf &&
-                !goMenuPanel.transform.GetChild(2).gameObject.activeSelf &&
+            //NEW IMPORT
+            //MENU: SELECT CSM
+            //TOPIC INFO PANEL
+            GameObject menuPanel = HierarchyObject.Instance.MenuPanel;
+            if (!menuPanel.transform.GetChild(1).gameObject.activeSelf &&
+                !menuPanel.transform.GetChild(2).gameObject.activeSelf &&
                 !HierarchyObject.Instance.TopicInfoPanel.activeSelf)
             {
-                goMenuPanel.SetActive(!goMenuPanel.activeSelf);
+                menuPanel.SetActive(!menuPanel.activeSelf);
             }
         }
     }

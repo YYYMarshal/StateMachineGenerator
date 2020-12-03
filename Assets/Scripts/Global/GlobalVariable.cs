@@ -40,4 +40,5 @@ public class GlobalVariable
     public string IptValuteEmpty = "The two input fields below cannot be empty";
     public string SameStateName = "State name cannot be repeated";
     public string SameStateMachine = "State Machine name cannot be repeated";
+    public string NoCSM = "There is no Custom State Machine";
 }

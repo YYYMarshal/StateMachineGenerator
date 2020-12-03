@@ -64,6 +64,7 @@ public class MenuPanelController : MonoBehaviour
     }
     private void InitObjectActive()
     {
+        //软件刚打开时，显示 NEW IMPORT 按钮选项界面（第二个）
         SetChildUIActive(false, true, false);
     }
 
@@ -150,6 +151,13 @@ public class MenuPanelController : MonoBehaviour
     #endregion
     private void BtnFormatOnClick()
     {
+        if (Entities.Instance.listState.Count == 0)
+        {
+            Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoState);
+            gameObject.SetActive(false);
+            return;
+        }
+
         GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
         grid.enabled = true;
         LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
@@ -176,18 +184,27 @@ public class MenuPanelController : MonoBehaviour
         gameObject.SetActive(false);
     }
     /// <summary>
-    /// 切换CustomStateMachine：执行Clear和Import函数即可
+    /// 切换CustomStateMachine：执行Clear()和Import()函数即可
     /// </summary>
     private void BtnSwitchOnClick()
     {
         BtnClearOnClick();
+
         //2020-12-2 14:47:12
         //因为Clear函数关闭了物体自身，所以需要再打开
         gameObject.SetActive(true);
+
         BtnImportOnClick();
     }
     private void BtnClearOnClick()
     {
+        if (Entities.Instance.listState.Count == 0)
+        {
+            Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoState);
+            gameObject.SetActive(false);
+            return;
+        }
+
         if (HierarchyObject.Instance.ContentPanel.activeSelf)
             HierarchyObject.Instance.ContentPanel.SetActive(false);
 
@@ -239,13 +256,18 @@ public class MenuPanelController : MonoBehaviour
             return hitInfo.point;
         return Vector3.zero;
     }
-    private void SetGridLayoutGroup(RectTransform rectTransform, bool isImport)
+    private void SetGridLayoutGroup(bool isImport)
     {
         GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
 
-        grid.enabled = true;
+        //这里只是需要获取一下 ItemState Prefab的尺寸，所以实例化之后又紧跟着删除
+        GameObject newItemState = Instantiate(
+            Resources.Load<GameObject>("Prefabs/ItemState"));
+        grid.enabled = isImport;
         grid.cellSize =
-            rectTransform.rect.size;
+            newItemState.GetComponent<RectTransform>().rect.size;
+        Destroy(newItemState);
+
         LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
     }
     #endregion
@@ -258,12 +280,8 @@ public class MenuPanelController : MonoBehaviour
             CurrentVariable.Instance.TargetFileName,
             File.Exists(CurrentVariable.Instance.TargetFileName));
 
-        GameObject newItemState = Instantiate(
-            Resources.Load<GameObject>("Prefabs/ItemState"));
-        //HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>().enabled = false;
-        SetGridLayoutGroup(newItemState.GetComponent<RectTransform>(), false);
+        SetGridLayoutGroup(false);
 
-        SetChildUIActive(true, false, false);
         gameObject.SetActive(false);
     }
     private void BtnImportOnClick()
@@ -296,6 +314,22 @@ public class MenuPanelController : MonoBehaviour
         for (int i = 0; i < stateMachineUI.childCount; i++)
         {
             Destroy(stateMachineUI.GetChild(i).gameObject);
+        }
+
+        bool hasCSM = false;
+        foreach (XmlElement item in elemAppData.ChildNodes)
+        {
+            if (item.Name == "CustomStateMachine")
+            {
+                hasCSM = true;
+                break;
+            }
+        }
+        if (!hasCSM)
+        {
+            Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoCSM);
+            gameObject.SetActive(false);
+            return;
         }
 
         //通过多个CustomStateMachine的StateMachine/StateMachine的name属性的值，生成可供选择的按钮菜单
@@ -347,7 +381,6 @@ public class MenuPanelController : MonoBehaviour
             }
         }
 
-        SetChildUIActive(true, false, false);
         gameObject.SetActive(false);
     }
     private void InstantiateState(XmlElement elem)
@@ -357,7 +390,7 @@ public class MenuPanelController : MonoBehaviour
             //将StateGroup作为新生成的ItemState的父物体
             HierarchyObject.Instance.StateGroup.transform);
 
-        SetGridLayoutGroup(newItemState.GetComponent<RectTransform>(), true);
+        SetGridLayoutGroup(true);
 
         string stateName = elem.GetAttribute("name");
         newItemState.transform.Find("IptName").GetComponent<InputField>().text = stateName;
@@ -449,5 +482,12 @@ public class MenuPanelController : MonoBehaviour
         transition.btnLine = goBtnLine.GetComponent<Button>();
     }
     #endregion
-
+    private void OnDisable()
+    {
+        //2020-12-3 10:25:56
+        //之前在每次 gameObject.SetActive(false); 之前，都会手动调用一下下面这行代码
+        //现在发现：其实直接放在 OnDisable() 函数中即可，因为
+        //gameObject.SetActive(false) ---> OnDisable() ---> SetChildUIActive(true, false, false)
+        SetChildUIActive(true, false, false);
+    }
 }
