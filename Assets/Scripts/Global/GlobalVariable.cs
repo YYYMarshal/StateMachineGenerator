@@ -14,12 +14,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GlobalVariable
 {
     #region 单例
-    private static readonly Lazy<GlobalVariable> lazy = new Lazy<GlobalVariable>(() => new GlobalVariable());
+    private static readonly Lazy<GlobalVariable> lazy =
+        new Lazy<GlobalVariable>(() => new GlobalVariable());
     public static GlobalVariable Instance
     {
         get

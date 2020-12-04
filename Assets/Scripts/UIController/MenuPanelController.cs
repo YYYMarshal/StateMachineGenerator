@@ -264,7 +264,6 @@ public class MenuPanelController : MonoBehaviour
         grid.enabled = isImport;
         grid.cellSize =
             goItemState.GetComponent<RectTransform>().rect.size;
-        //Destroy(newItemState);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
     }

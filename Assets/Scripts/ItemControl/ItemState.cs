@@ -46,7 +46,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     void BtnStateDeleteOnClick()
     {
-        GameObject state = gameObject;
+        GameObject goState = gameObject;
         //若在for循环中动态删除 GlobalVariable.Instance.lstLine 的元素，则会导致循环次数与预期不符，
         //因为 GlobalVariable.Instance.lstLine 的Count在减少
         //If the element of "GlobalVariable.Instance.lstLine" deleted dynamically in the for loop, The number of
@@ -56,12 +56,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             TransitionEntity transition = Entities.Instance.listTransition[i];
             int curtLineIndex = GetCurtLineIndex(transition.line);
-            if (state == transition.pre)
+            if (goState == transition.pre)
             {
                 listTransitionTemp.Add(transition);
                 DestroyLineAndBtnDel(curtLineIndex);
             }
-            else if (state == transition.next)
+            else if (goState == transition.next)
             {
                 listTransitionTemp.Add(transition);
                 DestroyLineAndBtnDel(curtLineIndex);
@@ -99,7 +99,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
     }
 
-    #region ↑↑↑Method↑↑↑
+    #region ↑↑↑METHOD↑↑↑
     /// <summary>
     /// Control state objects will not move out of the window
     /// </summary>
@@ -158,7 +158,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
 
     }
-    #region ↑↑↑Method↑↑↑
+    #region ↑↑↑METHOD↑↑↑
     private void CreateLine()
     {
         LineRenderer lineRenderer = Instantiate(
@@ -222,7 +222,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     #endregion
     #endregion
-    #region 公共代码部分
+    #region REUSE FUNCTION
     /// <summary>
     /// 控制LineRenderer线段中间位置的BtnLine的位置或实例化
     /// </summary>
