@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using System;
 
 public class GameManager : MonoBehaviour, IPointerClickHandler
 {
@@ -32,7 +31,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.Save));
     }
-    #region Method:Awake()
+    #region ↑↑↑METHOD↑↑↑
     private void SetHierarchyObject()
     {
         HierarchyObject.Instance.GameManagerObject = gameObject;
@@ -53,7 +52,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
         HierarchyObject.Instance.ContentPanel.AddComponent<ContentPanelController>();
         HierarchyObject.Instance.MenuPanel.AddComponent<MenuPanelController>();
-        HierarchyObject.Instance.TopicInfoPanel.AddComponent<TopicInfoPanel>();
+        HierarchyObject.Instance.TopicInfoPanel.AddComponent<TopicInfoPanelController>();
 
         btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
@@ -71,9 +70,16 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             HierarchyObject.Instance.StateGroup.transform);
         newItemState.AddComponent<ItemState>();
 
+        //随机颜色的RGB值。即刻得到一个随机的颜色
+        float r = UnityEngine.Random.Range(0f, 1f);
+        float g = UnityEngine.Random.Range(0f, 1f);
+        float b = UnityEngine.Random.Range(0f, 1f);
+        Color randomColor = new Color(r, g, b);
+        //newItemState.GetComponent<Image>().color = randomColor;
         StateEntity state = new StateEntity
         {
             goItemState = newItemState,
+            color = randomColor
         };
         Entities.Instance.listState.Add(state);
     }

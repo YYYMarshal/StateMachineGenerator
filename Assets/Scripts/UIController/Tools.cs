@@ -18,7 +18,7 @@ public class Tools : DialogTest
         textTip.SetActive(false);
     }
 
-    #region 公开函数：Tip动画
+    #region PUBLIC：Tip动画
     public void PlayTipAnimation(string content)
     {
         textTip.GetComponent<Text>().text = content;
@@ -43,7 +43,7 @@ public class Tools : DialogTest
     }
     #endregion
 
-    #region 公开函数：文件选择
+    #region PUBLIC：文件选择
     /// <summary>
     /// 选择目标xml文件
     /// </summary>

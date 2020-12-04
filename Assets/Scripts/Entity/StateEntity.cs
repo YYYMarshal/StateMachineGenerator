@@ -9,4 +9,6 @@ public class StateEntity
 
     public string stateName = "";
     public string content = "";
+
+    public Color color;
 }

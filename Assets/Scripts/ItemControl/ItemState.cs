@@ -99,7 +99,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
     }
 
-    #region Method:OnDarg()
+    #region ↑↑↑Method↑↑↑
     /// <summary>
     /// Control state objects will not move out of the window
     /// </summary>
@@ -158,8 +158,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
 
     }
-    #region Method:OnPointerClick()
-    void CreateLine()
+    #region ↑↑↑Method↑↑↑
+    private void CreateLine()
     {
         LineRenderer lineRenderer = Instantiate(
             Resources.Load<GameObject>("Prefabs/ItemLine"),
@@ -167,13 +167,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
-        //随机颜色的RGB值。即刻得到一个随机的颜色
-        float r = UnityEngine.Random.Range(0f, 1f);
-        float g = UnityEngine.Random.Range(0f, 1f);
-        float b = UnityEngine.Random.Range(0f, 1f);
-        Color randomColor = new Color(r, g, b);
-        lineRenderer.startColor = randomColor;
-        lineRenderer.endColor = randomColor;
+        Color color = Entities.Instance.listState[GetCurtStateIndex()].color;
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
 
         TransitionEntity transition = new TransitionEntity()
         {
@@ -187,17 +183,17 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         CurrentVariable.Instance.line = transition.line;
         CurrentVariable.Instance.isLineStartPaint = true;
-        CurrentVariable.Instance.itemLineIndex = GetCurtLineIndex(transition.line);
+        CurrentVariable.Instance.curtLineIndex = GetCurtLineIndex(transition.line);
     }
-    void EndDrawRay()
+    private void EndDrawRay()
     {
-        int curtLineIndex = CurrentVariable.Instance.itemLineIndex;
+        int curtLineIndex = CurrentVariable.Instance.curtLineIndex;
         TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
         transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
         CurrentVariable.Instance.isLineStartPaint = false;
 
         transition.next = gameObject;
-        BtnLinePositionControl(transition);
+        BtnLinePositionControl(transition, true);
 
         bool isRepeated = false;
         //If the line is repeated, it will be deleted.
@@ -230,7 +226,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     /// <summary>
     /// 控制LineRenderer线段中间位置的BtnLine的位置或实例化
     /// </summary>
-    private void BtnLinePositionControl(TransitionEntity transition, bool isCreate = true)
+    private void BtnLinePositionControl(TransitionEntity transition, bool isCreate)
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
@@ -279,21 +275,27 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     /// <returns></returns>
     private int GetCurtStateIndex()
     {
-        for (int i = 0; i < Entities.Instance.listState.Count; i++)
-        {
-            if (gameObject.Equals(Entities.Instance.listState[i].goItemState))
-                return i;
-        }
-        return -1;
+        return Entities.Instance.listState.FindIndex((StateEntity state) => gameObject.Equals(state.goItemState));
+
+        //for (int i = 0; i < Entities.Instance.listState.Count; i++)
+        //{
+        //    if (gameObject.Equals(Entities.Instance.listState[i].goItemState))
+        //    {
+        //        return i;
+        //    }
+        //}
+        //return -1;
     }
     private int GetCurtLineIndex(LineRenderer line)
     {
-        for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
-        {
-            if (line == Entities.Instance.listTransition[i].line)
-                return i;
-        }
-        return -1;
+        return Entities.Instance.listTransition.FindIndex((TransitionEntity transition) => line.Equals(transition.line));
+
+        //for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
+        //{
+        //    if (line == Entities.Instance.listTransition[i].line)
+        //        return i;
+        //}
+        //return -1;
     }
     #endregion
 }

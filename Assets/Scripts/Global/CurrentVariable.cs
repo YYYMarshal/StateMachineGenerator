@@ -34,7 +34,7 @@ public class CurrentVariable
     //2020-11-12 08:53:57  这个变量必须单一存在，不能放在ItemState类中当做其字段存在，因为会有多个ItemState类
     public bool isLineStartPaint = false;
     //ItemState中用的：当前的Line索引
-    public int itemLineIndex = 0;
+    public int curtLineIndex = 0;
 
     public string TargetFileName = "";
 }

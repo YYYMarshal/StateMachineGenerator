@@ -32,7 +32,7 @@ public class MenuPanelController : MonoBehaviour
         ObjectEvent();
         InitObjectActive();
     }
-    #region ↑↑↑Method↑↑↑
+    #region ↑↑↑METHOD↑↑↑
     private void FindObject()
     {
         btnGroupOne = transform.Find("BtnGroupOne").gameObject;
@@ -86,7 +86,7 @@ public class MenuPanelController : MonoBehaviour
         HierarchyObject.Instance.TopicInfoPanel.SetActive(true);
         gameObject.SetActive(false);
     }
-    #region ↑↑↑Method↑↑↑
+    #region ↑↑↑METHOD↑↑↑
     /// <summary>
     /// 检查所有状态的名称是否为空
     /// </summary>
@@ -241,7 +241,7 @@ public class MenuPanelController : MonoBehaviour
         Application.Quit();
 #endif
     }
-    #region 公共函数
+    #region PUBLIC FUNCTION
     private void SetChildUIActive(params bool[] vs)
     {
         btnGroupOne.SetActive(vs[0]);
@@ -260,13 +260,11 @@ public class MenuPanelController : MonoBehaviour
     {
         GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
 
-        //这里只是需要获取一下 ItemState Prefab的尺寸，所以实例化之后又紧跟着删除
-        GameObject newItemState = Instantiate(
-            Resources.Load<GameObject>("Prefabs/ItemState"));
+        GameObject goItemState = Resources.Load<GameObject>("Prefabs/ItemState");
         grid.enabled = isImport;
         grid.cellSize =
-            newItemState.GetComponent<RectTransform>().rect.size;
-        Destroy(newItemState);
+            goItemState.GetComponent<RectTransform>().rect.size;
+        //Destroy(newItemState);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
     }
@@ -396,11 +394,17 @@ public class MenuPanelController : MonoBehaviour
         newItemState.transform.Find("IptName").GetComponent<InputField>().text = stateName;
         newItemState.AddComponent<ItemState>();
 
+        float r = UnityEngine.Random.Range(0f, 1f);
+        float g = UnityEngine.Random.Range(0f, 1f);
+        float b = UnityEngine.Random.Range(0f, 1f);
+        Color randomColor = new Color(r, g, b);
+        //newItemState.GetComponent<Image>().color = randomColor;
         StateEntity state = new StateEntity
         {
             goItemState = newItemState,
             stateName = stateName,
-            content = elem.InnerXml
+            content = elem.InnerXml,
+            color = randomColor
         };
         Entities.Instance.listState.Add(state);
     }
@@ -412,22 +416,17 @@ public class MenuPanelController : MonoBehaviour
             Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
-        float r = UnityEngine.Random.Range(0f, 1f);
-        float g = UnityEngine.Random.Range(0f, 1f);
-        float b = UnityEngine.Random.Range(0f, 1f);
-        Color randomColor = new Color(r, g, b);
-        lineRenderer.startColor = randomColor;
-        lineRenderer.endColor = randomColor;
-
         GameObject pre = null;
         GameObject next = null;
         string src = elem.GetAttribute("src");
         string dest = elem.GetAttribute("dest");
+        Color color = Color.clear;
         foreach (StateEntity state in Entities.Instance.listState)
         {
             if (state.stateName == src)
             {
                 pre = state.goItemState;
+                color = state.color;
             }
             else if (state.stateName == dest)
             {
@@ -437,6 +436,9 @@ public class MenuPanelController : MonoBehaviour
 
         if (pre == null || next == null)
             return;
+
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
 
         TransitionEntity transition = new TransitionEntity()
         {

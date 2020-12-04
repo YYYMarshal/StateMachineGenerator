@@ -16,7 +16,7 @@ public class TransitionEntity
 
     //2020-11-18 13:07:42
     //# 是需要的：防止在未给 pre 和 next 赋名称时，引起的报错
-    //SettingPanelController.BtnExportOnClick().SetTransitionTopic()
+    //MenuPanelController.BtnExportOnClick().SetTransitionTopic().STListSort()
     public string topic = "#";
     public string content = "";
 }

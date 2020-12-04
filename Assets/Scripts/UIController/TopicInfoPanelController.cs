@@ -5,7 +5,7 @@ using System.Xml;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TopicInfoPanel : MonoBehaviour
+public class TopicInfoPanelController : MonoBehaviour
 {
     private XmlDocument xmlDoc = null;
 
@@ -62,8 +62,7 @@ public class TopicInfoPanel : MonoBehaviour
 
         gameObject.SetActive(false);
     }
-    #region ↑↑↑Method↑↑↑
-
+    #region ↑↑↑METHOD↑↑↑
     private XmlDocument CreateXmlDoc()
     {
         XmlReaderSettings settings = new XmlReaderSettings()
