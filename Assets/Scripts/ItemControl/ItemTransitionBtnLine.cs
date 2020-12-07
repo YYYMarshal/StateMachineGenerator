@@ -28,7 +28,7 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
         btnDelete.gameObject.SetActive(false);
     }
 
-    #region 点击事件
+    #region CLICK EVENT
     void BtnLineOnClick()
     {
         int index = transform.GetSiblingIndex();

@@ -22,27 +22,29 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
 
     private void Awake()
     {
-        SetHierarchyObject();
+        InitHierarchyObject();
 
-        GameObject tools = transform.parent.Find("ToolsPanel").gameObject;
-        tools.SetActive(true);
-        tools.AddComponent<Tools>();
 
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.Save));
     }
     #region ↑↑↑METHOD↑↑↑
-    private void SetHierarchyObject()
+    private void InitHierarchyObject()
     {
         HierarchyObject.Instance.GameManagerObject = gameObject;
+
+        btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
+        btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
+        btnCreateState.gameObject.SetActive(false);
 
         HierarchyObject.Instance.BtnLineGroup = GameObject.Find("BtnLineGroup");
         HierarchyObject.Instance.StateGroup = GameObject.Find("StateGroup");
         HierarchyObject.Instance.PlaneLineGroup = GameObject.Find("PlaneLineGroup");
 
-        HierarchyObject.Instance.ContentPanel = transform.parent.Find("ContentPanel").gameObject;
-        HierarchyObject.Instance.MenuPanel = transform.parent.Find("MenuPanel").gameObject;
-        HierarchyObject.Instance.TopicInfoPanel = transform.parent.Find("TopicInfoPanel").gameObject;
+        Transform canvasTrans = transform.parent;
+        HierarchyObject.Instance.ContentPanel = canvasTrans.Find("ContentPanel").gameObject;
+        HierarchyObject.Instance.MenuPanel = canvasTrans.Find("MenuPanel").gameObject;
+        HierarchyObject.Instance.TopicInfoPanel = canvasTrans.Find("TopicInfoPanel").gameObject;
 
         //先让其开启一下，是为了让其启用脚本
         //顺序：查找物体---启用物体---添加脚本
@@ -54,9 +56,9 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         HierarchyObject.Instance.MenuPanel.AddComponent<MenuPanelController>();
         HierarchyObject.Instance.TopicInfoPanel.AddComponent<TopicInfoPanelController>();
 
-        btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
-        btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
-        btnCreateState.gameObject.SetActive(false);
+        GameObject tools = canvasTrans.Find("ToolsPanel").gameObject;
+        tools.SetActive(true);
+        tools.AddComponent<Tools>();
     }
     private void BtnCreateStateOnClick()
     {
@@ -75,7 +77,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
         float g = UnityEngine.Random.Range(0f, 1f);
         float b = UnityEngine.Random.Range(0f, 1f);
         Color randomColor = new Color(r, g, b);
-        //newItemState.GetComponent<Image>().color = randomColor;
+        newItemState.GetComponent<Image>().color = randomColor;
         StateEntity state = new StateEntity
         {
             goItemState = newItemState,

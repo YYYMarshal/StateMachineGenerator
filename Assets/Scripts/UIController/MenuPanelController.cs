@@ -397,7 +397,7 @@ public class MenuPanelController : MonoBehaviour
         float g = UnityEngine.Random.Range(0f, 1f);
         float b = UnityEngine.Random.Range(0f, 1f);
         Color randomColor = new Color(r, g, b);
-        //newItemState.GetComponent<Image>().color = randomColor;
+        newItemState.GetComponent<Image>().color = randomColor;
         StateEntity state = new StateEntity
         {
             goItemState = newItemState,
@@ -455,7 +455,6 @@ public class MenuPanelController : MonoBehaviour
         InstantiateBtnLine(transition);
 
         Entities.Instance.listTransition.Add(transition);
-
     }
     private void InstantiateBtnLine(TransitionEntity transition)
     {

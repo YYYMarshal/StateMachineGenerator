@@ -17,7 +17,6 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
@@ -28,12 +27,11 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             (value) => Entities.Instance.listState[GetCurtStateIndex()].stateName = value);
 
         transform.Find("BtnSelected").GetComponent<Button>().onClick.AddListener(BtnStateSelectedOnClick);
-
         transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);
     }
-    #region 点击事件
+    #region CLICK EVENT
     //ShowSettingPanel
-    void BtnStateSelectedOnClick()
+    private void BtnStateSelectedOnClick()
     {
         if (transform.Find("IptName").GetComponent<InputField>().text.Trim() == "")
         {
@@ -44,27 +42,30 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
         HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listState[GetCurtStateIndex()]);
     }
-    void BtnStateDeleteOnClick()
+    private void BtnStateDeleteOnClick()
     {
+        //2020-12-7 13:19:51
+        //线段绘制中，不允许删除状态机
+        if (CurrentVariable.Instance.isLineStartDraw)
+        {
+            Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.DrawingLine);
+            return;
+        }
+
         GameObject goState = gameObject;
-        //若在for循环中动态删除 GlobalVariable.Instance.lstLine 的元素，则会导致循环次数与预期不符，
-        //因为 GlobalVariable.Instance.lstLine 的Count在减少
-        //If the element of "GlobalVariable.Instance.lstLine" deleted dynamically in the for loop, The number of
-        //cycles is not as expected, because "GlobalVariable.Instance.lstLine.Count" is decreasing.
+        //若在for循环中动态删除 Entities.Instance.listLine 的元素，则会导致循环次数与预期不符，
+        //因为 Entities.Instance.listLine 的Count在减少
+        //If the element of "Entities.Instance.listLine" deleted dynamically in the for loop, The number of
+        //cycles is not as expected, because "Entities.Instance.listLine.Count" is decreasing.
         List<TransitionEntity> listTransitionTemp = new List<TransitionEntity>();
         for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
         {
             TransitionEntity transition = Entities.Instance.listTransition[i];
             int curtLineIndex = GetCurtLineIndex(transition.line);
-            if (goState == transition.pre)
+            if (goState == transition.pre || goState == transition.next)
             {
                 listTransitionTemp.Add(transition);
-                DestroyLineAndBtnDel(curtLineIndex);
-            }
-            else if (goState == transition.next)
-            {
-                listTransitionTemp.Add(transition);
-                DestroyLineAndBtnDel(curtLineIndex);
+                DestroyLineAndBtnLine(curtLineIndex);
             }
         }
         for (int i = 0; i < listTransitionTemp.Count; i++)
@@ -78,24 +79,21 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #endregion
     private void Update()
     {
-        if (CurrentVariable.Instance.isLineStartPaint)
+        if (CurrentVariable.Instance.isLineStartDraw)
         {
             CurrentVariable.Instance.line.SetPosition(1, GetRayPoint(Input.mousePosition));
         }
     }
 
-    #region Interface
+    #region INTERFACE
     public void OnDrag(PointerEventData eventData)
     {
         //2020-11-16 15:26:39
         //如果不加 !isLineStartPaint 的判断，那么在LineRenderer的绘制过程中（LineRenderer只开始，未结束）去拖拽StateUI，则会报错。
-        if (Input.GetMouseButton(0) && !CurrentVariable.Instance.isLineStartPaint)
+        if (Input.GetMouseButton(0) && !CurrentVariable.Instance.isLineStartDraw)
         {
-            RectTransform stateRectTrans = gameObject.GetComponent<RectTransform>();
-
-            stateRectTrans.position = StatePositionControl(eventData);
-
-            LinePositionControl();
+            gameObject.GetComponent<RectTransform>().position = PositionControlState(eventData);
+            PositionControlLine();
         }
     }
 
@@ -104,7 +102,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     /// Control state objects will not move out of the window
     /// </summary>
     /// <returns></returns>
-    private Vector2 StatePositionControl(PointerEventData eventData)
+    private Vector2 PositionControlState(PointerEventData eventData)
     {
         //2020-11-23 16:28:42
         //新的解决方案
@@ -125,20 +123,21 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             targetPos.y = Screen.height - half.y;
         return targetPos;
     }
-    private void LinePositionControl()
+    private void PositionControlLine()
     {
         GameObject goState = gameObject;
+        Vector3 targetPos = GetRayPoint(transform.Find("PaintPos").position);
         foreach (TransitionEntity transition in Entities.Instance.listTransition)
         {
             if (goState == transition.pre)
             {
-                transition.line.SetPosition(0, GetRayPoint(transform.Find("PaintPos").position));
+                transition.line.SetPosition(0, targetPos);
             }
             if (goState == transition.next)
             {
-                transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
+                transition.line.SetPosition(1, targetPos);
             }
-            BtnLinePositionControl(transition, false);
+            PositionControlBtnLine(transition, false);
         }
     }
     #endregion
@@ -147,14 +146,14 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //If right-click to the state image gameobject, start drawing ray.
         //如果不加 !isLineStartPaint 的判断，那么两次 右键鼠标，便会出错
         if (eventData.button == PointerEventData.InputButton.Right &&
-            !CurrentVariable.Instance.isLineStartPaint)
+            !CurrentVariable.Instance.isLineStartDraw)
         {
             CreateLine();
         }
         //If left-click to the state image gameobject, end drawing ray.
-        else if (eventData.button == PointerEventData.InputButton.Left && CurrentVariable.Instance.isLineStartPaint)
+        else if (eventData.button == PointerEventData.InputButton.Left && CurrentVariable.Instance.isLineStartDraw)
         {
-            EndDrawRay();
+            EndDrawRayLine();
         }
 
     }
@@ -163,8 +162,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         LineRenderer lineRenderer = Instantiate(
             Resources.Load<GameObject>("Prefabs/ItemLine"),
-            Vector3.zero,
-            Quaternion.identity,
+            Vector3.zero, Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
         Color color = Entities.Instance.listState[GetCurtStateIndex()].color;
@@ -182,31 +180,32 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         Entities.Instance.listTransition.Add(transition);
 
         CurrentVariable.Instance.line = transition.line;
-        CurrentVariable.Instance.isLineStartPaint = true;
-        CurrentVariable.Instance.curtLineIndex = GetCurtLineIndex(transition.line);
+        CurrentVariable.Instance.isLineStartDraw = true;
     }
-    private void EndDrawRay()
+    private void EndDrawRayLine()
     {
-        int curtLineIndex = CurrentVariable.Instance.curtLineIndex;
-        TransitionEntity transition = Entities.Instance.listTransition[curtLineIndex];
+        //2020-12-7 12:42:15
+        //当前正在绘制的LineRenderer只能是最后一个LineRenderer，所以可以省去CurrentVariable类中的curtLineIndex变量的使用
+        int curtDrawingLineIndex = Entities.Instance.listTransition.Count - 1;
+        TransitionEntity transition = Entities.Instance.listTransition[curtDrawingLineIndex];
         transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
-        CurrentVariable.Instance.isLineStartPaint = false;
+        CurrentVariable.Instance.isLineStartDraw = false;
 
         transition.next = gameObject;
-        BtnLinePositionControl(transition, true);
+        PositionControlBtnLine(transition, true);
 
         bool isRepeated = false;
         //If the line is repeated, it will be deleted.
         for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
         {
-            if (curtLineIndex == i)
+            if (curtDrawingLineIndex == i)
                 continue;
             if (Entities.Instance.listTransition[i].pre == transition.pre &&
                 Entities.Instance.listTransition[i].next == transition.next)
             {
                 isRepeated = true;
                 Entities.Instance.listTransition.Remove(transition);
-                DestroyLineAndBtnDel(curtLineIndex);
+                DestroyLineAndBtnLine(curtDrawingLineIndex);
 
                 //2020-9-2 12:40:01
                 //break is necessary!!!
@@ -217,16 +216,17 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         if (!isRepeated && transition.pre == transition.next)
         {
             Entities.Instance.listTransition.Remove(transition);
-            DestroyLineAndBtnDel(curtLineIndex);
+            DestroyLineAndBtnLine(curtDrawingLineIndex);
         }
     }
     #endregion
     #endregion
+
     #region REUSE FUNCTION
     /// <summary>
     /// 控制LineRenderer线段中间位置的BtnLine的位置或实例化
     /// </summary>
-    private void BtnLinePositionControl(TransitionEntity transition, bool isCreate)
+    private void PositionControlBtnLine(TransitionEntity transition, bool isCreate)
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
@@ -247,7 +247,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         }
 
     }
-    private void DestroyLineAndBtnDel(int curtLineIndex)
+    private void DestroyLineAndBtnLine(int curtLineIndex)
     {
         //因为生成LineRenderer物体后该LineRenderer便开始绘制，在该LineRenderer物体结束绘制后，会生成BtnLine物体，
         //则这两个物体在其父物体上的索引是一样的，可以用相同的索引值来删除物体
@@ -270,12 +270,13 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #endregion
     #region GetCurt
     /// <summary>
-    /// 如果当前的ItemState游戏物体与 listState中的 某个物体相等，则返回其索引值
+    /// 如果当前的 ItemState 游戏物体与 listState 中的某个物体相等，则返回其索引值
     /// </summary>
     /// <returns></returns>
     private int GetCurtStateIndex()
     {
-        return Entities.Instance.listState.FindIndex((StateEntity state) => gameObject.Equals(state.goItemState));
+        return Entities.Instance.listState.FindIndex(
+            (StateEntity state) => gameObject.Equals(state.goItemState));
 
         //for (int i = 0; i < Entities.Instance.listState.Count; i++)
         //{
@@ -288,7 +289,8 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private int GetCurtLineIndex(LineRenderer line)
     {
-        return Entities.Instance.listTransition.FindIndex((TransitionEntity transition) => line.Equals(transition.line));
+        return Entities.Instance.listTransition.FindIndex(
+            (TransitionEntity transition) => line.Equals(transition.line));
 
         //for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
         //{

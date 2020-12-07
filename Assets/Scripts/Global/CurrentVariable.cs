@@ -32,9 +32,7 @@ public class CurrentVariable
     public LineRenderer line = null;
     //检测LineRenderer是否开始绘制
     //2020-11-12 08:53:57  这个变量必须单一存在，不能放在ItemState类中当做其字段存在，因为会有多个ItemState类
-    public bool isLineStartPaint = false;
-    //ItemState中用的：当前的Line索引
-    public int curtLineIndex = 0;
+    public bool isLineStartDraw = false;
 
     public string TargetFileName = "";
 }

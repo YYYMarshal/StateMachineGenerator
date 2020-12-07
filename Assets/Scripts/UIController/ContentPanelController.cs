@@ -54,8 +54,8 @@ public class ContentPanelController : MonoBehaviour
         InitCommonUI();
         InitStateUI();
         InitTransitionUI();
-
     }
+    #region INITIALIZATION
     private void InitListByXmlFile()
     {
         XmlReaderSettings settings = new XmlReaderSettings()
@@ -66,8 +66,8 @@ public class ContentPanelController : MonoBehaviour
         XmlDocument doc = new XmlDocument();
         doc.Load(reader);
         reader.Close();
-        XmlNodeList nodLst = doc.SelectSingleNode("YYYXB").ChildNodes;
-        foreach (XmlElement elem in nodLst)
+        XmlNodeList nodeList = doc.SelectSingleNode("YYYXB").ChildNodes;
+        foreach (XmlElement elem in nodeList)
         {
             switch (elem.Name)
             {
@@ -84,7 +84,6 @@ public class ContentPanelController : MonoBehaviour
             }
         }
     }
-    #region UI初始化:Awake()
     private void InitCommonUI()
     {
         gameObject.SetActive(false);
@@ -93,39 +92,31 @@ public class ContentPanelController : MonoBehaviour
         transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
 
         iptContent = transform.Find("BottomGroup/IptContent").GetComponent<InputField>();
-        iptContent.onEndEdit.AddListener((value) =>
-        {
-            SetEntityContent(value);
-        });
+        iptContent.onEndEdit.AddListener((value) => SetEntityContent(value));
 
         btnACGroup = transform.Find("BtnACGroup").gameObject;
         btnACGroup.GetComponent<Button>().onClick.AddListener(() => btnACGroup.SetActive(false));
         btnACGroup.SetActive(false);
-
     }
     private void InitStateUI()
     {
         goState = transform.Find("BottomGroup/State").gameObject;
         txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
 
-        goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(() =>
-        {
-            ShowBtnACGroup(true);
-        });
+        goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(
+            () => ShowBtnACGroup(true));
     }
     private void InitTransitionUI()
     {
         goTransition = transform.Find("BottomGroup/Transition").gameObject;
         txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
 
-        goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(() =>
-        {
-            ShowBtnACGroup(false);
-        });
+        goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(
+            () => ShowBtnACGroup(false));
     }
     #endregion
 
-    #region 公开的重载函数
+    #region PUBLIC OVERRIDE FUNCTION
     /// <summary>
     /// 由State的 √按钮 点击调用
     /// </summary>
@@ -135,7 +126,6 @@ public class ContentPanelController : MonoBehaviour
 
         txtStateName.text = $"State Name : \n{state.stateName}";
     }
-
     /// <summary>
     /// 由 BtnLine按钮 点击调用
     /// </summary>
@@ -155,12 +145,11 @@ public class ContentPanelController : MonoBehaviour
         txtTransitionTopic.text = $"  src : {preState.stateName}\n" +
             $"dest : {nextState.stateName}";
     }
-
     #endregion
 
-    #region 公共代码部分
+    #region REUSE FUNCTION
     /// <summary>
-    /// 设置 state和transition ui面板的显隐
+    /// 设置 state 和 transition ui面板的显隐
     /// </summary>
     /// <param name="isState"></param>
     /// <param name="state"></param>
