@@ -234,10 +234,18 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
         float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
 
+        //目标坐标与当前坐标差的向量
+        Vector3 targetDir = nextPos - prePos;
+        //返回当前坐标与目标坐标的角度
+        float angle = Vector3.Angle(Vector3.right, targetDir);
+        if (nextPos.y < prePos.y)
+            angle = -angle;
+
         if (isCreate)
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
-               new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);
+               new Vector2(x, y), Quaternion.Euler(new Vector3(0, 0, angle - 45)),
+               HierarchyObject.Instance.BtnLineGroup.transform);
             goBtnLine.AddComponent<ItemTransitionBtnLine>();
             transition.btnLine = goBtnLine.GetComponent<Button>();
         }
@@ -245,7 +253,15 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             transition.btnLine.transform.position = new Vector2(x, y);
         }
+        transition.btnLine.transform.localEulerAngles = new Vector3(0, 0, angle - 45);
 
+        Transform btnLineDelTrans = transition.btnLine.transform.Find("BtnLineDel");
+        btnLineDelTrans.eulerAngles = Vector3.zero;
+        Transform btnLineTrans = transition.btnLine.transform;
+        btnLineDelTrans.position = new Vector3(
+            btnLineTrans.position.x,
+            btnLineTrans.position.y - btnLineDelTrans.GetComponent<RectTransform>().rect.height * 0.5f - btnLineTrans.GetComponent<RectTransform>().rect.height * 0.5f,
+            btnLineDelTrans.position.z);
     }
     private void DestroyLineAndBtnLine(int curtLineIndex)
     {

@@ -397,7 +397,7 @@ public class MenuPanelController : MonoBehaviour
         float g = UnityEngine.Random.Range(0f, 1f);
         float b = UnityEngine.Random.Range(0f, 1f);
         Color randomColor = new Color(r, g, b);
-        newItemState.GetComponent<Image>().color = randomColor;
+        //newItemState.GetComponent<Image>().color = randomColor;
         StateEntity state = new StateEntity
         {
             goItemState = newItemState,
@@ -476,10 +476,24 @@ public class MenuPanelController : MonoBehaviour
         //    //y = leftBottom.y;
         //}
 
+        //目标坐标与当前坐标差的向量
+        Vector3 targetDir = nextPos - prePos;
+        //返回当前坐标与目标坐标的角度
+        float angle = Vector3.Angle(Vector3.right, targetDir);
+        if (nextPos.y < prePos.y)
+            angle = -angle;
+
         GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
-           new Vector2(x, y), Quaternion.identity, HierarchyObject.Instance.BtnLineGroup.transform);
+            new Vector2(x, y), Quaternion.Euler(new Vector3(0, 0, angle - 45)),
+            HierarchyObject.Instance.BtnLineGroup.transform);
         goBtnLine.AddComponent<ItemTransitionBtnLine>();
         transition.btnLine = goBtnLine.GetComponent<Button>();
+        Transform btnLineDelTrans = transition.btnLine.transform.Find("BtnLineDel");
+        btnLineDelTrans.eulerAngles = Vector3.zero;
+        btnLineDelTrans.position = new Vector3(
+            goBtnLine.transform.position.x,
+            goBtnLine.transform.position.y - btnLineDelTrans.GetComponent<RectTransform>().rect.height * 0.5f - goBtnLine.transform.GetComponent<RectTransform>().rect.height * 0.5f,
+            btnLineDelTrans.position.z);
     }
     #endregion
     private void OnDisable()

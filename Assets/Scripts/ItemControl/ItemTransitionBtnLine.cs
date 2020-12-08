@@ -29,7 +29,7 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
     }
 
     #region CLICK EVENT
-    void BtnLineOnClick()
+    private void BtnLineOnClick()
     {
         int index = transform.GetSiblingIndex();
         if (Entities.Instance.listTransition[index].pre.transform.Find("IptName").GetComponent<InputField>().text.Trim() == "" ||
@@ -42,7 +42,7 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
         }
         HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listTransition[index]);
     }
-    void BtnLineDelOnClick()
+    private void BtnLineDelOnClick()
     {
         int index = transform.GetSiblingIndex();
         Destroy(HierarchyObject.Instance.PlaneLineGroup.transform.GetChild(index).gameObject);
