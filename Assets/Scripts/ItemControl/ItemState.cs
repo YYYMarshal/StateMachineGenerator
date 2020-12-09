@@ -81,7 +81,10 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         if (CurrentVariable.Instance.isLineStartDraw)
         {
-            CurrentVariable.Instance.line.SetPosition(1, GetRayPoint(Input.mousePosition));
+            //2020-12-9 08:38:40 
+            //当前正在绘制的LineRenderer只能是最后一个LineRenderer，
+            //所以可以省去CurrentVariable类中的line变量的使用（与EndDrawRayLine()中省去变量的思路相同）
+            EndDrawLineRenderer();
         }
     }
 
@@ -137,7 +140,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             {
                 transition.line.SetPosition(1, targetPos);
             }
-            PositionControlBtnLine(transition, false);
+            ControlBtnLine(transition, false);
         }
     }
     #endregion
@@ -179,20 +182,17 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         Entities.Instance.listTransition.Add(transition);
 
-        CurrentVariable.Instance.line = transition.line;
         CurrentVariable.Instance.isLineStartDraw = true;
     }
     private void EndDrawRayLine()
     {
         //2020-12-7 12:42:15
         //当前正在绘制的LineRenderer只能是最后一个LineRenderer，所以可以省去CurrentVariable类中的curtLineIndex变量的使用
-        int curtDrawingLineIndex = Entities.Instance.listTransition.Count - 1;
-        TransitionEntity transition = Entities.Instance.listTransition[curtDrawingLineIndex];
-        transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
+        EndDrawLineRenderer(out int curtDrawingLineIndex, out TransitionEntity transition);
         CurrentVariable.Instance.isLineStartDraw = false;
 
         transition.next = gameObject;
-        PositionControlBtnLine(transition, true);
+        ControlBtnLine(transition, true);
 
         bool isRepeated = false;
         //If the line is repeated, it will be deleted.
@@ -222,11 +222,29 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #endregion
     #endregion
 
+    #region OVERLOAD FUNCTION
+    private void EndDrawLineRenderer()
+    {
+        int curtDrawingLineIndex = Entities.Instance.listTransition.Count - 1;
+        TransitionEntity transition = Entities.Instance.listTransition[curtDrawingLineIndex];
+        transition.line.SetPosition(1, GetRayPoint(Input.mousePosition));
+    }
+    private void EndDrawLineRenderer(out int index, out TransitionEntity transitionEntity)
+    {
+        int curtDrawingLineIndex = Entities.Instance.listTransition.Count - 1;
+        TransitionEntity transition = Entities.Instance.listTransition[curtDrawingLineIndex];
+        transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
+
+        index = curtDrawingLineIndex;
+        transitionEntity = transition;
+    }
+    #endregion
+
     #region REUSE FUNCTION
     /// <summary>
-    /// 控制LineRenderer线段中间位置的BtnLine的位置或实例化
+    /// 控制LineRenderer线段中间位置的BtnLine的位置 或 实例化
     /// </summary>
-    private void PositionControlBtnLine(TransitionEntity transition, bool isCreate)
+    private void ControlBtnLine(TransitionEntity transition, bool isCreate)
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
@@ -244,7 +262,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         if (isCreate)
         {
             GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
-               new Vector2(x, y), Quaternion.Euler(new Vector3(0, 0, angle - 45)),
+               new Vector2(x, y), Quaternion.identity,
                HierarchyObject.Instance.BtnLineGroup.transform);
             goBtnLine.AddComponent<ItemTransitionBtnLine>();
             transition.btnLine = goBtnLine.GetComponent<Button>();

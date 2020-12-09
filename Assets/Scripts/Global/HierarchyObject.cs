@@ -17,7 +17,8 @@ using System;
 public class HierarchyObject
 {
     #region 单例
-    private static readonly Lazy<HierarchyObject> lazy = new Lazy<HierarchyObject>(() => new HierarchyObject());
+    private static readonly Lazy<HierarchyObject> lazy = 
+        new Lazy<HierarchyObject>(() => new HierarchyObject());
     public static HierarchyObject Instance
     {
         get
@@ -26,8 +27,6 @@ public class HierarchyObject
         }
     }
     #endregion
-
-    public GameObject GameManagerObject;
 
     public GameObject BtnLineGroup;
     public GameObject StateGroup;

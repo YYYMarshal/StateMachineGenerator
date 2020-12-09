@@ -24,15 +24,12 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
     {
         InitHierarchyObject();
 
-
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.Save));
     }
     #region ↑↑↑METHOD↑↑↑
     private void InitHierarchyObject()
     {
-        HierarchyObject.Instance.GameManagerObject = gameObject;
-
         btnCreateState = transform.Find("BtnCreateState").GetComponent<Button>();
         btnCreateState.onClick.AddListener(BtnCreateStateOnClick);
         btnCreateState.gameObject.SetActive(false);

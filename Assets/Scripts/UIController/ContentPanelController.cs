@@ -167,7 +167,7 @@ public class ContentPanelController : MonoBehaviour
         curtState = state;
         curtTransition = transition;
         string str = isState ? state.content : transition.content;
-        iptContent.text = str;
+        iptContent.text = str.Replace(">",">\n");
     }
 
     private void ShowBtnACGroup(bool isAction)

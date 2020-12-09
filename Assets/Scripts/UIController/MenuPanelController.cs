@@ -488,6 +488,7 @@ public class MenuPanelController : MonoBehaviour
             HierarchyObject.Instance.BtnLineGroup.transform);
         goBtnLine.AddComponent<ItemTransitionBtnLine>();
         transition.btnLine = goBtnLine.GetComponent<Button>();
+
         Transform btnLineDelTrans = transition.btnLine.transform.Find("BtnLineDel");
         btnLineDelTrans.eulerAngles = Vector3.zero;
         btnLineDelTrans.position = new Vector3(
