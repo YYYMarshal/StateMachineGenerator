@@ -7,7 +7,7 @@
 	file ext:	cs
 	author:		YYYMarshal
 	
-	purpose:	BGGameManager UI物体挂载这个脚本
+	purpose:	GameManager UI物体挂载这个脚本
 *********************************************************************/
 using System.Collections;
 using System.Collections.Generic;

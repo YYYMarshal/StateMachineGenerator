@@ -81,7 +81,7 @@ public class MenuPanelController : MonoBehaviour
             return;
         }
 
-        STListSort();
+        StateTtransitionListSort();
 
         HierarchyObject.Instance.TopicInfoPanel.SetActive(true);
         gameObject.SetActive(false);
@@ -121,10 +121,12 @@ public class MenuPanelController : MonoBehaviour
     }
     /// <summary>
     /// 逐个设置Entities中的 所有 Transition 的topic字段；
-    /// 将ListState和ListTransition按照 StateName 进行排序
+    /// 将listState和listTransition按照 StateName 进行排序
     /// </summary>
-    private void STListSort()
+    private void StateTtransitionListSort()
     {
+        //2020-12-18 16:06:31
+        //我像风一样自由
         SetTransitionTopic();
         void SetTransitionTopic()
         {
@@ -145,6 +147,7 @@ public class MenuPanelController : MonoBehaviour
             int result = x.topic.Trim().Split('#')[0].CompareTo(y.topic.Trim().Split('#')[0]);
             if (result != 0)
                 return result;
+            //如果 src 处的名称相同，则继续比较 dest 处的名称 
             return x.topic.Trim().Split('#')[1].CompareTo(y.topic.Trim().Split('#')[1]);
         });
     }
@@ -158,30 +161,32 @@ public class MenuPanelController : MonoBehaviour
             return;
         }
 
-        GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
-        grid.enabled = true;
-        LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
-        grid.enabled = false;
-
-        foreach (TransitionEntity transition in Entities.Instance.listTransition)
-        {
-            //if (transition.pre == null || transition.next == null)
-            //    break;
-
-            Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
-            Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
-            float distanceScale = 0.3f;
-            float x = (nextPos.x - prePos.x) * distanceScale + prePos.x;
-            float y = (nextPos.y - prePos.y) * distanceScale + prePos.y;
-
-            transition.btnLine.transform.position = new Vector2(x, y);
-
-            transition.line.SetPosition(0, GetRayPoint(prePos));
-            transition.line.SetPosition(1, GetRayPoint(nextPos));
-
-        }
-
+        FormatStates();
+        FormatTransitions();
         gameObject.SetActive(false);
+
+        void FormatStates()
+        {
+            GridLayoutGroup gridLayoutGroup = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
+            gridLayoutGroup.enabled = true;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
+            gridLayoutGroup.enabled = false;
+        }
+        void FormatTransitions()
+        {
+            foreach (TransitionEntity transition in Entities.Instance.listTransition)
+            {
+                //if (transition.pre == null || transition.next == null)
+                //    break;
+
+                InstantiateBtnLine(transition, false);
+                Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
+                Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
+
+                transition.line.SetPosition(0, GetRayPoint(prePos));
+                transition.line.SetPosition(1, GetRayPoint(nextPos));
+            }
+        }
     }
     /// <summary>
     /// 切换CustomStateMachine：执行Clear()和Import()函数即可
@@ -241,7 +246,7 @@ public class MenuPanelController : MonoBehaviour
         Application.Quit();
 #endif
     }
-    #region PUBLIC FUNCTION
+    #region REUSE FUNCTION
     private void SetChildUIActive(params bool[] vs)
     {
         btnGroupOne.SetActive(vs[0]);
@@ -258,11 +263,11 @@ public class MenuPanelController : MonoBehaviour
     }
     private void SetGridLayoutGroup(bool isImport)
     {
-        GridLayoutGroup grid = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
+        GridLayoutGroup gridLayoutGroup = HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>();
 
         GameObject goItemState = Resources.Load<GameObject>("Prefabs/ItemState");
-        grid.enabled = isImport;
-        grid.cellSize =
+        gridLayoutGroup.enabled = isImport;
+        gridLayoutGroup.cellSize =
             goItemState.GetComponent<RectTransform>().rect.size;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(HierarchyObject.Instance.StateGroup.GetComponent<RectTransform>());
@@ -303,10 +308,10 @@ public class MenuPanelController : MonoBehaviour
 
         XmlElement elemAppData = xmlDoc.SelectSingleNode("AppData") as XmlElement;
 
-        ShowCustomSelctStateMachineUI(elemAppData);
+        ShowSelctCustomStateMachineUI(elemAppData);
     }
     #region 导入xml文件后的物体生成
-    private void ShowCustomSelctStateMachineUI(XmlElement elemAppData)
+    private void ShowSelctCustomStateMachineUI(XmlElement elemAppData)
     {
         for (int i = 0; i < stateMachineUI.childCount; i++)
         {
@@ -337,19 +342,19 @@ public class MenuPanelController : MonoBehaviour
             XmlElement elem = csmElem.SelectSingleNode("StateMachine").SelectSingleNode("StateMachine") as XmlElement;
 
             string name = elem.GetAttribute("name");
-            GameObject goBtnCSMItem = Instantiate(
-                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero,
+            GameObject goBtnCustomStateMachine = Instantiate(
+                Resources.Load<GameObject>("Prefabs/BtnActionCondition"), Vector3.zero,
                 Quaternion.identity, stateMachineUI);
 
-            goBtnCSMItem.transform.GetChild(0).GetComponent<Text>().text = name;
-            goBtnCSMItem.GetComponent<Button>().onClick.AddListener(() =>
+            goBtnCustomStateMachine.transform.GetChild(0).GetComponent<Text>().text = name;
+            goBtnCustomStateMachine.GetComponent<Button>().onClick.AddListener(() =>
             {
-                BtnCSMItemOnClick(elemAppData, name);
+                BtnCustomStateMachineOnClick(elemAppData, name);
                 HierarchyObject.Instance.StateGroup.GetComponent<GridLayoutGroup>().enabled = false;
             });
         }
     }
-    private void BtnCSMItemOnClick(XmlElement elemAppData, string name)
+    private void BtnCustomStateMachineOnClick(XmlElement elemAppData, string name)
     {
         XmlElement elemSMChild = null;
         //寻找目标 CustomStateMachine
@@ -452,11 +457,18 @@ public class MenuPanelController : MonoBehaviour
         transition.line.SetPosition(0, GetRayPoint(pre.transform.Find("PaintPos").position));
         transition.line.SetPosition(1, GetRayPoint(next.transform.Find("PaintPos").position));
 
-        InstantiateBtnLine(transition);
+        InstantiateBtnLine(transition, true);
 
         Entities.Instance.listTransition.Add(transition);
     }
-    private void InstantiateBtnLine(TransitionEntity transition)
+    /// <summary>
+    /// 生成BtnLine物体，在生成的同时控制其以及子物体BtnLineDel的位置和旋转；
+    /// 当isInstantiate为false时，则是BtnFormatOnClick()函数进行调用的，
+    /// 用来重置BtnLine及其子物体BtnLineDel的位置和旋转
+    /// </summary>
+    /// <param name="transition"></param>
+    /// <param name="isInstantiate"></param>
+    private void InstantiateBtnLine(TransitionEntity transition, bool isInstantiate)
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
         Vector2 nextPos = transition.next.transform.Find("PaintPos").position;
@@ -483,11 +495,21 @@ public class MenuPanelController : MonoBehaviour
         if (nextPos.y < prePos.y)
             angle = -angle;
 
-        GameObject goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
-            new Vector2(x, y), Quaternion.Euler(new Vector3(0, 0, angle - 45)),
-            HierarchyObject.Instance.BtnLineGroup.transform);
-        goBtnLine.AddComponent<ItemTransitionBtnLine>();
-        transition.btnLine = goBtnLine.GetComponent<Button>();
+        GameObject goBtnLine;
+        if (isInstantiate)
+        {
+            goBtnLine = Instantiate(Resources.Load<GameObject>("Prefabs/BtnLine"),
+                    new Vector2(x, y), Quaternion.Euler(new Vector3(0, 0, angle - 45)),
+                    HierarchyObject.Instance.BtnLineGroup.transform);
+            goBtnLine.AddComponent<ItemTransitionBtnLine>();
+            transition.btnLine = goBtnLine.GetComponent<Button>();
+        }
+        else
+        {
+            goBtnLine = transition.btnLine.gameObject;
+            goBtnLine.transform.position = new Vector2(x, y);
+            goBtnLine.transform.eulerAngles = new Vector3(0, 0, angle - 45);
+        }
 
         Transform btnLineDelTrans = transition.btnLine.transform.Find("BtnLineDel");
         btnLineDelTrans.eulerAngles = Vector3.zero;

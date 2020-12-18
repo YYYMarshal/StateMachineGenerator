@@ -24,7 +24,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     private void Awake()
     {
         transform.Find("IptName").GetComponent<InputField>().onEndEdit.AddListener(
-            (value) => Entities.Instance.listState[GetCurtStateIndex()].stateName = value);
+            (value) => Entities.Instance.listState[GetCurrentStateIndex()].stateName = value);
 
         transform.Find("BtnSelected").GetComponent<Button>().onClick.AddListener(BtnStateSelectedOnClick);
         transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);
@@ -40,7 +40,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 HierarchyObject.Instance.ContentPanel.SetActive(false);
             return;
         }
-        HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listState[GetCurtStateIndex()]);
+        HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listState[GetCurrentStateIndex()]);
     }
     private void BtnStateDeleteOnClick()
     {
@@ -61,7 +61,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
         {
             TransitionEntity transition = Entities.Instance.listTransition[i];
-            int curtLineIndex = GetCurtLineIndex(transition.line);
+            int curtLineIndex = GetCurrentLineIndex(transition.line);
             if (goState == transition.pre || goState == transition.next)
             {
                 listTransitionTemp.Add(transition);
@@ -73,7 +73,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         listTransitionTemp.Clear();
 
         Destroy(gameObject);
-        Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurtStateIndex()]);
+        Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurrentStateIndex()]);
         HierarchyObject.Instance.ContentPanel.SetActive(false);
     }
     #endregion
@@ -168,7 +168,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             Vector3.zero, Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
-        Color color = Entities.Instance.listState[GetCurtStateIndex()].color;
+        Color color = Entities.Instance.listState[GetCurrentStateIndex()].color;
         lineRenderer.startColor = color;
         lineRenderer.endColor = color;
 
@@ -307,7 +307,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     /// 如果当前的 ItemState 游戏物体与 listState 中的某个物体相等，则返回其索引值
     /// </summary>
     /// <returns></returns>
-    private int GetCurtStateIndex()
+    private int GetCurrentStateIndex()
     {
         return Entities.Instance.listState.FindIndex(
             (StateEntity state) => gameObject.Equals(state.goItemState));
@@ -321,7 +321,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //}
         //return -1;
     }
-    private int GetCurtLineIndex(LineRenderer line)
+    private int GetCurrentLineIndex(LineRenderer line)
     {
         return Entities.Instance.listTransition.FindIndex(
             (TransitionEntity transition) => line.Equals(transition.line));

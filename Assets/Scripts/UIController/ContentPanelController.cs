@@ -20,20 +20,18 @@ public class ContentPanelController : MonoBehaviour
 {
     #region Hierarchy Object
     private InputField iptContent;
-    private GameObject btnACGroup;
+    private GameObject btnActionConditionGroup;
     #endregion
 
     #region Menu Releated
-    private readonly List<KeyValuePair<string, string>> listAction =
-        new List<KeyValuePair<string, string>>();
-    private readonly List<KeyValuePair<string, string>> listCondition =
-        new List<KeyValuePair<string, string>>();
+    private readonly List<KeyValuePair<string, string>> listAction = new List<KeyValuePair<string, string>>();
+    private readonly List<KeyValuePair<string, string>> listCondition = new List<KeyValuePair<string, string>>();
     #endregion
 
-    #region Curt
-    private StateEntity curtState;
-    private TransitionEntity curtTransition;
-    //判断当前是否是state在输入
+    #region Current
+    private StateEntity currentState;
+    private TransitionEntity currentTransition;
+    //判断iptContent输入框当前输入的是否是state的content
     private bool isStateInput = false;
     #endregion
 
@@ -86,17 +84,16 @@ public class ContentPanelController : MonoBehaviour
     }
     private void InitCommonUI()
     {
-        gameObject.SetActive(false);
-
-        transform.Find("BottomGroup").gameObject.SetActive(true);
-        transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
-
         iptContent = transform.Find("BottomGroup/IptContent").GetComponent<InputField>();
-        iptContent.onEndEdit.AddListener((value) => SetEntityContent(value));
+        btnActionConditionGroup = transform.Find("BtnActionConditionGroup").gameObject;
 
-        btnACGroup = transform.Find("BtnACGroup").gameObject;
-        btnACGroup.GetComponent<Button>().onClick.AddListener(() => btnACGroup.SetActive(false));
-        btnACGroup.SetActive(false);
+        transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+        iptContent.onEndEdit.AddListener((value) => SetEntityContent(value));
+        btnActionConditionGroup.GetComponent<Button>().onClick.AddListener(() => btnActionConditionGroup.SetActive(false));
+
+        gameObject.SetActive(false);
+        transform.Find("BottomGroup").gameObject.SetActive(true);
+        btnActionConditionGroup.SetActive(false);
     }
     private void InitStateUI()
     {
@@ -104,7 +101,7 @@ public class ContentPanelController : MonoBehaviour
         txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
 
         goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(
-            () => ShowBtnACGroup(true));
+            () => ShowBtnActionConditionGroup(true));
     }
     private void InitTransitionUI()
     {
@@ -112,7 +109,7 @@ public class ContentPanelController : MonoBehaviour
         txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
 
         goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(
-            () => ShowBtnACGroup(false));
+            () => ShowBtnActionConditionGroup(false));
     }
     #endregion
 
@@ -122,7 +119,7 @@ public class ContentPanelController : MonoBehaviour
     /// </summary>
     public void ShowContentPanel(StateEntity state)
     {
-        SetSTUIObjectActive(true, state, null);
+        SetStateTransitionUIActive(true, state, null);
 
         txtStateName.text = $"State Name : \n{state.stateName}";
     }
@@ -131,7 +128,7 @@ public class ContentPanelController : MonoBehaviour
     /// </summary>
     public void ShowContentPanel(TransitionEntity transition)
     {
-        SetSTUIObjectActive(false, null, transition);
+        SetStateTransitionUIActive(false, null, transition);
 
         StateEntity preState = null;
         StateEntity nextState = null;
@@ -149,12 +146,12 @@ public class ContentPanelController : MonoBehaviour
 
     #region REUSE FUNCTION
     /// <summary>
-    /// 设置 state 和 transition ui面板的显隐
+    /// 设置 State 和 Transition UI面板的显隐
     /// </summary>
     /// <param name="isState"></param>
     /// <param name="state"></param>
     /// <param name="transition"></param>
-    private void SetSTUIObjectActive(bool isState, StateEntity state, TransitionEntity transition)
+    private void SetStateTransitionUIActive(bool isState, StateEntity state, TransitionEntity transition)
     {
         if (!gameObject.activeSelf)
             gameObject.SetActive(true);
@@ -164,18 +161,18 @@ public class ContentPanelController : MonoBehaviour
 
         //2020-11-16 15:46:31
         isStateInput = isState;
-        curtState = state;
-        curtTransition = transition;
+        currentState = state;
+        currentTransition = transition;
         string str = isState ? state.content : transition.content;
-        iptContent.text = str.Replace(">",">\n");
+        //iptContent.text = str.Replace(">\n", ">");
+        iptContent.text = str.Replace(">", ">\n");
     }
 
-    private void ShowBtnACGroup(bool isAction)
+    private void ShowBtnActionConditionGroup(bool isAction)
     {
-        if (!btnACGroup.activeSelf)
-            btnACGroup.SetActive(true);
-        Transform imgBg = transform.Find("BtnACGroup/ImgBg");
-
+        if (!btnActionConditionGroup.activeSelf)
+            btnActionConditionGroup.SetActive(true);
+        Transform imgBg = btnActionConditionGroup.transform.Find("ImgBg");
         for (int i = 0; i < imgBg.childCount; i++)
         {
             Destroy(imgBg.GetChild(i).gameObject);
@@ -183,10 +180,10 @@ public class ContentPanelController : MonoBehaviour
 
         foreach (KeyValuePair<string, string> item in isAction ? listAction : listCondition)
         {
-            GameObject goBtnAC = Instantiate(
-                Resources.Load<GameObject>("Prefabs/BtnAC"), Vector3.zero, Quaternion.identity, imgBg);
-            goBtnAC.transform.GetChild(0).GetComponent<Text>().text = item.Key;
-            goBtnAC.GetComponent<Button>().onClick.AddListener(() =>
+            GameObject goBtnActionCondition = Instantiate(
+                Resources.Load<GameObject>("Prefabs/BtnActionCondition"), Vector3.zero, Quaternion.identity, imgBg);
+            goBtnActionCondition.transform.GetChild(0).GetComponent<Text>().text = item.Key;
+            goBtnActionCondition.GetComponent<Button>().onClick.AddListener(() =>
             {
                 iptContent.text += item.Value + "\n";
                 SetEntityContent(iptContent.text);
@@ -194,15 +191,15 @@ public class ContentPanelController : MonoBehaviour
         }
     }
     /// <summary>
-    /// 设置Entities中的State OR Transition 的Content变量
+    /// 设置Entities中的State或Transition的content变量
     /// </summary>
     /// <param name="value"></param>
     private void SetEntityContent(string value)
     {
         if (isStateInput)
-            curtState.content = value;
+            currentState.content = value;
         else
-            curtTransition.content = value;
+            currentTransition.content = value;
     }
     #endregion
 }
