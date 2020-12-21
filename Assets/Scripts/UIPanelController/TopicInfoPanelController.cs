@@ -16,7 +16,8 @@ public class TopicInfoPanelController : MonoBehaviour
     {
         gameObject.SetActive(false);
 
-        gameObject.GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
+        gameObject.GetComponent<Button>().onClick.AddListener(
+            () => gameObject.SetActive(false));
 
         defaultUI = transform.Find("SelctDefaultStateUI");
         iptSMName = transform.Find("TopicInfoEditUI/SMName/IptSMName").GetComponent<InputField>();

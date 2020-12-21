@@ -75,10 +75,10 @@
     <Compile Include="Assets\Scripts\OpenFolder\DialogTest.cs" />
     <Compile Include="Assets\Scripts\OpenFolder\LocalDialog.cs" />
     <Compile Include="Assets\Scripts\OpenFolder\OpenFileName.cs" />
-    <Compile Include="Assets\Scripts\UIController\ContentPanelController.cs" />
-    <Compile Include="Assets\Scripts\UIController\MenuPanelController.cs" />
-    <Compile Include="Assets\Scripts\UIController\Tools.cs" />
-    <Compile Include="Assets\Scripts\UIController\TopicInfoPanelController.cs" />
+    <Compile Include="Assets\Scripts\UIPanelController\ContentPanelController.cs" />
+    <Compile Include="Assets\Scripts\UIPanelController\MenuPanelController.cs" />
+    <Compile Include="Assets\Scripts\UIPanelController\Tools.cs" />
+    <Compile Include="Assets\Scripts\UIPanelController\TopicInfoPanelController.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/2019.4.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

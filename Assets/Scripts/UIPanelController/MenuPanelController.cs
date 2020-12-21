@@ -65,7 +65,7 @@ public class MenuPanelController : MonoBehaviour
     private void InitObjectActive()
     {
         //软件刚打开时，显示 NEW IMPORT 按钮选项界面（第二个）
-        SetChildUIActive(false, true, false);
+        SetChildRootActive(false, true, false);
     }
 
     #endregion
@@ -247,7 +247,7 @@ public class MenuPanelController : MonoBehaviour
 #endif
     }
     #region REUSE FUNCTION
-    private void SetChildUIActive(params bool[] vs)
+    private void SetChildRootActive(params bool[] vs)
     {
         btnGroupOne.SetActive(vs[0]);
         btnGroupTwo.SetActive(vs[1]);
@@ -294,7 +294,7 @@ public class MenuPanelController : MonoBehaviour
                 return;
         }
 
-        SetChildUIActive(false, false, true);
+        SetChildRootActive(false, false, true);
 
         XmlReaderSettings settings = new XmlReaderSettings()
         {
@@ -467,7 +467,7 @@ public class MenuPanelController : MonoBehaviour
     /// 用来重置BtnLine及其子物体BtnLineDel的位置和旋转
     /// </summary>
     /// <param name="transition"></param>
-    /// <param name="isInstantiate"></param>
+    /// <param name="isInstantiate">判断是生成操作还是格式规整操作</param>
     private void InstantiateBtnLine(TransitionEntity transition, bool isInstantiate)
     {
         Vector2 prePos = transition.pre.transform.Find("PaintPos").position;
@@ -525,6 +525,6 @@ public class MenuPanelController : MonoBehaviour
         //之前在每次 gameObject.SetActive(false); 之前，都会手动调用一下下面这行代码
         //现在发现：其实直接放在 OnDisable() 函数中即可，因为
         //gameObject.SetActive(false) ---> OnDisable() ---> SetChildUIActive(true, false, false)
-        SetChildUIActive(true, false, false);
+        SetChildRootActive(true, false, false);
     }
 }
