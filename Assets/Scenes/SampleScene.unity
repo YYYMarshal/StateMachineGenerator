@@ -803,7 +803,7 @@ GameObject:
   - component: {fileID: 140273312}
   - component: {fileID: 140273311}
   m_Layer: 5
-  m_Name: IptSMName
+  m_Name: IptStateMachineName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1909,7 +1909,7 @@ GameObject:
   - component: {fileID: 527383535}
   - component: {fileID: 527383534}
   m_Layer: 5
-  m_Name: ImgLineTopic
+  m_Name: ImgTransitionTopic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3298,7 +3298,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -5170,7 +5170,7 @@ GameObject:
   - component: {fileID: 1449312471}
   - component: {fileID: 1449312473}
   m_Layer: 5
-  m_Name: BtnActionConditionGroup
+  m_Name: BtnActionConditionGroupUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5991,7 +5991,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1919685557
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6141,7 +6141,7 @@ GameObject:
   - component: {fileID: 2021184658}
   - component: {fileID: 2021184659}
   m_Layer: 5
-  m_Name: SMName
+  m_Name: StateMachineName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

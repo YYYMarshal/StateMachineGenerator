@@ -7,7 +7,7 @@
 	file ext:	cs
 	author:		YYYXB
 	
-	purpose:	当前的一些变量，比如需要在多个ItemState类中通用的 isLineStartPaint
+	purpose:	当前的一些变量，比如需要在多个ItemState类中通用的 isLineStartDraw
 *********************************************************************/
 using System.Collections;
 using System.Collections.Generic;
@@ -29,9 +29,14 @@ public class CurrentVariable
     }
     #endregion
 
-    //检测LineRenderer是否开始绘制
     //2020-11-12 08:53:57  这个变量必须单一存在，不能放在ItemState类中当做其字段存在，因为会有多个ItemState类
-    public bool isLineStartDraw = false;
+    /// <summary>
+    /// 检测LineRenderer是否开始绘制
+    /// </summary>
+    public bool IsLineStartDraw = false;
 
+    /// <summary>
+    /// 选择的目标xml文件的路径
+    /// </summary>
     public string TargetFileName = "";
 }

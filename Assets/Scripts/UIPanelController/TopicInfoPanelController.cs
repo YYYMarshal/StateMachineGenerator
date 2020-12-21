@@ -9,8 +9,8 @@ public class TopicInfoPanelController : MonoBehaviour
 {
     private XmlDocument xmlDoc = null;
 
-    private Transform defaultUI;
-    private InputField iptSMName;
+    private Transform selctDefaultStateUI;
+    private InputField iptStateMachineName;
     private InputField iptSceneID;
     private void Awake()
     {
@@ -19,8 +19,8 @@ public class TopicInfoPanelController : MonoBehaviour
         gameObject.GetComponent<Button>().onClick.AddListener(
             () => gameObject.SetActive(false));
 
-        defaultUI = transform.Find("SelctDefaultStateUI");
-        iptSMName = transform.Find("TopicInfoEditUI/SMName/IptSMName").GetComponent<InputField>();
+        selctDefaultStateUI = transform.Find("SelctDefaultStateUI");
+        iptStateMachineName = transform.Find("TopicInfoEditUI/StateMachineName/IptStateMachineName").GetComponent<InputField>();
         iptSceneID = transform.Find("TopicInfoEditUI/SceneID/IptSceneID").GetComponent<InputField>();
 
         transform.Find("BtnSave").GetComponent<Button>().onClick.AddListener(BtnSaveOnClick);
@@ -30,7 +30,7 @@ public class TopicInfoPanelController : MonoBehaviour
     /// </summary>
     private void BtnSaveOnClick()
     {
-        if (iptSMName.text.Trim() == "" || iptSceneID.text.Trim() == "")
+        if (iptStateMachineName.text.Trim() == "" || iptSceneID.text.Trim() == "")
         {
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.IptValuteEmpty);
             return;
@@ -94,7 +94,7 @@ public class TopicInfoPanelController : MonoBehaviour
         elemA.AppendChild(elemB);
 
         XmlElement elemC = xmlDoc.CreateElement("StateMachine");
-        elemC.SetAttribute("name", iptSMName.text);
+        elemC.SetAttribute("name", iptStateMachineName.text);
         elemC.SetAttribute("sceneid", iptSceneID.text);
         elemB.AppendChild(elemC);
 
@@ -108,17 +108,17 @@ public class TopicInfoPanelController : MonoBehaviour
     private void CreateItemContent(XmlElement elemC, XmlDocument xmlDoc)
     {
         string defaultStateName = "";
-        for (int i = 0; i < defaultUI.childCount; i++)
+        for (int i = 0; i < selctDefaultStateUI.childCount; i++)
         {
-            if (defaultUI.GetChild(i).GetComponent<Toggle>().isOn)
+            if (selctDefaultStateUI.GetChild(i).GetComponent<Toggle>().isOn)
             {
-                defaultStateName = defaultUI.GetChild(i).Find("Label").GetComponent<Text>().text;
+                defaultStateName = selctDefaultStateUI.GetChild(i).Find("Label").GetComponent<Text>().text;
                 break;
             }
         }
-        for (int i = 0; i < Entities.Instance.listState.Count; i++)
+        for (int i = 0; i < Entities.Instance.ListState.Count; i++)
         {
-            StateEntity state = Entities.Instance.listState[i];
+            StateEntity state = Entities.Instance.ListState[i];
             XmlElement elem = xmlDoc.CreateElement("State");
             elem.SetAttribute("name", state.stateName);
             if (state.stateName.Trim() == defaultStateName)
@@ -126,7 +126,7 @@ public class TopicInfoPanelController : MonoBehaviour
             elem.InnerXml = state.content;
             elemC.AppendChild(elem);
         }
-        foreach (TransitionEntity transition in Entities.Instance.listTransition)
+        foreach (TransitionEntity transition in Entities.Instance.ListTransition)
         {
             XmlElement elem = xmlDoc.CreateElement("Transition");
             string[] strs = transition.topic.Split('#');
@@ -143,7 +143,7 @@ public class TopicInfoPanelController : MonoBehaviour
         foreach (XmlElement item in nodeList)
         {
             XmlElement elem = item.SelectSingleNode("StateMachine").SelectSingleNode("StateMachine") as XmlElement;
-            if (iptSMName.text.Trim() == elem.GetAttribute("name"))
+            if (iptStateMachineName.text.Trim() == elem.GetAttribute("name"))
             {
                 Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.SameStateMachine);
                 return true;
@@ -156,16 +156,16 @@ public class TopicInfoPanelController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
-        for (int i = 0; i < defaultUI.childCount; i++)
+        for (int i = 0; i < selctDefaultStateUI.childCount; i++)
         {
-            Destroy(defaultUI.GetChild(i).gameObject);
+            Destroy(selctDefaultStateUI.GetChild(i).gameObject);
         }
 
-        foreach (StateEntity state in Entities.Instance.listState)
+        foreach (StateEntity state in Entities.Instance.ListState)
         {
             GameObject toggleState = Instantiate(
-                Resources.Load<GameObject>("Prefabs/ToggleState"), Vector3.zero, Quaternion.identity, defaultUI);
-            toggleState.GetComponent<Toggle>().group = defaultUI.GetComponent<ToggleGroup>();
+                Resources.Load<GameObject>("Prefabs/ToggleState"), Vector3.zero, Quaternion.identity, selctDefaultStateUI);
+            toggleState.GetComponent<Toggle>().group = selctDefaultStateUI.GetComponent<ToggleGroup>();
             toggleState.transform.Find("Label").GetComponent<Text>().text = state.stateName;
         }
     }

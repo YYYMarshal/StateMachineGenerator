@@ -29,7 +29,7 @@ public class Tools : DialogTest
         if (animation.isPlaying)
         {
             animation.Stop();
-            //始终保持：最后一次点击后，才开始倒计时关闭 TextTip游戏物体
+            //始终保持：最后一次点击后，便重置倒计时，且重新播放动画
             StopAllCoroutines();
         }
         animation.Play("TextTipAni");
@@ -47,7 +47,7 @@ public class Tools : DialogTest
     /// <summary>
     /// 选择目标xml文件
     /// </summary>
-    /// <returns></returns>
+    /// <returns>是否成功选择xml文件</returns>
     public bool SelectXmlFile()
     {
         CurrentVariable.Instance.TargetFileName = Instance.OpenSelectFileDialog();
@@ -59,5 +59,5 @@ public class Tools : DialogTest
         return true;
     }
     #endregion
-    
+
 }

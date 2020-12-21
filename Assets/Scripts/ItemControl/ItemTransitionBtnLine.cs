@@ -32,22 +32,22 @@ public class ItemTransitionBtnLine : MonoBehaviour, IPointerClickHandler
     private void BtnLineOnClick()
     {
         int index = transform.GetSiblingIndex();
-        if (Entities.Instance.listTransition[index].pre.transform.Find("IptName").GetComponent<InputField>().text.Trim() == "" ||
-           Entities.Instance.listTransition[index].next.transform.Find("IptName").GetComponent<InputField>().text.Trim() == "")
+        if (Entities.Instance.ListTransition[index].pre.transform.Find("IptName").GetComponent<InputField>().text.Trim() == "" ||
+           Entities.Instance.ListTransition[index].next.transform.Find("IptName").GetComponent<InputField>().text.Trim() == "")
         {
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.StateNameEmpty);
             if (HierarchyObject.Instance.ContentPanel.activeSelf)
                 HierarchyObject.Instance.ContentPanel.SetActive(false);
             return;
         }
-        HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listTransition[index]);
+        HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.ListTransition[index]);
     }
     private void BtnLineDelOnClick()
     {
         int index = transform.GetSiblingIndex();
         Destroy(HierarchyObject.Instance.PlaneLineGroup.transform.GetChild(index).gameObject);
         Destroy(HierarchyObject.Instance.BtnLineGroup.transform.GetChild(index).gameObject);
-        Entities.Instance.listTransition.RemoveAt(index);
+        Entities.Instance.ListTransition.RemoveAt(index);
         HierarchyObject.Instance.ContentPanel.SetActive(false);
     }
     #endregion

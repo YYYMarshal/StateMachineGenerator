@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour, IPointerClickHandler
             goItemState = newItemState,
             color = randomColor
         };
-        Entities.Instance.listState.Add(state);
+        Entities.Instance.ListState.Add(state);
     }
     #endregion
     void Update()

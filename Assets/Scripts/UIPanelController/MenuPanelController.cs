@@ -94,7 +94,7 @@ public class MenuPanelController : MonoBehaviour
     private bool CheckStateName()
     {
         //判断当前是否没有任何一个状态存在
-        if (Entities.Instance.listState.Count == 0)
+        if (Entities.Instance.ListState.Count == 0)
         {
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoState);
             return false;
@@ -102,7 +102,7 @@ public class MenuPanelController : MonoBehaviour
 
         //判断所有状态的名称是否重复
         HashSet<string> checkSameStateName = new HashSet<string>();
-        foreach (StateEntity state in Entities.Instance.listState)
+        foreach (StateEntity state in Entities.Instance.ListState)
         {
             InputField ipt = state.goItemState.transform.Find("IptName").GetComponent<InputField>();
             if (ipt.text.Trim() == "")
@@ -121,7 +121,7 @@ public class MenuPanelController : MonoBehaviour
     }
     /// <summary>
     /// 逐个设置Entities中的 所有 Transition 的topic字段；
-    /// 将listState和listTransition按照 StateName 进行排序
+    /// 将ListState和ListTransition按照 StateName 进行排序
     /// </summary>
     private void StateTtransitionListSort()
     {
@@ -130,7 +130,7 @@ public class MenuPanelController : MonoBehaviour
         SetTransitionTopic();
         void SetTransitionTopic()
         {
-            foreach (TransitionEntity transition in Entities.Instance.listTransition)
+            foreach (TransitionEntity transition in Entities.Instance.ListTransition)
             {
                 transition.topic =
                     transition.pre.transform.Find("IptName").GetComponent<InputField>().text + "#" +
@@ -138,11 +138,11 @@ public class MenuPanelController : MonoBehaviour
             }
         }
 
-        Entities.Instance.listState.Sort((StateEntity x, StateEntity y) =>
+        Entities.Instance.ListState.Sort((StateEntity x, StateEntity y) =>
         {
             return x.stateName.Trim().CompareTo(y.stateName.Trim());
         });
-        Entities.Instance.listTransition.Sort((TransitionEntity x, TransitionEntity y) =>
+        Entities.Instance.ListTransition.Sort((TransitionEntity x, TransitionEntity y) =>
         {
             int result = x.topic.Trim().Split('#')[0].CompareTo(y.topic.Trim().Split('#')[0]);
             if (result != 0)
@@ -154,7 +154,7 @@ public class MenuPanelController : MonoBehaviour
     #endregion
     private void BtnFormatOnClick()
     {
-        if (Entities.Instance.listState.Count == 0)
+        if (Entities.Instance.ListState.Count == 0)
         {
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoState);
             gameObject.SetActive(false);
@@ -174,7 +174,7 @@ public class MenuPanelController : MonoBehaviour
         }
         void FormatTransitions()
         {
-            foreach (TransitionEntity transition in Entities.Instance.listTransition)
+            foreach (TransitionEntity transition in Entities.Instance.ListTransition)
             {
                 //if (transition.pre == null || transition.next == null)
                 //    break;
@@ -203,7 +203,7 @@ public class MenuPanelController : MonoBehaviour
     }
     private void BtnClearOnClick()
     {
-        if (Entities.Instance.listState.Count == 0)
+        if (Entities.Instance.ListState.Count == 0)
         {
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.NoState);
             gameObject.SetActive(false);
@@ -213,8 +213,8 @@ public class MenuPanelController : MonoBehaviour
         if (HierarchyObject.Instance.ContentPanel.activeSelf)
             HierarchyObject.Instance.ContentPanel.SetActive(false);
 
-        Entities.Instance.listState.Clear();
-        Entities.Instance.listTransition.Clear();
+        Entities.Instance.ListState.Clear();
+        Entities.Instance.ListTransition.Clear();
 
         DestroyAllChilds(HierarchyObject.Instance.StateGroup);
         DestroyAllChilds(HierarchyObject.Instance.BtnLineGroup);
@@ -410,7 +410,7 @@ public class MenuPanelController : MonoBehaviour
             content = elem.InnerXml,
             color = randomColor
         };
-        Entities.Instance.listState.Add(state);
+        Entities.Instance.ListState.Add(state);
     }
     private void InstantiateTransition(XmlElement elem)
     {
@@ -422,10 +422,11 @@ public class MenuPanelController : MonoBehaviour
 
         GameObject pre = null;
         GameObject next = null;
+        //src和dest字符串获取的是 "<Transition src="A" dest="B" />" 中的这两个值
         string src = elem.GetAttribute("src");
         string dest = elem.GetAttribute("dest");
         Color color = Color.clear;
-        foreach (StateEntity state in Entities.Instance.listState)
+        foreach (StateEntity state in Entities.Instance.ListState)
         {
             if (state.stateName == src)
             {
@@ -439,7 +440,11 @@ public class MenuPanelController : MonoBehaviour
         }
 
         if (pre == null || next == null)
+        {
+            //如果 src 或 dest 的值跟State结点的name属性值不对应，那么先删除生成的LineRenderer物体，再return
+            Destroy(lineRenderer.gameObject);
             return;
+        }
 
         lineRenderer.startColor = color;
         lineRenderer.endColor = color;
@@ -459,7 +464,7 @@ public class MenuPanelController : MonoBehaviour
 
         InstantiateBtnLine(transition, true);
 
-        Entities.Instance.listTransition.Add(transition);
+        Entities.Instance.ListTransition.Add(transition);
     }
     /// <summary>
     /// 生成BtnLine物体，在生成的同时控制其以及子物体BtnLineDel的位置和旋转；

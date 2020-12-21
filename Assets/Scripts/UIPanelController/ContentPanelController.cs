@@ -18,31 +18,42 @@ using UnityEngine.UI;
 
 public class ContentPanelController : MonoBehaviour
 {
-    #region Hierarchy Object
+    #region Hierarchy Object - Common
     private InputField iptContent;
-    private GameObject btnActionConditionGroup;
+    /// <summary>
+    /// 点击添加某一项Action或Condition的面板
+    /// </summary>
+    private GameObject btnActionConditionGroupUI;
     #endregion
 
-    #region Menu Releated
+    #region Hierarchy Object - State
+    private GameObject goState;
+    private Text txtStateName;
+    #endregion
+
+    #region Hierarchy Object - Transition
+    private GameObject goTransition;
+    private Text txtTransitionTopic;
+    #endregion
+
+    #region BtnActionConditionGroupUI Releated
+    /// <summary>
+    /// key存储Action的type名称，value存储整行xml内容
+    /// </summary>
     private readonly List<KeyValuePair<string, string>> listAction = new List<KeyValuePair<string, string>>();
+    /// <summary>
+    /// key存储Condition的type名称，value存储整行xml内容
+    /// </summary>
     private readonly List<KeyValuePair<string, string>> listCondition = new List<KeyValuePair<string, string>>();
     #endregion
 
     #region Current
     private StateEntity currentState;
     private TransitionEntity currentTransition;
-    //判断iptContent输入框当前输入的是否是state的content
+    /// <summary>
+    /// 判断iptContent输入框当前输入的是否是state的content
+    /// </summary>
     private bool isStateInput = false;
-    #endregion
-
-    #region State Properties
-    private GameObject goState;
-    private Text txtStateName;
-    #endregion
-
-    #region Transition Properties
-    private GameObject goTransition;
-    private Text txtTransitionTopic;
     #endregion
 
     private void Awake()
@@ -85,15 +96,15 @@ public class ContentPanelController : MonoBehaviour
     private void InitCommonUI()
     {
         iptContent = transform.Find("BottomGroup/IptContent").GetComponent<InputField>();
-        btnActionConditionGroup = transform.Find("BtnActionConditionGroup").gameObject;
+        btnActionConditionGroupUI = transform.Find("BtnActionConditionGroupUI").gameObject;
 
         transform.Find("BottomGroup/BtnCloseSettingPanel").GetComponent<Button>().onClick.AddListener(() => gameObject.SetActive(false));
         iptContent.onEndEdit.AddListener((value) => SetEntityContent(value));
-        btnActionConditionGroup.GetComponent<Button>().onClick.AddListener(() => btnActionConditionGroup.SetActive(false));
+        btnActionConditionGroupUI.GetComponent<Button>().onClick.AddListener(() => btnActionConditionGroupUI.SetActive(false));
 
         gameObject.SetActive(false);
         transform.Find("BottomGroup").gameObject.SetActive(true);
-        btnActionConditionGroup.SetActive(false);
+        btnActionConditionGroupUI.SetActive(false);
     }
     private void InitStateUI()
     {
@@ -101,21 +112,21 @@ public class ContentPanelController : MonoBehaviour
         txtStateName = goState.transform.Find("ImgStateName/TxtStateName").GetComponent<Text>();
 
         goState.transform.Find("BtnAddAction").GetComponent<Button>().onClick.AddListener(
-            () => ShowBtnActionConditionGroup(true));
+            () => ShowBtnActionConditionGroupUI(true));
     }
     private void InitTransitionUI()
     {
         goTransition = transform.Find("BottomGroup/Transition").gameObject;
-        txtTransitionTopic = goTransition.transform.Find("ImgLineTopic/TxtTransitionTopic").GetComponent<Text>();
+        txtTransitionTopic = goTransition.transform.Find("ImgTransitionTopic/TxtTransitionTopic").GetComponent<Text>();
 
         goTransition.transform.Find("BtnAddCondition").GetComponent<Button>().onClick.AddListener(
-            () => ShowBtnActionConditionGroup(false));
+            () => ShowBtnActionConditionGroupUI(false));
     }
     #endregion
 
     #region PUBLIC OVERRIDE FUNCTION
     /// <summary>
-    /// 由State的 √按钮 点击调用
+    /// 由State物体的 选中（编辑）按钮 点击调用
     /// </summary>
     public void ShowContentPanel(StateEntity state)
     {
@@ -132,7 +143,7 @@ public class ContentPanelController : MonoBehaviour
 
         StateEntity preState = null;
         StateEntity nextState = null;
-        foreach (StateEntity state in Entities.Instance.listState)
+        foreach (StateEntity state in Entities.Instance.ListState)
         {
             if (transition.pre.Equals(state.goItemState))
                 preState = state;
@@ -160,6 +171,8 @@ public class ContentPanelController : MonoBehaviour
         goTransition.SetActive(!isState);
 
         //2020-11-16 15:46:31
+        //切换 isStateInput 的状态，给 currentState 和 currentTransition 赋值相应变量值
+        //并根据 isState 改变 iptContent 的 Text
         isStateInput = isState;
         currentState = state;
         currentTransition = transition;
@@ -168,11 +181,11 @@ public class ContentPanelController : MonoBehaviour
         iptContent.text = str.Replace(">", ">\n");
     }
 
-    private void ShowBtnActionConditionGroup(bool isAction)
+    private void ShowBtnActionConditionGroupUI(bool isAction)
     {
-        if (!btnActionConditionGroup.activeSelf)
-            btnActionConditionGroup.SetActive(true);
-        Transform imgBg = btnActionConditionGroup.transform.Find("ImgBg");
+        if (!btnActionConditionGroupUI.activeSelf)
+            btnActionConditionGroupUI.SetActive(true);
+        Transform imgBg = btnActionConditionGroupUI.transform.Find("ImgBg");
         for (int i = 0; i < imgBg.childCount; i++)
         {
             Destroy(imgBg.GetChild(i).gameObject);

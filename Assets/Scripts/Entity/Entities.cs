@@ -25,6 +25,6 @@ public class Entities
     }
     #endregion
 
-    public List<StateEntity> listState = new List<StateEntity>();
-    public List<TransitionEntity> listTransition = new List<TransitionEntity>();
+    public List<StateEntity> ListState = new List<StateEntity>();
+    public List<TransitionEntity> ListTransition = new List<TransitionEntity>();
 }

@@ -24,13 +24,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     private void Awake()
     {
         transform.Find("IptName").GetComponent<InputField>().onEndEdit.AddListener(
-            (value) => Entities.Instance.listState[GetCurrentStateIndex()].stateName = value);
+            (value) => Entities.Instance.ListState[GetCurrentStateIndex()].stateName = value);
 
         transform.Find("BtnSelected").GetComponent<Button>().onClick.AddListener(BtnStateSelectedOnClick);
         transform.Find("BtnStateDelete").GetComponent<Button>().onClick.AddListener(BtnStateDeleteOnClick);
     }
     #region CLICK EVENT
-    //ShowSettingPanel
     private void BtnStateSelectedOnClick()
     {
         if (transform.Find("IptName").GetComponent<InputField>().text.Trim() == "")
@@ -40,13 +39,13 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
                 HierarchyObject.Instance.ContentPanel.SetActive(false);
             return;
         }
-        HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.listState[GetCurrentStateIndex()]);
+        HierarchyObject.Instance.ContentPanel.GetComponent<ContentPanelController>().ShowContentPanel(Entities.Instance.ListState[GetCurrentStateIndex()]);
     }
     private void BtnStateDeleteOnClick()
     {
         //2020-12-7 13:19:51
         //线段绘制中，不允许删除状态机
-        if (CurrentVariable.Instance.isLineStartDraw)
+        if (CurrentVariable.Instance.IsLineStartDraw)
         {
             Tools.Instance.PlayTipAnimation(GlobalVariable.Instance.DrawingLine);
             return;
@@ -58,9 +57,9 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //If the element of "Entities.Instance.listLine" deleted dynamically in the for loop, The number of
         //cycles is not as expected, because "Entities.Instance.listLine.Count" is decreasing.
         List<TransitionEntity> listTransitionTemp = new List<TransitionEntity>();
-        for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
+        for (int i = 0; i < Entities.Instance.ListTransition.Count; i++)
         {
-            TransitionEntity transition = Entities.Instance.listTransition[i];
+            TransitionEntity transition = Entities.Instance.ListTransition[i];
             int curtLineIndex = GetCurrentLineIndex(transition.line);
             if (goState == transition.pre || goState == transition.next)
             {
@@ -69,17 +68,17 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             }
         }
         for (int i = 0; i < listTransitionTemp.Count; i++)
-            Entities.Instance.listTransition.Remove(listTransitionTemp[i]);
+            Entities.Instance.ListTransition.Remove(listTransitionTemp[i]);
         listTransitionTemp.Clear();
 
         Destroy(gameObject);
-        Entities.Instance.listState.Remove(Entities.Instance.listState[GetCurrentStateIndex()]);
+        Entities.Instance.ListState.Remove(Entities.Instance.ListState[GetCurrentStateIndex()]);
         HierarchyObject.Instance.ContentPanel.SetActive(false);
     }
     #endregion
     private void Update()
     {
-        if (CurrentVariable.Instance.isLineStartDraw)
+        if (CurrentVariable.Instance.IsLineStartDraw)
         {
             //2020-12-9 08:38:40 
             //当前正在绘制的LineRenderer只能是最后一个LineRenderer，
@@ -93,7 +92,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         //2020-11-16 15:26:39
         //如果不加 !isLineStartPaint 的判断，那么在LineRenderer的绘制过程中（LineRenderer只开始，未结束）去拖拽StateUI，则会报错。
-        if (Input.GetMouseButton(0) && !CurrentVariable.Instance.isLineStartDraw)
+        if (Input.GetMouseButton(0) && !CurrentVariable.Instance.IsLineStartDraw)
         {
             gameObject.GetComponent<RectTransform>().position = PositionControlState(eventData);
             PositionControlLine();
@@ -130,7 +129,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     {
         GameObject goState = gameObject;
         Vector3 targetPos = GetRayPoint(transform.Find("PaintPos").position);
-        foreach (TransitionEntity transition in Entities.Instance.listTransition)
+        foreach (TransitionEntity transition in Entities.Instance.ListTransition)
         {
             if (goState == transition.pre)
             {
@@ -149,12 +148,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //If right-click to the state image gameobject, start drawing ray.
         //如果不加 !isLineStartPaint 的判断，那么两次 右键鼠标，便会出错
         if (eventData.button == PointerEventData.InputButton.Right &&
-            !CurrentVariable.Instance.isLineStartDraw)
+            !CurrentVariable.Instance.IsLineStartDraw)
         {
             CreateLine();
         }
         //If left-click to the state image gameobject, end drawing ray.
-        else if (eventData.button == PointerEventData.InputButton.Left && CurrentVariable.Instance.isLineStartDraw)
+        else if (eventData.button == PointerEventData.InputButton.Left && CurrentVariable.Instance.IsLineStartDraw)
         {
             EndDrawRayLine();
         }
@@ -168,7 +167,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
             Vector3.zero, Quaternion.identity,
             HierarchyObject.Instance.PlaneLineGroup.transform).GetComponent<LineRenderer>();
 
-        Color color = Entities.Instance.listState[GetCurrentStateIndex()].color;
+        Color color = Entities.Instance.ListState[GetCurrentStateIndex()].color;
         lineRenderer.startColor = color;
         lineRenderer.endColor = color;
 
@@ -180,31 +179,31 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
 
         transition.line.SetPosition(0, GetRayPoint(transform.Find("PaintPos").position));
 
-        Entities.Instance.listTransition.Add(transition);
+        Entities.Instance.ListTransition.Add(transition);
 
-        CurrentVariable.Instance.isLineStartDraw = true;
+        CurrentVariable.Instance.IsLineStartDraw = true;
     }
     private void EndDrawRayLine()
     {
         //2020-12-7 12:42:15
         //当前正在绘制的LineRenderer只能是最后一个LineRenderer，所以可以省去CurrentVariable类中的curtLineIndex变量的使用
         EndDrawLineRenderer(out int curtDrawingLineIndex, out TransitionEntity transition);
-        CurrentVariable.Instance.isLineStartDraw = false;
+        CurrentVariable.Instance.IsLineStartDraw = false;
 
         transition.next = gameObject;
         ControlBtnLine(transition, true);
 
         bool isRepeated = false;
         //If the line is repeated, it will be deleted.
-        for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
+        for (int i = 0; i < Entities.Instance.ListTransition.Count; i++)
         {
             if (curtDrawingLineIndex == i)
                 continue;
-            if (Entities.Instance.listTransition[i].pre == transition.pre &&
-                Entities.Instance.listTransition[i].next == transition.next)
+            if (Entities.Instance.ListTransition[i].pre == transition.pre &&
+                Entities.Instance.ListTransition[i].next == transition.next)
             {
                 isRepeated = true;
-                Entities.Instance.listTransition.Remove(transition);
+                Entities.Instance.ListTransition.Remove(transition);
                 DestroyLineAndBtnLine(curtDrawingLineIndex);
 
                 //2020-9-2 12:40:01
@@ -215,7 +214,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
         //If the line is not repeated, it is judged whether it is self jump. If so, delete.
         if (!isRepeated && transition.pre == transition.next)
         {
-            Entities.Instance.listTransition.Remove(transition);
+            Entities.Instance.ListTransition.Remove(transition);
             DestroyLineAndBtnLine(curtDrawingLineIndex);
         }
     }
@@ -225,14 +224,14 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #region OVERLOAD FUNCTION
     private void EndDrawLineRenderer()
     {
-        int curtDrawingLineIndex = Entities.Instance.listTransition.Count - 1;
-        TransitionEntity transition = Entities.Instance.listTransition[curtDrawingLineIndex];
+        int curtDrawingLineIndex = Entities.Instance.ListTransition.Count - 1;
+        TransitionEntity transition = Entities.Instance.ListTransition[curtDrawingLineIndex];
         transition.line.SetPosition(1, GetRayPoint(Input.mousePosition));
     }
     private void EndDrawLineRenderer(out int index, out TransitionEntity transitionEntity)
     {
-        int curtDrawingLineIndex = Entities.Instance.listTransition.Count - 1;
-        TransitionEntity transition = Entities.Instance.listTransition[curtDrawingLineIndex];
+        int curtDrawingLineIndex = Entities.Instance.ListTransition.Count - 1;
+        TransitionEntity transition = Entities.Instance.ListTransition[curtDrawingLineIndex];
         transition.line.SetPosition(1, GetRayPoint(transform.Find("PaintPos").position));
 
         index = curtDrawingLineIndex;
@@ -304,12 +303,12 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     #endregion
     #region GetCurt
     /// <summary>
-    /// 如果当前的 ItemState 游戏物体与 listState 中的某个物体相等，则返回其索引值
+    /// 如果当前的 ItemState 游戏物体与 ListState 中的某个物体相等，则返回其索引值
     /// </summary>
     /// <returns></returns>
     private int GetCurrentStateIndex()
     {
-        return Entities.Instance.listState.FindIndex(
+        return Entities.Instance.ListState.FindIndex(
             (StateEntity state) => gameObject.Equals(state.goItemState));
 
         //for (int i = 0; i < Entities.Instance.listState.Count; i++)
@@ -323,7 +322,7 @@ public class ItemState : MonoBehaviour, IDragHandler, IPointerClickHandler
     }
     private int GetCurrentLineIndex(LineRenderer line)
     {
-        return Entities.Instance.listTransition.FindIndex(
+        return Entities.Instance.ListTransition.FindIndex(
             (TransitionEntity transition) => line.Equals(transition.line));
 
         //for (int i = 0; i < Entities.Instance.listTransition.Count; i++)
